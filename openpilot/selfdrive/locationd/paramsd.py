@@ -12,6 +12,7 @@ from openpilot.selfdrive.locationd.models.car_kf import CarKalman, ObservationKi
 from openpilot.selfdrive.locationd.models.constants import GENERATED_DIR
 from openpilot.selfdrive.locationd.helpers import PoseCalibrator, Pose
 from openpilot.common.swaglog import cloudlog
+from openpilot.sunnypilot.selfdrive.controls.lib.measured_curvature import uses_yaw_rate
 
 MAX_ANGLE_OFFSET_DELTA = 20 * DT_MDL  # Max 20 deg/s
 ROLL_MAX_DELTA = np.radians(20.0) * DT_MDL  # 20deg in 1 second is well within curvature limits
@@ -45,6 +46,9 @@ class VehicleParamsLearner:
     )
 
     self.min_sr, self.max_sr = 0.5 * CP.steerRatio, 2.0 * CP.steerRatio
+    # These cars only know the steering angle relative to where their steering motor started, so the angle can't
+    # teach steer ratio or angle offset. Their controls measure curvature from the gyro and don't need either.
+    self.ignore_steering_angle = uses_yaw_rate(CP)
 
     self.calibrator = PoseCalibrator()
 
@@ -119,12 +123,13 @@ class VehicleParamsLearner:
     elif which == 'carState':
       steering_angle = msg.steeringAngleDeg
 
-      in_linear_region = abs(steering_angle) < 45
+      in_linear_region = self.ignore_steering_angle or abs(steering_angle) < 45
       self.observed_speed = msg.vEgo
       self.active = self.observed_speed > MIN_ACTIVE_SPEED and in_linear_region and msg.gearShifter != car.CarState.GearShifter.reverse
 
       if self.active:
-        self.kf.predict_and_observe(t, ObservationKind.STEER_ANGLE, np.array([[np.radians(steering_angle)]]))
+        if not self.ignore_steering_angle:
+          self.kf.predict_and_observe(t, ObservationKind.STEER_ANGLE, np.array([[np.radians(steering_angle)]]))
         self.kf.predict_and_observe(t, ObservationKind.ROAD_FRAME_X_SPEED, np.array([[self.observed_speed]]))
 
     if not self.active:

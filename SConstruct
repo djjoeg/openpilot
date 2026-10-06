@@ -270,6 +270,18 @@ messaging = [socketmaster, msgq, 'capnp', 'kj',]
 Export('messaging')
 
 
+# hondastepper (Honda Accord with the add-on steering motor): its DBC and panda safety header are generated from
+# its config, the default in the code or the one the car setup tool saved under /data/hondastepper. Bring them up
+# to date before the panda firmware and anything else that uses them is built.
+from opendbc.car.hondastepper.config import (active_config_path as hondastepper_config_path,
+                                             load_config_or_default as hondastepper_load, write_generated as hondastepper_write)
+_hondastepper_cfg, _hondastepper_problem = hondastepper_load()
+if _hondastepper_problem:
+  print(f"hondastepper: {_hondastepper_problem}")
+_hondastepper_source = "the default in the code" if _hondastepper_problem else hondastepper_config_path()
+for _path in hondastepper_write(_hondastepper_cfg):
+  print(f"hondastepper: regenerated {os.path.basename(_path)} from {_hondastepper_source}")
+
 # Build other submodules
 SConscript(['panda/SConscript'])
 

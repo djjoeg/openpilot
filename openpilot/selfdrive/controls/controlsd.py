@@ -23,6 +23,7 @@ from openpilot.selfdrive.modeld.modeld import LAT_SMOOTH_SECONDS
 from openpilot.selfdrive.locationd.helpers import PoseCalibrator, Pose
 
 from openpilot.sunnypilot.selfdrive.controls.controlsd_ext import ControlsExt
+from openpilot.sunnypilot.selfdrive.controls.lib.measured_curvature import get_measured_curvature, uses_yaw_rate
 
 State = log.SelfdriveState.OpenpilotState
 LaneChangeState = log.LaneChangeState
@@ -58,6 +59,7 @@ class Controls(ControlsExt):
 
     self.LoC = LongControl(self.CP, self.CP_SP)
     self.VM = VehicleModel(self.CP)
+    self.use_yaw_rate = uses_yaw_rate(self.CP)
     self.LaC: LatControl
     if self.CP.steerControlType == car.CarParams.SteerControlType.angle:
       self.LaC = LatControlAngle(self.CP, self.CP_SP, self.CI, DT_CTRL)
@@ -87,8 +89,7 @@ class Controls(ControlsExt):
     sr = max(lp.steerRatio, 0.1)
     self.VM.update_params(x, sr)
 
-    steer_angle_without_offset = math.radians(CS.steeringAngleDeg - lp.angleOffsetDeg)
-    self.curvature = -self.VM.calc_curvature(steer_angle_without_offset, CS.vEgo, lp.roll)
+    self.curvature = get_measured_curvature(self.use_yaw_rate, CS, self.VM, lp, self.calibrated_pose)
 
     # Update Torque Params
     if self.CP.lateralTuning.which() == 'torque':

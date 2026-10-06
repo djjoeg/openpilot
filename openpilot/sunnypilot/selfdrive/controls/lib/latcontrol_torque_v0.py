@@ -10,6 +10,7 @@ from openpilot.selfdrive.controls.lib.latcontrol import LatControl
 from openpilot.common.pid import PIDController
 
 from openpilot.sunnypilot.selfdrive.controls.lib.latcontrol_torque_ext import LatControlTorqueExt
+from openpilot.sunnypilot.selfdrive.controls.lib.measured_curvature import get_measured_curvature, uses_yaw_rate
 
 # At higher speeds (25+mph) we can assume:
 # Lateral acceleration achieved by a specific car correlates to
@@ -42,7 +43,9 @@ class LatControlTorque(LatControl):
     self.lateral_accel_from_torque = CI.lateral_accel_from_torque()
     self.pid = PIDController([INTERP_SPEEDS, KP_INTERP], KI, KD, rate=1/self.dt)
     self.update_limits()
-    self.steering_angle_deadzone_deg = self.torque_params.steeringAngleDeadzoneDeg
+    self.use_yaw_rate = uses_yaw_rate(CP)
+    # a steering angle deadzone means nothing when the curvature is measured from the gyro
+    self.steering_angle_deadzone_deg = 0.0 if self.use_yaw_rate else self.torque_params.steeringAngleDeadzoneDeg
     self.lat_accel_request_buffer_len = int(LAT_ACCEL_REQUEST_BUFFER_SECONDS / self.dt)
     self.lat_accel_request_buffer = deque([0.] * self.lat_accel_request_buffer_len , maxlen=self.lat_accel_request_buffer_len)
     self.previous_measurement = 0.0
@@ -71,7 +74,7 @@ class LatControlTorque(LatControl):
       output_torque = 0.0
       pid_log.active = False
     else:
-      measured_curvature = -VM.calc_curvature(math.radians(CS.steeringAngleDeg - params.angleOffsetDeg), CS.vEgo, params.roll)
+      measured_curvature = get_measured_curvature(self.use_yaw_rate, CS, VM, params, calibrated_pose)
       roll_compensation = params.roll * ACCELERATION_DUE_TO_GRAVITY
       curvature_deadzone = abs(VM.calc_curvature(math.radians(self.steering_angle_deadzone_deg), CS.vEgo, 0.0))
       lateral_accel_deadzone = curvature_deadzone * CS.vEgo ** 2
