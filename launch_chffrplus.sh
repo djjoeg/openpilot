@@ -96,6 +96,14 @@ function launch {
     fi
   fi
 
+  # hondastepper: the car setup page for a phone on the comma device's hotspot (http://192.168.43.1:8090). It runs
+  # outside the manager, because part 1 of the car setup stops the manager, and starts again if it ever stops.
+  (flock -n 9 || exit 0
+   while true; do
+     python3 -m openpilot.sunnypilot.tools.hondastepper.phone
+     sleep 5
+   done) 9> /tmp/hondastepper_phone.lock > /tmp/hondastepper_phone.log 2>&1 &
+
   # start manager
   cd openpilot/system/manager
   if [ ! -f $DIR/prebuilt ]; then

@@ -7,9 +7,9 @@ See the LICENSE.md file in the root directory for more details.
 
 Car setup for the Honda Accord with the add-on steering motor (hondastepper), part 2 of 2: the drive check.
 
-After part 1 (accord_setup.sh car) has passed, drive for at least 5 minutes with the lift lever down (lane keeping
-stays off until this check passes), at a mix of speeds with some curves or lane changes. Park, then run on the comma
-device over SSH:
+After part 1 has passed, drive for at least 5 minutes with the lift lever down (lane keeping stays off until this
+check passes), at a mix of speeds with some curves or lane changes. Park, then run it from a phone on the comma
+device's hotspot (the setup page, phone.py: Part 2), or on the comma device over SSH:
 
   /data/openpilot/accord_setup.sh drive
 
@@ -30,6 +30,7 @@ from dataclasses import dataclass, field
 from opendbc.car.hondastepper import discovery as dsc
 from opendbc.car.hondastepper.config import load_raw_config, parse_config, save_device_config
 from openpilot.sunnypilot.tools.hondastepper import VERSION
+from openpilot.sunnypilot.tools.hondastepper.prompter import Prompter
 
 LOG_ROOT = "/data/media/0/realdata"
 MAX_SEGMENTS = 12          # the last 12 minutes of driving is plenty
@@ -43,7 +44,7 @@ MSG_DRIVE_MORE = " ".join((
   "Nothing was saved. Drive at least 5 minutes with the lift lever down, at a mix of speeds between about 15 and",
   "50 mph with some curves or lane changes, where the comma device can see the sky, then run this again.",
 ))
-MSG_PART1_FIRST = "Run part 1 first: /data/openpilot/accord_setup.sh car"
+MSG_PART1_FIRST = "Run part 1 of the car setup first (Part 1 on the setup page, or /data/openpilot/accord_setup.sh car over SSH)."
 MSG_ALL_PASSED = " ".join((
   "Both parts of the setup have passed. After the restart, lane keeping turns on by itself about 2 seconds after you",
   "pull the lift lever down until it clicks, and off when you lift it. If the lever is already down when you start the",
@@ -190,10 +191,13 @@ motor's direction against the way the car turned.
 def main() -> int:
   from openpilot.sunnypilot.tools.hondastepper.device import reboot
 
-  print(INTRO)
-  if not run():
+  p = Prompter()
+  p.say(INTRO)
+  if not run(print_fn=p.say):
     return 2
-  input("\nPress Enter to restart the comma device (it rebuilds the software first; that can take several minutes). ")
+  p.ask("Press Enter to restart the comma device (it rebuilds the software first; that can take several minutes).",
+        (("", "Restart the comma device"),),
+        "Restart the comma device to finish. It rebuilds the software first, which can take several minutes.")
   reboot()
   return 0
 

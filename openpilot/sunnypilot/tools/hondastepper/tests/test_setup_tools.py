@@ -354,7 +354,7 @@ class TestCheckDrive(unittest.TestCase):
     printed: list[str] = []
     with mock.patch.object(check_drive, "load_raw_config", lambda: copy.deepcopy(DEFAULT_RAW)):
       self.assertFalse(check_drive.run(printed.append, "/nonexistent", save=lambda r: "x"))
-    self.assertIn("Run part 1 first", printed[-1])
+    self.assertIn("Run part 1 of the car setup first", printed[-1])
 
   def test_reads_recorded_segments(self):
     from openpilot.cereal import log

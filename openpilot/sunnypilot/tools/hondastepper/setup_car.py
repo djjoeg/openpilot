@@ -7,7 +7,8 @@ See the LICENSE.md file in the root directory for more details.
 
 Car setup for the Honda Accord with the add-on steering motor (hondastepper), part 1 of 2: parked.
 
-Run it on the comma device over SSH, with the car parked, the engine running and the steering wheel straight:
+Run it from a phone on the comma device's hotspot (the setup page, phone.py: Part 1), or on the comma device over
+SSH, with the car parked, the engine running and the steering wheel straight:
 
   /data/openpilot/accord_setup.sh car
 
@@ -17,8 +18,8 @@ everything lane keeping needs, finds it when it's somewhere else, checks which w
 steering wheel held that the motor's hardest push can't make its gear slip over the steering wheel teeth, saves the
 result to /data/hondastepper/config.json, and restarts the comma device, which rebuilds the software with it.
 
-Part 2 is the drive check (accord_setup.sh drive) after a few minutes of driving. Lane keeping stays off until
-both parts pass.
+Part 2 is the drive check (Part 2 on the setup page, or accord_setup.sh drive) after a few minutes of driving. Lane
+keeping stays off until both parts pass.
 """
 import dataclasses
 import datetime
@@ -33,6 +34,7 @@ from opendbc.car.hondastepper.config import TEETH_SETS, load_raw_config, parse_c
 from opendbc.car.hondastepper.values import StepperControlStatus, StepperMode
 from openpilot.sunnypilot.tools.hondastepper import VERSION
 from openpilot.sunnypilot.tools.hondastepper.device import CanSession
+from openpilot.sunnypilot.tools.hondastepper.prompter import Prompter
 
 INTRO = f"""
 Honda Accord lane keeping, software {VERSION}: car setup, part 1 of 2 (parked)
@@ -49,6 +51,10 @@ MSG_MORE_GEARS = " ".join((
   "If the shifter goes further than D (like D3, 2 or 1), move it one more step and type what the dash shows",
   "(for example D3), then press Enter. If it doesn't go further, just press Enter.",
 ))
+MSG_MORE_GEARS_PHONE = " ".join((
+  "If the shifter goes further than D (like D3, 2 or 1), move it one more step and type what the dash shows",
+  "(for example D3). If it doesn't go further, tap the button.",
+))
 MSG_PUSH = " ".join((
   "Turn the wheel back to straight, so the motor gear is in the middle of the teeth, and let go of the wheel completely.",
   "Watch the top of the steering wheel: the motor will turn it a little by itself, then let go.",
@@ -57,6 +63,7 @@ MSG_DID_IT_TURN_LEFT = " ".join((
   "Did the steering wheel just turn LEFT by itself (the top of the wheel moved towards the driver's door)?",
   "Type y or n and press Enter:",
 ))
+MSG_DID_IT_TURN_LEFT_PHONE = "Did the steering wheel just turn LEFT by itself (the top of the wheel moved towards the driver's door)?"
 MSG_TRY_OTHER_WAY = " ".join((
   "Then the motor's direction is the other way round (perhaps the wheel was turned right first a moment ago).",
   "Trying the other way.",
@@ -79,6 +86,11 @@ MSG_WHICH_TEETH = " ".join((
   "Which steering wheel teeth are on the steering wheel: the short ones (they reach 15 degrees each way) or the long",
   "ones (29 degrees each way)? Type 15 or 29 and press Enter:",
 ))
+MSG_WHICH_TEETH_PHONE = " ".join((
+  "Which steering wheel teeth are on the steering wheel: the short ones (they reach 15 degrees each way) or the long",
+  "ones (29 degrees each way)?",
+))
+TEETH_CHOICES = (("15", "Short teeth (15)"), ("29", "Long teeth (29)"))
 MSG_TURN_LEFT = " ".join((
   "Slowly turn the steering wheel LEFT until the motor gear has run off the end of the steering wheel teeth and stopped",
   "turning (a sixteenth of a turn with the short teeth, an eighth with the long ones). Stop there and hold the wheel",
@@ -91,23 +103,26 @@ MSG_TURN_RIGHT = " ".join((
 MSG_PART1_PASSED = " ".join((
   "Part 1 passed. Next: drive for at least 5 minutes with the lift lever DOWN (lane keeping stays off until both parts",
   "pass, so the motor only rides along), at a mix of speeds between about 15 and 50 mph, with some curves or lane",
-  "changes, where the comma device can see the sky. Then run the drive check: /data/openpilot/accord_setup.sh drive",
+  "changes, where the comma device can see the sky. Then run part 2, the drive check (Part 2 on the setup page, or",
+  "/data/openpilot/accord_setup.sh drive over SSH).",
 ))
 
 MSG_GRIP = " ".join((
-  "Grip test. Keep the lift lever clicked down. Hold the steering wheel firmly with both hands at 9 and 3 o'clock, so",
-  "it can't turn, and keep holding until this says you can let go. The motor pushes as hard as it can, about 2 seconds",
-  "one way, then the other (about as hard as 3 kg pulling on the edge of the steering wheel). Nothing should click or jump.",
+  "Grip test. Keep the lift lever clicked down. Start it, then within 3 seconds hold the steering wheel firmly with",
+  "both hands at 9 and 3 o'clock, so it can't turn. The motor then pushes as hard as it can, about 2 seconds one way,",
+  "then the other (about as hard as 3 kg pulling on the edge of the steering wheel). Keep holding until it has",
+  "stopped pushing both ways, about 8 seconds after you start. Nothing should click or jump.",
 ))
+MSG_GRIP_HOLD = "Hold the steering wheel now: the motor starts pushing in 3 seconds."
 MSG_GRIP_DONE = "You can let go of the steering wheel."
 MSG_GRIP_TRY_AGAIN = " ".join((
   "The steering wheel moved during the grip test: it turned in your hands, or the steering wheel teeth slid on the",
   "steering wheel. Check that their zip ties are tight, hold the wheel firmly, and it tries once more.",
 ))
 MSG_GRIP_SLIPPED = " ".join((
-  "the motor gear slipped over the steering wheel teeth. Put a thin coat of grease on the steering wheel teeth and the",
-  "motor gear's teeth, check the spring is in place and the lift lever is clicked down, and run the car setup again.",
-  "If it still slips, put an M4 washer under the spring (see the build guide)",
+  "the motor gear slipped over the steering wheel teeth. Check that the spring is in place, the lift lever is clicked",
+  "down, and neither the motor gear's teeth nor the steering wheel teeth are worn or broken, then run the car setup",
+  "again. If it slips again, put an M5 washer under the spring (see the build guide)",
 ))
 MSG_GRIP_MOVED = " ".join((
   "the steering wheel moved during the grip test both times: it turned in your hands, or the steering wheel teeth",
@@ -123,33 +138,10 @@ PUSH_STOP_DEG = 6.0      # the push lets go once the steering wheel has turned t
 # the steering wheel teeth there, the motor can't make it slip at all.
 BOARD_MAX_A = 3.3
 GRIP_RAMP_S, GRIP_HOLD_S = 0.5, 1.0
+GRIP_COUNTDOWN_S = 3.0   # time to put the phone or laptop down and take hold of the steering wheel
 GRIP_SLIP_DEG = 1.0      # the motor's angle jumping this far between two commands (20 ms) is its gear slipping over a
                          # tooth (one tooth is 1.8 degrees of steering wheel turn); a hand gives way much more slowly
 GRIP_STOP_DEG = 3.0      # the push stops once the steering wheel has turned this far in your hands
-
-
-class Prompter:
-  def __init__(self, input_fn: Callable[[str], str] = input, print_fn: Callable[[str], None] = print):
-    self.input_fn, self.print_fn = input_fn, print_fn
-
-  def say(self, text: str = ""):
-    self.print_fn(text)
-
-  def step(self, text: str):
-    self.input_fn(f"\n{text}\n  Press Enter when that's done. ")
-
-  def ask(self, text: str) -> str:
-    return self.input_fn(f"\n{text} ").strip()
-
-  def yes_no(self, text: str) -> bool | None:
-    """True for y, False for n; asks again up to three times, then None."""
-    for _ in range(3):
-      answer = self.ask(text).lower()
-      if answer.startswith("y"):
-        return True
-      if answer.startswith("n"):
-        return False
-    return None
 
 
 @dataclass
@@ -231,7 +223,7 @@ class CarSetup:
       for gear in ("P", "R", "N", "D"):
         gears[gear] = self.record(f"Foot on the brake, move the shifter to {gear}.")
       while len(gears) < 10:
-        label = p.ask(MSG_MORE_GEARS).upper()
+        label = p.ask(MSG_MORE_GEARS, (("", "It doesn't go further"),), MSG_MORE_GEARS_PHONE, free_text=True).upper()
         if not label:
           break
         if label in gears:
@@ -270,7 +262,7 @@ class CarSetup:
 
   def which_teeth(self) -> int | None:
     for _ in range(3):
-      answer = self.p.ask(MSG_WHICH_TEETH).strip()
+      answer = self.p.ask(MSG_WHICH_TEETH, TEETH_CHOICES, MSG_WHICH_TEETH_PHONE).strip()
       if answer.isdigit() and int(answer) in TEETH_SETS:
         return int(answer)
     return None
@@ -324,7 +316,7 @@ class CarSetup:
       res.push = self._push_and_measure(direction)
       if not res.push.ok:
         return
-      seen_left = p.yes_no(MSG_DID_IT_TURN_LEFT)
+      seen_left = p.yes_no(MSG_DID_IT_TURN_LEFT, MSG_DID_IT_TURN_LEFT_PHONE)
       if seen_left is None:
         res.push = dsc.MotorCheck(False, "no clear answer to which way the wheel turned", direction)
         return
@@ -386,10 +378,11 @@ class CarSetup:
     torque = grip_torque_fw(a)
     wheel_nm = torque / a.torque_cmd_scale
     for attempt in range(2):
-      self.p.step(MSG_GRIP)
+      self.p.step(MSG_GRIP, button="Start the grip test")
+      self.p.say(MSG_GRIP_HOLD)
       outcomes = []
       for sign in (1, -1):
-        before = self._motor_angle_after(0.3)
+        before = self._motor_angle_after(GRIP_COUNTDOWN_S if sign == 1 else 0.3)
         if before is None:
           self.p.say(MSG_GRIP_DONE)
           return dsc.MotorCheck(False, "the motor stopped answering during the grip test", direction)
@@ -529,9 +522,11 @@ def main() -> int:
 
   p = Prompter()
   p.say(INTRO)
-  answer = p.ask("Is the car an automatic or a manual? Type a or m and press Enter:").lower()
+  answer = p.ask("Is the car an automatic or a manual? Type a or m and press Enter:", (("a", "Automatic"), ("m", "Manual")),
+                 "Is the car an automatic or a manual?").lower()
   manual = answer.startswith("m")
-  p.step("Car parked, engine running, comma device on its mount and plugged in. openpilot will stop and the screen will go dark until the end.")
+  p.step("Car parked, engine running, comma device on its mount and plugged in. openpilot will stop and the screen will go dark until the end.",
+         button="Start")
   if not stop_openpilot():
     p.say("openpilot didn't stop; restart the comma device and try again.")
     return 1
@@ -543,7 +538,9 @@ def main() -> int:
   finally:
     session.close()
     watchdog.stop()
-  p.ask("Press Enter to restart the comma device (it rebuilds the software first; that can take several minutes).")
+  p.ask("Press Enter to restart the comma device (it rebuilds the software first; that can take several minutes).",
+        (("", "Restart the comma device"),),
+        "Restart the comma device to finish. It rebuilds the software first, which can take several minutes.")
   reboot()
   return 0 if passed else 2
 
