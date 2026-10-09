@@ -29,6 +29,7 @@ from dataclasses import dataclass, field
 
 from opendbc.car.hondastepper import discovery as dsc
 from opendbc.car.hondastepper.config import load_raw_config, parse_config, save_device_config
+from openpilot.sunnypilot.tools.hondastepper import VERSION
 
 LOG_ROOT = "/data/media/0/realdata"
 MAX_SEGMENTS = 12          # the last 12 minutes of driving is plenty
@@ -178,8 +179,8 @@ def run(print_fn: Callable[[str], None] = print, root: str = LOG_ROOT, save: Cal
   return True
 
 
-INTRO = """
-Honda Accord lane keeping: car setup, part 2 of 2 (drive check)
+INTRO = f"""
+Honda Accord lane keeping, software {VERSION}: car setup, part 2 of 2 (drive check)
 
 This reads the drive the comma device just recorded. It checks the car's speed reading against the GPS, and the
 motor's direction against the way the car turned.

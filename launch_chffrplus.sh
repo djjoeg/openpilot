@@ -88,6 +88,14 @@ function launch {
   # write tmux scrollback to a file
   tmux capture-pane -pq -S-1000 > /tmp/launch_log
 
+  # hondastepper: an install straight from GitHub needs git's large files (the driving model, fonts, pictures). git
+  # normally fetches them during the install; if any are still placeholders, fetch them before building.
+  if [ ! -f $DIR/prebuilt ] && git -C "$DIR" lfs version > /dev/null 2>&1; then
+    if git -C "$DIR" lfs ls-files 2> /dev/null | grep -q ' - '; then
+      git -C "$DIR" lfs pull || echo "hondastepper: couldn't download git's large files"
+    fi
+  fi
+
   # start manager
   cd openpilot/system/manager
   if [ ! -f $DIR/prebuilt ]; then

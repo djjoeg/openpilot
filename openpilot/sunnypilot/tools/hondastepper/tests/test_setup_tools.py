@@ -65,8 +65,9 @@ class SimDriver:
   """Answers the setup tool's prompts by changing the simulated car and motor."""
 
   def __init__(self, car: SimCar, motor: SimMotor, extra_gears=(), motor_works=True, turns_right_first=False, answer=None,
-               teeth="29"):
+               teeth="29", grip_holds=True):
     self.car, self.motor = car, motor
+    self.grip_holds = grip_holds                 # holds the wheel still when the grip test asks
     self.teeth = teeth                           # answer to "which steering wheel teeth are on"
     self.extra_gears = list(extra_gears)
     self.motor_works = motor_works
@@ -82,6 +83,10 @@ class SimDriver:
   def __call__(self, prompt: str) -> str:
     self.prompts.append(prompt)
     c, m = self.car, self.motor
+    # the wheel is held only for the grip test, until the next thing asked
+    m.held = "Grip test" in prompt and self.grip_holds
+    if m.held:
+      return ""
     if "Which steering wheel teeth" in prompt:
       return self.teeth
     if "Did the steering wheel just turn LEFT" in prompt:
@@ -158,6 +163,37 @@ class TestSetupCar(unittest.TestCase):
     asked = " ".join(driver.prompts) + text
     for word in ("F-CAN", "pinion", "rim", "MADS", "panda", "gear ring", "gear lever", "arm", "MAIN"):
       self.assertIsNone(re.search(rf"\b{re.escape(word)}\b", asked, re.IGNORECASE), word)
+
+  def test_grip_test(self):
+    car, motor = SimCar(), SimMotor()
+    passed, raw, text, driver = run_setup(car, motor)
+    self.assertTrue(passed, text)
+    self.assertEqual(sum("Grip test" in p for p in driver.prompts), 1)
+    # it pushed with the most the board gives: 58 firmware units, 5.4 Nm at the steering wheel with the 45 Ncm motor
+    a = parse_config(raw).actuator
+    self.assertEqual(setup_car.grip_torque_fw(a), 7.25)
+    self.assertIn("nothing slipped with 5.4 Nm at the steering wheel each way", text)
+    self.assertEqual(motor.slips, 0)
+
+  def test_grip_test_slipping(self):
+    car, motor = SimCar(), SimMotor()
+    motor.slip_fw_nm = 5.0   # a weak spring or dry teeth: the gear jumps a tooth under the hardest push
+    passed, raw, text, _ = run_setup(car, motor)
+    self.assertFalse(passed)
+    self.assertIn("FAIL grip test: the motor gear slipped over the steering wheel teeth", text)
+    self.assertNotIn("parked", raw["setup"])
+    # the push stopped at the first slip in each direction
+    self.assertEqual(motor.slips, 2)
+
+  def test_grip_test_wheel_not_held(self):
+    car, motor = SimCar(), SimMotor()
+    passed, raw, text, driver = run_setup(car, motor, SimDriver(car, motor, grip_holds=False))
+    self.assertFalse(passed)
+    self.assertEqual(sum("Grip test" in p for p in driver.prompts), 2)   # asked once more
+    self.assertIn("FAIL grip test: the steering wheel moved during the grip test both times", text)
+    self.assertNotIn("parked", raw["setup"])
+    # each push stopped after a few degrees, so the motor gear stayed on the teeth
+    self.assertTrue(motor.in_teeth(motor.wheel_deg))
 
   def test_short_teeth(self):
     car, motor = SimCar(), SimMotor(true_direction=1, arc_deg=TEETH_SETS[15])

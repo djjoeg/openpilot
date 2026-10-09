@@ -13,7 +13,8 @@ Run it on the comma device over SSH, with the car parked, the engine running and
 
 It stops openpilot, then asks you to do simple things one at a time (press the brake, switch a blinker on, shift
 gears, turn the steering wheel) while it watches the car's data and the motor. It checks where the car keeps
-everything lane keeping needs, finds it when it's somewhere else, checks which way the motor turns, saves the
+everything lane keeping needs, finds it when it's somewhere else, checks which way the motor turns, checks with the
+steering wheel held that the motor's hardest push can't make its gear slip over the steering wheel teeth, saves the
 result to /data/hondastepper/config.json, and restarts the comma device, which rebuilds the software with it.
 
 Part 2 is the drive check (accord_setup.sh drive) after a few minutes of driving. Lane keeping stays off until
@@ -21,6 +22,7 @@ both parts pass.
 """
 import dataclasses
 import datetime
+import math
 import os
 import sys
 from collections.abc import Callable
@@ -29,13 +31,14 @@ from dataclasses import dataclass, field
 from opendbc.car.hondastepper import discovery as dsc
 from opendbc.car.hondastepper.config import TEETH_SETS, load_raw_config, parse_config, save_device_config, device_config_path
 from opendbc.car.hondastepper.values import StepperControlStatus, StepperMode
+from openpilot.sunnypilot.tools.hondastepper import VERSION
 from openpilot.sunnypilot.tools.hondastepper.device import CanSession
 
-INTRO = """
-Honda Accord lane keeping: car setup, part 1 of 2 (parked)
+INTRO = f"""
+Honda Accord lane keeping, software {VERSION}: car setup, part 1 of 2 (parked)
 
 This takes about 10 minutes. It asks you to do one simple thing at a time: press a pedal, switch a turn signal,
-move the shifter, turn the steering wheel. Do it, press Enter, and hold it for 3 seconds while it watches.
+move the shifter, turn or hold the steering wheel. Do it, press Enter, and hold it for 3 seconds while it watches.
 At the end it saves what it learned and restarts the comma device.
 
 Before you start: car parked somewhere safe, engine running, steering wheel straight. It tells you when to pull
@@ -91,10 +94,38 @@ MSG_PART1_PASSED = " ".join((
   "changes, where the comma device can see the sky. Then run the drive check: /data/openpilot/accord_setup.sh drive",
 ))
 
+MSG_GRIP = " ".join((
+  "Grip test. Keep the lift lever clicked down. Hold the steering wheel firmly with both hands at 9 and 3 o'clock, so",
+  "it can't turn, and keep holding until this says you can let go. The motor pushes as hard as it can, about 2 seconds",
+  "one way, then the other (about as hard as 3 kg pulling on the edge of the steering wheel). Nothing should click or jump.",
+))
+MSG_GRIP_DONE = "You can let go of the steering wheel."
+MSG_GRIP_TRY_AGAIN = " ".join((
+  "The steering wheel moved during the grip test: it turned in your hands, or the steering wheel teeth slid on the",
+  "steering wheel. Check that their zip ties are tight, hold the wheel firmly, and it tries once more.",
+))
+MSG_GRIP_SLIPPED = " ".join((
+  "the motor gear slipped over the steering wheel teeth. Put a thin coat of grease on the steering wheel teeth and the",
+  "motor gear's teeth, check the spring is in place and the lift lever is clicked down, and run the car setup again.",
+  "If it still slips, put an M4 washer under the spring (see the build guide)",
+))
+MSG_GRIP_MOVED = " ".join((
+  "the steering wheel moved during the grip test both times: it turned in your hands, or the steering wheel teeth",
+  "slide on the steering wheel (tighten their zip ties)",
+))
+
 RECORD_SECONDS = 3.0
 SETTLE_SECONDS = 0.5     # the start of each recording is ignored while things settle
-PUSH_TORQUE_FW_NM = 3.0  # motor torque for the push test, about 3 Nm at the steering wheel
+PUSH_NM = 3.0            # the push that shows the motor's direction: about 3 Nm at the steering wheel
 PUSH_STOP_DEG = 6.0      # the push lets go once the steering wheel has turned this far
+# Grip test: with the steering wheel held still, the motor pushes as hard as its controller board can (3.3 A, the
+# StepperServoCAN firmware's I_MAX_A4950), which is more than lane keeping ever asks for. If its gear doesn't slip over
+# the steering wheel teeth there, the motor can't make it slip at all.
+BOARD_MAX_A = 3.3
+GRIP_RAMP_S, GRIP_HOLD_S = 0.5, 1.0
+GRIP_SLIP_DEG = 1.0      # the motor's angle jumping this far between two commands (20 ms) is its gear slipping over a
+                         # tooth (one tooth is 1.8 degrees of steering wheel turn); a hand gives way much more slowly
+GRIP_STOP_DEG = 3.0      # the push stops once the steering wheel has turned this far in your hands
 
 
 class Prompter:
@@ -128,6 +159,7 @@ class ParkedResult:
   fingerprint: dict = field(default_factory=dict)
   motor: dsc.MotorCheck | None = None
   push: dsc.MotorCheck | None = None
+  grip: dsc.MotorCheck | None = None
   teeth: int | None = None     # which steering wheel teeth are on: 15 or 29 (TEETH_SETS)
   notes: list[str] = field(default_factory=list)
 
@@ -301,6 +333,7 @@ class CarSetup:
         if direction != res.motor.direction:
           res.motor = dataclasses.replace(res.motor, direction=direction,
                                           detail=res.motor.detail + "; direction corrected after you saw the wheel go right")
+        res.grip = self.grip_test(direction)
         return
       if attempt == 0:
         p.say(MSG_TRY_OTHER_WAY)
@@ -340,11 +373,67 @@ class CarSetup:
       if stopped or t < 0.2 or t > 2.0:
         return StepperMode.OFF, 0.0
       ramp = min((t - 0.2) / 0.5, 1.0, (2.0 - t) / 0.3)
-      return StepperMode.TORQUE_CONTROL, direction * PUSH_TORQUE_FW_NM * max(ramp, 0.0)
+      return StepperMode.TORQUE_CONTROL, direction * PUSH_NM * self.cfg.actuator.torque_cmd_scale * max(ramp, 0.0)
 
     self.session.drain()
     self.session.run(2.3, command)
     return angles
+
+  def grip_test(self, direction: int) -> dsc.MotorCheck:
+    """The person holds the steering wheel still and the motor pushes as hard as it can, each way. Its gear must not
+    slip over the steering wheel teeth, and the teeth must not slide on the steering wheel."""
+    a = self.cfg.actuator
+    torque = grip_torque_fw(a)
+    wheel_nm = torque / a.torque_cmd_scale
+    for attempt in range(2):
+      self.p.step(MSG_GRIP)
+      outcomes = []
+      for sign in (1, -1):
+        before = self._motor_angle_after(0.3)
+        if before is None:
+          self.p.say(MSG_GRIP_DONE)
+          return dsc.MotorCheck(False, "the motor stopped answering during the grip test", direction)
+        outcomes.append(self._grip_push(sign * direction * torque, before))
+      self.p.say(MSG_GRIP_DONE)
+      if "slipped" in outcomes:
+        return dsc.MotorCheck(False, MSG_GRIP_SLIPPED, direction)
+      if "moved" not in outcomes:
+        detail = f"nothing slipped with {wheel_nm:.1f} Nm at the steering wheel each way, the most the motor can push"
+        return dsc.MotorCheck(True, detail, direction)
+      if attempt == 0:
+        self.p.say(MSG_GRIP_TRY_AGAIN)
+    return dsc.MotorCheck(False, MSG_GRIP_MOVED, direction)
+
+  def _grip_push(self, torque_fw: float, start: float) -> str:
+    """One push of the grip test: ramp up, hold, ramp down. Returns "held", "slipped" (the motor's angle jumped, its
+    gear went over a tooth) or "moved" (the steering wheel turned), stopping the push at once for either."""
+    scale = self.cfg.actuator.angle_scale
+    outcome = "held"
+    last: float | None = None
+
+    def command(t: float):
+      nonlocal outcome, last
+      if self.session.motor is not None and outcome == "held":
+        angle = self.session.motor.angle
+        if last is not None and abs(angle - last) * scale >= GRIP_SLIP_DEG:
+          outcome = "slipped"
+        elif abs(angle - start) * scale >= GRIP_STOP_DEG:
+          outcome = "moved"
+        last = angle
+      end = GRIP_RAMP_S + GRIP_HOLD_S
+      if outcome != "held" or t > end + 0.2:
+        return StepperMode.OFF, 0.0
+      ramp = min(t / GRIP_RAMP_S, 1.0, (end + 0.2 - t) / 0.2)
+      return StepperMode.TORQUE_CONTROL, torque_fw * max(ramp, 0.0)
+
+    self.session.drain()
+    self.session.run(GRIP_RAMP_S + GRIP_HOLD_S + 0.5, command)
+    return outcome
+
+
+def grip_torque_fw(actuator) -> float:
+  """The grip test's push in firmware torque: the most the controller board gives, in the firmware's 0.125 steps."""
+  return math.floor(BOARD_MAX_A * actuator.firmware_k_torque * actuator.firmware_gearing_ratio / 0.125) * 0.125
 
 
 # ***** results *****
@@ -357,11 +446,13 @@ def build_config(raw: dict, res: ParkedResult) -> tuple[dict, bool, list[str]]:
     problems.append(f"{dsc.plain_name('BRAKE_PRESSED')}: {by_name['BRAKE_PRESSED'].detail}")
   new_raw = dsc.apply_findings(raw, res.findings)
   res.notes += dsc.update_message_rates(new_raw, res.stats)
-  motor_ok = res.motor is not None and res.motor.ok and res.push is not None and res.push.ok
+  motor_ok = res.motor is not None and res.motor.ok and res.push is not None and res.push.ok and res.grip is not None and res.grip.ok
   if res.motor is None or not res.motor.ok:
     problems.append(f"motor: {res.motor.detail if res.motor else 'not checked'}")
   elif res.push is None or not res.push.ok:
     problems.append(f"motor push: {res.push.detail if res.push else 'not checked'}")
+  elif res.grip is None or not res.grip.ok:
+    problems.append(f"grip test: {res.grip.detail if res.grip else 'not done'}")
   if res.motor is not None and res.motor.ok:
     new_raw["actuator"]["direction"] = res.motor.direction
     new_raw["actuator"]["tracked_arc_deg"] = TEETH_SETS[res.teeth]
@@ -379,7 +470,7 @@ def build_config(raw: dict, res: ParkedResult) -> tuple[dict, bool, list[str]]:
 
 
 def report(res: ParkedResult, problems: list[str], passed: bool) -> str:
-  lines = [f"hondastepper car setup, parked part, {datetime.datetime.now().isoformat(timespec='seconds')}", ""]
+  lines = [f"hondastepper car setup, parked part, software {VERSION}, {datetime.datetime.now().isoformat(timespec='seconds')}", ""]
   for f in res.findings:
     lines.append(f"  {'OK  ' if f.ok else 'FAIL'} {dsc.plain_name(f.signal)}: {f.detail}")
   if res.teeth:
@@ -388,6 +479,8 @@ def report(res: ParkedResult, problems: list[str], passed: bool) -> str:
     lines.append(f"  {'OK  ' if res.motor.ok else 'FAIL'} motor direction: {res.motor.detail}")
   if res.push:
     lines.append(f"  {'OK  ' if res.push.ok else 'FAIL'} motor push: {res.push.detail}")
+  if res.grip:
+    lines.append(f"  {'OK  ' if res.grip.ok else 'FAIL'} grip test: {res.grip.detail}")
   lines += ["", *[f"  note: {n}" for n in res.notes]]
   if problems:
     lines += ["", "Problems:", *[f"  {pr}" for pr in problems]]

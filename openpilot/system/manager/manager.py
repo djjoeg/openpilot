@@ -59,6 +59,15 @@ def manager_init() -> None:
     if default_value is not None and params.get(k) is None:
       params.put(k, default_value, block=True)
 
+  # hondastepper: the settings the Honda Accord with the add-on steering motor needs, every start
+  try:
+    from openpilot.sunnypilot.tools.hondastepper import settings as hondastepper_settings
+    changed = hondastepper_settings.apply(params)
+    if changed:
+      cloudlog.warning(f"hondastepper settings made: {changed}")
+  except Exception:
+    cloudlog.exception("hondastepper settings couldn't be made")
+
   # Create folders needed for msgq
   try:
     os.mkdir(Paths.shm_path())
