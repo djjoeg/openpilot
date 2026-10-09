@@ -23,8 +23,14 @@ class CarSpecificEventsSP:
     self.CP_SP = CP_SP
 
     self.low_speed_alert = False
+    self.hondastepper = None
+    if self.CP.brand == 'hondastepper':
+      from opendbc.car.hondastepper.values import CONFIG
+      from openpilot.sunnypilot.selfdrive.car.hondastepper_alerts import TeethAlerts
+      self.hondastepper = TeethAlerts(self.CP, CONFIG.actuator.full_push_reach_deg)
 
-  def update(self, CS: structs.CarState, events: Events):
+  def update(self, CS: structs.CarState, events: Events, sm=None):
+    """sm: selfdrived's messages (carControl, controlsState, modelV2), for the cars whose alerts need them."""
     events_sp = EventsSP()
 
     if self.CP.brand == 'chrysler':
@@ -47,5 +53,13 @@ class CarSpecificEventsSP:
         if CS.cruiseState.standstill and not CS.brakePressed and self.CP_SP.enableGasInterceptor:
           if events.has(EventName.resumeRequired):
             events.remove(EventName.resumeRequired)
+
+    elif self.hondastepper is not None and sm is not None:
+      # the add-on steering motor only pushes as far as the printed steering wheel teeth reach
+      curve_ahead, past_teeth = self.hondastepper.update(CS, sm)
+      if curve_ahead:
+        events_sp.add(EventNameSP.hondastepperCurveAhead)
+      if past_teeth:
+        events_sp.add(EventNameSP.hondastepperPastTeeth)
 
     return events_sp

@@ -354,6 +354,8 @@ struct OnroadEventSP @0xda96579883444c35 {
     e2eChime @23;
     laneChangeRoadEdge @24;
     bigModelReady @25;
+    hondastepperCurveAhead @26;   # the curve ahead needs more steering wheel than the add-on motor's teeth reach
+    hondastepperPastTeeth @27;    # the motor gear just ran off the teeth: lane keeping has stopped pushing
   }
 }
 

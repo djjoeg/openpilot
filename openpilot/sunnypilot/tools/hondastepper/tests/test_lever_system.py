@@ -17,6 +17,7 @@ from opendbc.car.hondastepper.values import CAR, CanBus, StepperMode
 from opendbc.safety.tests.libsafety import libsafety_py
 from openpilot.cereal import custom, log
 from openpilot.selfdrive.car.car_events import CarEvents
+from openpilot.selfdrive.modeld.constants import ModelConstants
 from openpilot.selfdrive.selfdrived.events import Events
 from openpilot.selfdrive.selfdrived.state import StateMachine
 from openpilot.sunnypilot.mads.helpers import MadsSteeringModeOnBrake, set_alternative_experience
@@ -120,7 +121,15 @@ class Selfdrive:
     self.enabled_prev = False
     self.initialized = False
     self.CS_prev = structs.CarState()
-    self.sm = {"pandaStates": []}
+    self.sm = {"pandaStates": [], "carControl": structs.CarControl(), "controlsState": SimpleNamespace(curvature=0.0),
+               "modelV2": planned_path(0.0)}
+
+
+def planned_path(curvature: float, v: float = DRIVE_KPH / 3.6):
+  """What the driving model plans, as the teeth chimes read it: one curvature from 1 s ahead on."""
+  t_idxs = ModelConstants.T_IDXS
+  z = [curvature * v if t >= 1.0 else 0.0 for t in t_idxs]
+  return SimpleNamespace(orientationRate=SimpleNamespace(t=t_idxs, z=z), velocity=SimpleNamespace(t=t_idxs, x=[v] * len(t_idxs)))
 
 
 class LeverSystem:
@@ -201,7 +210,8 @@ class LeverSystem:
     else:
       if CS.canValid:
         sd.events.add_from_msg(self.car_events.update(CS, sd.CS_prev, self.CC_prev).to_msg())
-        sd.events_sp.add_from_msg(self.car_events_sp.update(CS, sd.events).to_msg())
+        sd.sm["carControl"] = self.CC_prev
+        sd.events_sp.add_from_msg(self.car_events_sp.update(CS, sd.events, sd.sm).to_msg())
         if CS.brakePressed and (not sd.CS_prev.brakePressed or not CS.standstill):
           sd.events.add(EventName.pedalPressed)
       for ps in sd.sm["pandaStates"]:
@@ -252,10 +262,12 @@ class LeverSystem:
 
 
 class TestLeverSystem(unittest.TestCase):
-  def assertQuiet(self, rows, allowed_sounds=()):
-    """No alert on screen or sound, other than the given sounds."""
+  def assertQuiet(self, rows, allowed_sounds=(), allowed_texts=()):
+    """No alert on screen or sound, other than the given sounds and the alerts with the given texts."""
     for r in rows:
       for a in r.alerts:
+        if a.alert_text_1 in allowed_texts:
+          continue
         self.assertIn(a.audible_alert, allowed_sounds, (r.t, a.alert_type, a.alert_text_1, a.alert_text_2))
         self.assertEqual(a.alert_size, AlertSize.none, (r.t, a.alert_type, a.alert_text_1, a.alert_text_2))
 
@@ -325,7 +337,7 @@ class TestLeverSystem(unittest.TestCase):
         self.assertEqual(sum(AudibleAlert.engage in r.sounds for r in s.log), 1)
         self.assertInStep(s.log)
 
-  def test_motor_gear_off_the_teeth_is_silent(self):
+  def test_motor_gear_off_the_teeth_chimes_once(self):
     s = LeverSystem(lever_down=True)
     s.run(3.0)
     _, t_on = self._engaged(s, 0.0)
@@ -339,6 +351,13 @@ class TestLeverSystem(unittest.TestCase):
     self.assertEqual(s.motor.mode, StepperMode.OFF)
     spun = s.motor.free_spin_deg
     self.assertGreater(spun, 0.0)
+    # one chime, "past the teeth", when the gear came off; no other alert
+    chimes = [r for r in s.since(t_on + DT / 2) if r.alerts]
+    self.assertTrue(chimes)
+    self.assertTrue(all(a.alert_text_1 == "Past the teeth: steer yourself" for r in chimes for a in r.alerts))
+    self.assertLess(chimes[0].t - held[0].t, 0.05)
+    self.assertAlmostEqual(chimes[-1].t - chimes[0].t, 2.0, delta=0.05)
+    self.assertQuiet(s.since(t_on + DT / 2), allowed_sounds=(AudibleAlert.prompt,), allowed_texts=("Past the teeth: steer yourself",))
     # back to straight: the teeth turn the motor again, and lane keeping steers again 1 s later
     s.motor.turn_wheel(s.motor.teeth_center_deg)
     s.run(2.0)
@@ -346,8 +365,29 @@ class TestLeverSystem(unittest.TestCase):
     self.assertEqual(s.motor.mode, StepperMode.TORQUE_CONTROL)
     self.assertEqual(s.motor.free_spin_deg, spun)
     self.assertTrue(all(r.mads_enabled and r.panda_lateral for r in s.since(t_on)))
-    self.assertQuiet(s.since(t_on + DT / 2))
+    self.assertQuiet(s.since(chimes[-1].t + DT / 2))
     self.assertInStep(s.log)
+
+  def test_curve_ahead_past_the_teeth_chimes(self):
+    s = LeverSystem(lever_down=True)
+    s.run(3.0)
+    _, t_on = self._engaged(s, 0.0)
+    self.assertQuiet(s.since(t_on + DT / 2))
+    # the driving model plans a curve 1 s ahead that needs about 40 degrees of steering wheel: past the long teeth
+    VM = s.car_events_sp.hondastepper.VM
+    s.sd.sm["modelV2"] = planned_path(VM.calc_curvature(math.radians(40.0), DRIVE_KPH / 3.6, 0.0))
+    s.run(3.5)
+    chimes = [r for r in s.since(3.0) if r.alerts]
+    self.assertTrue(chimes)
+    self.assertLess(chimes[0].t - 3.0, 0.05)
+    self.assertAlmostEqual(chimes[-1].t - chimes[0].t, 3.0, delta=0.05)   # shows for 3 s, then quiet for a while
+    self.assertTrue(all(a.alert_text_1 == "Steer: the curve ahead is past the teeth" for r in chimes for a in r.alerts))
+    self.assertIn(AudibleAlert.prompt, chimes[0].sounds)
+    self.assertTrue(all(r.mads_enabled and r.lat_active for r in s.since(3.0)))   # the chime changes nothing else
+    # a gentler curve, 20 degrees: within the long teeth, quiet
+    s.sd.sm["modelV2"] = planned_path(VM.calc_curvature(math.radians(20.0), DRIVE_KPH / 3.6, 0.0))
+    s.run(12.0)
+    self.assertQuiet(s.since(chimes[-1].t + DT / 2))
 
   def test_brake_pauses_lane_keeping_quietly(self):
     # Steering Mode on Brake Pedal: Pause

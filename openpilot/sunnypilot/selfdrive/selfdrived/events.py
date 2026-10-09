@@ -260,4 +260,21 @@ EVENTS_SP: dict[int, dict[str, Alert | AlertCallbackType]] = {
       AlertStatus.normal, AlertSize.small,
       Priority.LOW, VisualAlert.none, AudibleAlert.prompt, 2.),
   },
+
+  # Honda Accord with the add-on steering motor (hondastepper)
+  EventNameSP.hondastepperCurveAhead: {
+    ET.WARNING: Alert(
+      "Steer: the curve ahead is past the teeth",
+      "The motor can't turn the wheel that far",
+      AlertStatus.userPrompt, AlertSize.mid,
+      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.prompt, 3.),
+  },
+
+  EventNameSP.hondastepperPastTeeth: {
+    ET.WARNING: Alert(
+      "Past the teeth: steer yourself",
+      "Lane keeping pushes again once the wheel is back",
+      AlertStatus.userPrompt, AlertSize.mid,
+      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.prompt, 2.),
+  },
 }
