@@ -147,6 +147,18 @@ class TestTeethAlerts(unittest.TestCase):
       alerts.update(car_state(angle_deg=40.0), Messages())
     self.assertTrue(alerts.update(car_state(angle_deg=40.0 + SHORT_TEETH_REACH - 1.0), Messages(curvature=curv))[0])
 
+  def test_the_car_own_angle_keeps_the_reference(self):
+    from opendbc.car.hondastepper.values import HondaStepperFlags
+    CP = car_params()
+    CP.flags |= HondaStepperFlags.FCAN_STEER_ANGLE.value
+    alerts = TeethAlerts(CP, SHORT_TEETH_REACH)
+    for _ in range(int(STRAIGHT_MIN_S / 0.01) + 10):
+      alerts.update(car_state(angle_deg=2.0), Messages())
+    self.assertTrue(alerts.straight_valid)
+    alerts.update(car_state(angle_deg=2.0, pressed=True), Messages())
+    alerts.update(car_state(angle_deg=2.0, lever_down=False), Messages())
+    self.assertTrue(alerts.straight_valid)
+
   def test_lever_up_or_free_spin_forgets_the_reference(self):
     self.run_frames(int(STRAIGHT_MIN_S / 0.01) + 10, car_state(angle_deg=40.0), Messages())
     self.assertTrue(self.alerts.straight_valid)

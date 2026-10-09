@@ -135,25 +135,37 @@ def load_drive(segments: list[str], reader: Callable[[str], Drive] = read_segmen
   return out
 
 
-def check(raw: dict, drive: Drive) -> tuple[dict | None, dsc.SpeedFit, dsc.MotorCheck | None]:
-  """The config to save (None when a check failed), the speed result, and the motor direction result (None when the
-  speed check already failed)."""
+@dataclass
+class DriveResult:
+  new_raw: dict | None                 # the config to save; None when a check failed
+  fit: dsc.SpeedFit
+  motor: dsc.MotorCheck | None = None  # None when the speed check already failed
+  angle: dsc.Finding | None = None     # the car's own steering angle, when part 1 found one
+
+
+def check(raw: dict, drive: Drive) -> DriveResult:
+  """The speed check, the motor direction check, and, when part 1 found a steering angle on the car's network, a
+  check of that against the car's turning: dropped from the config if it doesn't agree."""
   cfg = parse_config(raw)
   stats = dsc.message_stats(drive.frames, max(drive.seconds, 1.0))
   fit = dsc.check_speed(cfg, drive.frames, drive.gps, stats)
   if not fit.ok:
-    return None, fit, None
+    return DriveResult(None, fit)
   motor = dsc.motor_direction_from_drive(drive.motor, drive.headings, cfg.actuator.direction, cfg.actuator.angle_scale)
   if not motor.ok:
-    return None, fit, motor
+    return DriveResult(None, fit, motor)
   findings = []
   if fit.signal_def is not None:
     findings.append(dsc.Finding("VEHICLE_SPEED", True, fit.detail, signal_def=fit.signal_def, message_def=fit.message_def))
+  angle = None
+  if cfg.has("STEER_ANGLE"):
+    angle = dsc.angle_direction_from_drive(cfg, drive.frames, drive.headings)
+    findings.append(angle)
   new_raw = dsc.apply_findings(raw, findings)
   dsc.update_message_rates(new_raw, stats)
   new_raw.setdefault("setup", {})["drive"] = datetime.datetime.now().isoformat(timespec="seconds")
   parse_config(new_raw)
-  return new_raw, fit, motor
+  return DriveResult(new_raw, fit, motor, angle)
 
 
 def run(print_fn: Callable[[str], None] = print, root: str = LOG_ROOT, save: Callable[[dict], str] = save_device_config) -> bool:
@@ -167,10 +179,13 @@ def run(print_fn: Callable[[str], None] = print, root: str = LOG_ROOT, save: Cal
     return False
   print_fn(f"Reading the last {len(segments)} minutes of driving...")
   drive = load_drive(segments)
-  new_raw, fit, motor = check(raw, drive)
+  result = check(raw, drive)
+  new_raw, fit, motor = result.new_raw, result.fit, result.motor
   print_fn(f"Speed: {fit.detail}")
   if motor is not None:
     print_fn(f"Motor direction: {motor.detail}")
+  if result.angle is not None:
+    print_fn(f"Steering angle from the car: {result.angle.detail}")
   if new_raw is None:
     print_fn(MSG_DRIVE_MORE)
     return False

@@ -92,13 +92,24 @@ MSG_WHICH_TEETH_PHONE = " ".join((
 ))
 TEETH_CHOICES = (("15", "Short teeth (15)"), ("29", "Long teeth (29)"))
 MSG_TURN_LEFT = " ".join((
-  "Slowly turn the steering wheel LEFT until the motor gear has run off the end of the steering wheel teeth and stopped",
-  "turning (a sixteenth of a turn with the short teeth, an eighth with the long ones). Stop there and hold the wheel",
-  "still.",
+  "Next, you turn the steering wheel LEFT, slowly, taking about 5 seconds, until the motor gear has run off the end of",
+  "the steering wheel teeth and stopped turning (a sixteenth of a turn with the short teeth, an eighth with the long",
+  "ones). Then hold the wheel still there. It records while you turn, and carries on by itself once the wheel has",
+  "been still for a moment. Press Enter, then turn.",
+))
+MSG_TURN_LEFT_PHONE = " ".join((
+  "Next, you turn the steering wheel LEFT, slowly, taking about 5 seconds, until the motor gear has run off the end of",
+  "the steering wheel teeth and stopped turning (a sixteenth of a turn with the short teeth, an eighth with the long",
+  "ones). Then hold the wheel still there. It records while you turn, and carries on by itself once the wheel has",
+  "been still for a moment. Press the button, then turn.",
 ))
 MSG_TURN_RIGHT = " ".join((
-  "Now slowly turn the wheel RIGHT, past the middle, until the motor gear has run off the other end of the teeth and",
-  "stopped turning. Stop there and hold the wheel still.",
+  "Now the same to the RIGHT: slowly, past the middle, until the motor gear has run off the other end of the teeth and",
+  "stopped turning, then hold the wheel still. Press Enter, then turn.",
+))
+MSG_TURN_RIGHT_PHONE = " ".join((
+  "Now the same to the RIGHT: slowly, past the middle, until the motor gear has run off the other end of the teeth and",
+  "stopped turning, then hold the wheel still. Press the button, then turn.",
 ))
 MSG_PART1_PASSED = " ".join((
   "Part 1 passed. Next: drive for at least 5 minutes with the lift lever DOWN (lane keeping stays off until both parts",
@@ -137,6 +148,9 @@ PUSH_STOP_DEG = 6.0      # the push lets go once the steering wheel has turned t
 # StepperServoCAN firmware's I_MAX_A4950), which is more than lane keeping ever asks for. If its gear doesn't slip over
 # the steering wheel teeth there, the motor can't make it slip at all.
 BOARD_MAX_A = 3.3
+TURN_MAX_S = 25.0        # a turn recording ends by itself once the motor has moved and then been still ...
+TURN_STILL_S = 1.5       # ... this long, or after this many seconds in all
+TURN_MOVED_FW_DEG = 2.0  # the motor counting this far from where it started counts as the wheel turning it
 GRIP_RAMP_S, GRIP_HOLD_S = 0.5, 1.0
 GRIP_COUNTDOWN_S = 3.0   # time to put the phone or laptop down and take hold of the steering wheel
 GRIP_SLIP_DEG = 1.0      # the motor's angle jumping this far between two commands (20 ms) is its gear slipping over a
@@ -154,6 +168,7 @@ class ParkedResult:
   grip: dsc.MotorCheck | None = None
   teeth: int | None = None     # which steering wheel teeth are on: 15 or 29 (TEETH_SETS)
   notes: list[str] = field(default_factory=list)
+  rest: list = field(default_factory=list)   # the first recording: wheel straight, nothing pressed
 
 
 class CarSetup:
@@ -206,6 +221,7 @@ class CarSetup:
     p.say("\nPart 1: the car's data. Each step asks for one thing; do it, then press Enter and hold it for 3 seconds.")
 
     rest = self.record("Engine running, shifter in P (manual: neutral with the parking brake on). Hands and feet off everything.")
+    res.rest = rest
     brake_off, brake_on = self.twice("Press the brake pedal and hold it down.", "Let go of the brake pedal.")
     gas_off, gas_on = self.twice("Press the gas pedal gently so the engine speeds up a little, and hold it there.",
                                  "Let go of the gas pedal.")
@@ -260,6 +276,39 @@ class CarSetup:
       return None
     return self.session.motor.angle
 
+  def _record_turn(self, text: str, phone_text: str) -> tuple[list[dsc.Frame], list[tuple[float, float]]]:
+    """Asks for a turn of the steering wheel, then records the car's data and the motor's angle while the person
+    turns, until the motor has moved and then been still for TURN_STILL_S (or TURN_MAX_S in all). Returns the
+    F-CAN frames and the motor's angle over time (seconds, firmware degrees), on the session's clock."""
+    self.p.ask(text, (("", "Start, then turn"),), phone_text)
+    self.session.drain()
+    frames: list[dsc.Frame] = []
+    series: list[tuple[float, float]] = []
+    start = self.session.now()
+    first: float | None = None
+    moved_t: float | None = None
+    still_since: float | None = None
+    while self.session.now() - start < TURN_MAX_S:
+      frames += self.session.run(0.1, self._hold_motor_off)
+      if not self.session.motor_present() or self.session.motor is None:
+        break
+      angle = self.session.motor.angle
+      now = self.session.now()
+      series.append((now, angle))
+      first = angle if first is None else first
+      if abs(angle - first) >= TURN_MOVED_FW_DEG and moved_t is None:
+        moved_t = now
+      if moved_t is not None and len(series) > 1:
+        if abs(angle - series[-2][1]) < 0.3:
+          still_since = now if still_since is None else still_since
+          if now - still_since >= TURN_STILL_S:
+            break
+        else:
+          still_since = None
+    self.frames += frames
+    self.recorded_seconds += self.session.now() - start
+    return frames, series
+
   def which_teeth(self) -> int | None:
     for _ in range(3):
       answer = self.p.ask(MSG_WHICH_TEETH, TEETH_CHOICES, MSG_WHICH_TEETH_PHONE).strip()
@@ -292,13 +341,17 @@ class CarSetup:
       res.notes.append("The motor reports no position sensor reading; it may need its calibration (see the build guide).")
     res.notes.append(f"Motor temperature {status.temperature:.0f} C")
 
-    p.step(MSG_TURN_LEFT)
-    left = self._motor_angle_after()
-    p.step(MSG_TURN_RIGHT)
-    right = self._motor_angle_after()
-    if left is None or right is None:
+    left_frames, left_series = self._record_turn(MSG_TURN_LEFT, MSG_TURN_LEFT_PHONE)
+    right_frames, right_series = self._record_turn(MSG_TURN_RIGHT, MSG_TURN_RIGHT_PHONE)
+    if not left_series or not right_series or not s.motor_present():
       res.motor = dsc.MotorCheck(False, "the motor stopped answering while the wheel turned")
       return
+    left, right = left_series[-1][1], right_series[-1][1]
+    # the car's own steering angle, if it broadcasts one: it would follow the motor's angle during the turns
+    stats = dsc.message_stats(self.frames, max(self.recorded_seconds, 1.0))
+    res.stats = stats
+    res.findings.append(dsc.find_angle_signal(self.cfg, res.rest, [(left_frames, left_series), (right_frames, right_series)],
+                                              stats, a.angle_scale))
     res.motor = dsc.motor_direction_from_turn(start, left, right, a.angle_scale, TEETH_SETS[res.teeth])
     if not res.motor.ok:
       # a turn that matches the other teeth means the answer about which teeth are on was wrong, not the gearing
@@ -465,7 +518,8 @@ def build_config(raw: dict, res: ParkedResult) -> tuple[dict, bool, list[str]]:
 def report(res: ParkedResult, problems: list[str], passed: bool) -> str:
   lines = [f"hondastepper car setup, parked part, software {VERSION}, {datetime.datetime.now().isoformat(timespec='seconds')}", ""]
   for f in res.findings:
-    lines.append(f"  {'OK  ' if f.ok else 'FAIL'} {dsc.plain_name(f.signal)}: {f.detail}")
+    marker = "OK  " if f.ok else ("    " if f.signal == "STEER_ANGLE" else "FAIL")   # the angle is a bonus, never a fault
+    lines.append(f"  {marker} {dsc.plain_name(f.signal)}: {f.detail}")
   if res.teeth:
     lines.append(f"  steering wheel teeth: the {'short' if res.teeth == min(TEETH_SETS) else 'long'} ones ({res.teeth} degrees each way)")
   if res.motor:

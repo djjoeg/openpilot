@@ -22,6 +22,7 @@ from collections import deque
 
 import numpy as np
 
+from opendbc.car.hondastepper.values import HondaStepperFlags
 from opendbc.car.vehicle_model import VehicleModel
 
 LOOKAHEAD_S = 3.5          # how far along the planned path to look
@@ -44,6 +45,9 @@ class TeethAlerts:
   def __init__(self, CP, reach_deg: float):
     self.VM = VehicleModel(CP)
     self.reach_deg = reach_deg
+    # the car's own steering angle (found by the car setup): absolute, so it stays meaningful off the teeth and
+    # with the lever up; the motor's angle restarts from zero at every power-up and loses count off the teeth
+    self.absolute_angle = bool(CP.flags & HondaStepperFlags.FCAN_STEER_ANGLE)
     self.ratio_scale = 1.0              # the car needs this times the vehicle model's steering wheel angle
     self.ratio_samples: deque[float] = deque(maxlen=RATIO_SAMPLES)
     self.straight_ref = 0.0             # the motor's angle (steering wheel degrees) driving straight
@@ -62,7 +66,7 @@ class TeethAlerts:
 
   def _learn(self, CS, curvature: float, lat_active: bool) -> None:
     motor_on_teeth = CS.cruiseState.available and not CS.steeringPressed
-    if not motor_on_teeth:
+    if not motor_on_teeth and not self.absolute_angle:
       # lever up, or the gear just ran off the teeth: the motor's count means nothing until it has gone straight again
       self.straight_valid, self.straight_s = False, 0.0
       return

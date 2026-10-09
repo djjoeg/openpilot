@@ -106,8 +106,8 @@ class SimDriver:
       ("Open the driver's door", lambda: c.state.update(DOOR_OPEN=1)),
       ("Close the driver's door", lambda: c.state.update(DOOR_OPEN=0)),
       ("Pull the lift lever down", lambda: setattr(m, "powered", self.motor_works)),
-      ("turn the steering wheel LEFT until", lambda: m.turn_wheel(m.teeth_center_deg + first)),
-      ("turn the wheel RIGHT, past the middle", lambda: m.turn_wheel(m.teeth_center_deg - first)),
+      ("turn the steering wheel LEFT", lambda: m.plan_turn(m.teeth_center_deg + first, 15.0)),   # over the next seconds
+      ("the same to the RIGHT", lambda: m.plan_turn(m.teeth_center_deg - first, 15.0)),
       ("back to straight", self._straight),
     ]
     for key, action in rules:
@@ -163,6 +163,45 @@ class TestSetupCar(unittest.TestCase):
     asked = " ".join(driver.prompts) + text
     for word in ("F-CAN", "pinion", "rim", "MADS", "panda", "gear ring", "gear lever", "arm", "MAIN"):
       self.assertIsNone(re.search(rf"\b{re.escape(word)}\b", asked, re.IGNORECASE), word)
+
+  def test_no_steering_angle_on_the_network(self):
+    car, motor = SimCar(), SimMotor()
+    passed, raw, text, driver = run_setup(car, motor)
+    self.assertTrue(passed, text)
+    self.assertIn("steering angle: not on the car's network (the motor's own angle is used; nothing to do)", text)
+    self.assertNotIn("FAIL steering angle", text)
+    self.assertNotIn("STEER_ANGLE", raw["fcan"]["signals"])
+    # the turns were recorded while the wheel turned: the driver was asked to start, then turn
+    self.assertEqual(sum("Press Enter, then turn" in p for p in driver.prompts), 2)
+
+  def test_steering_angle_found_and_scaled(self):
+    # a car that broadcasts its steering wheel angle like a newer Honda: 16 bits, big-endian, signed, -0.1 degrees a step
+    for factor, arc in ((-0.1, TEETH_SETS[29]), (0.0625, TEETH_SETS[15])):
+      motor = SimMotor(true_direction=-1, arc_deg=arc)
+      layout = {**SimCar().layout, "STEER_ANGLE": (0x1C2, 7, 16)}
+      car = SimCar(layout=layout, messages={**MESSAGES, 0x1C2: (8, 100)}, wheel_deg_fn=lambda m=motor: m.wheel_deg, angle_factor_deg=factor)
+      passed, raw, text, _ = run_setup(car, motor, SimDriver(car, motor, teeth="29" if arc == TEETH_SETS[29] else "15"))
+      self.assertTrue(passed, text)
+      found = f"steering angle: follows the motor's angle while the gear is on the teeth; found (message 0x1c2, byte 0, {abs(factor):g} degrees per step)"
+      self.assertIn(found, text)
+      sig = raw["fcan"]["signals"]["STEER_ANGLE"]
+      self.assertEqual((sig["message"], sig["start_bit"], sig["size"], sig["byte_order"], sig["signed"]), ("MSG_1C2", 7, 16, "big", True))
+      self.assertEqual(sig["factor"], factor)
+      self.assertAlmostEqual(sig["offset"], 0.0, places=3)
+      cfg = parse_config(raw)
+      self.assertEqual(cfg.message_of("STEER_ANGLE").freq, 100)
+      # the saved signal reads the wheel's angle, left positive, whichever way the motor counts
+      frame = next(d for _, a, d in car.run(0.05) if a == 0x1C2)
+      self.assertAlmostEqual(dsc.read_signal(frame, cfg.signals["STEER_ANGLE"]), motor.wheel_deg, delta=abs(factor))
+
+  def test_steering_angle_too_slow_is_not_used(self):
+    motor = SimMotor()
+    layout = {**SimCar().layout, "STEER_ANGLE": (0x1C2, 7, 16)}
+    car = SimCar(layout=layout, messages={**MESSAGES, 0x1C2: (8, 20)}, wheel_deg_fn=lambda: motor.wheel_deg)
+    passed, raw, text, _ = run_setup(car, motor)
+    self.assertTrue(passed, text)
+    self.assertIn("found only in a message that comes less than 50 times a second", text)
+    self.assertNotIn("STEER_ANGLE", raw["fcan"]["signals"])
 
   def test_grip_test(self):
     car, motor = SimCar(), SimMotor()
@@ -320,7 +359,8 @@ class TestCheckDrive(unittest.TestCase):
 
   def test_speed_found_and_saved(self):
     car = SimCar(layout=MOVED_LAYOUT, gears=MOVED_GEARS, speed_factor_kph=0.005, messages={a: v for a, v in MESSAGES.items() if a != 0x158})
-    new_raw, fit, motor = check_drive.check(copy.deepcopy(PARKED_RAW), self._drive(car))
+    r = check_drive.check(copy.deepcopy(PARKED_RAW), self._drive(car))
+    new_raw, fit, motor = r.new_raw, r.fit, r.motor
     self.assertTrue(fit.ok, fit.detail)
     self.assertTrue(motor.ok, motor.detail)
     cfg = parse_config(new_raw)
@@ -328,16 +368,46 @@ class TestCheckDrive(unittest.TestCase):
     self.assertEqual(cfg.message_of("VEHICLE_SPEED").addr, 0x309)
     self.assertEqual(cfg.signals["VEHICLE_SPEED"].factor, 0.005)
 
+  def _angle_car(self, factor: float) -> SimCar:
+    """A car whose steering angle follows the drive's steering (turning_drive: 8 sin(2 pi t / 30) + 3 degrees)."""
+    import math
+    layout = {**SimCar().layout, "STEER_ANGLE": (0x1C2, 7, 16)}
+    car = SimCar(layout=layout, messages={**MESSAGES, 0x1C2: (8, 100)}, angle_factor_deg=factor)
+    car.wheel_deg_fn = lambda: 8.0 * math.sin(2 * math.pi * car.t / 30.0) + 3.0
+    return car
+
+  def _angle_raw(self, factor: float) -> dict:
+    raw = copy.deepcopy(PARKED_RAW)
+    raw["fcan"]["messages"].append({"name": "MSG_1C2", "addr": "0x1C2", "len": 8, "freq": 100, "checksum": "honda", "counter": True})
+    raw["fcan"]["signals"]["STEER_ANGLE"] = {"message": "MSG_1C2", "start_bit": 7, "size": 16, "byte_order": "big", "signed": True,
+                                             "factor": factor, "offset": 0.0, "unit": "deg"}
+    return raw
+
+  def test_steering_angle_checked_against_the_car_turning(self):
+    r = check_drive.check(self._angle_raw(-0.1), self._drive(self._angle_car(-0.1)))
+    self.assertTrue(r.fit.ok and r.motor.ok)
+    self.assertTrue(r.angle.ok, r.angle.detail)
+    self.assertIn("STEER_ANGLE", r.new_raw["fcan"]["signals"])
+    self.assertTrue(parse_config(r.new_raw).verified)
+    # saved backwards in part 1 (a left turn read as right): dropped, the drive still passes on the motor's angle
+    r = check_drive.check(self._angle_raw(0.1), self._drive(self._angle_car(-0.1)))
+    self.assertFalse(r.angle.ok)
+    self.assertIn("reads the opposite way", r.angle.detail)
+    self.assertNotIn("STEER_ANGLE", r.new_raw["fcan"]["signals"])
+    self.assertTrue(parse_config(r.new_raw).verified)
+
   def test_wrong_motor_direction_is_caught(self):
     raw = copy.deepcopy(PARKED_RAW)
     raw["actuator"]["direction"] = -1   # part 1 saved it backwards
-    new_raw, fit, motor = check_drive.check(raw, self._drive(SimCar(), true_direction=1))
+    r = check_drive.check(raw, self._drive(SimCar(), true_direction=1))
+    new_raw, fit, motor = r.new_raw, r.fit, r.motor
     self.assertTrue(fit.ok, fit.detail)
     self.assertIsNone(new_raw)
     self.assertTrue(motor.wrong_way)
 
   def test_needs_the_lift_lever_down(self):
-    new_raw, _, motor = check_drive.check(copy.deepcopy(PARKED_RAW), self._drive(SimCar(), with_motor=False))
+    r = check_drive.check(copy.deepcopy(PARKED_RAW), self._drive(SimCar(), with_motor=False))
+    new_raw, motor = r.new_raw, r.motor
     self.assertIsNone(new_raw)
     self.assertIn("lift lever down", motor.detail)
 
@@ -345,7 +415,8 @@ class TestCheckDrive(unittest.TestCase):
     car = SimCar()
     frames = car.run(10.0, VEHICLE_SPEED=60.0)
     drive = check_drive.Drive(frames, [], [(frames[0][0], 16.7)] * 5, [], 10.0)
-    new_raw, fit, motor = check_drive.check(copy.deepcopy(PARKED_RAW), drive)
+    r = check_drive.check(copy.deepcopy(PARKED_RAW), drive)
+    new_raw, fit, motor = r.new_raw, r.fit, r.motor
     self.assertIsNone(new_raw)
     self.assertFalse(fit.ok)
     self.assertIsNone(motor)
