@@ -47,9 +47,11 @@ def model_path(curvature_at_s: dict[float, float], v: float = V):
 
 
 class Messages:
-  def __init__(self, lat_active: bool = True, curvature: float = 0.0, model=None):
+  def __init__(self, lat_active: bool = True, curvature: float = 0.0, model=None, torque: float = 0.5):
+    cc = car.CarControl.new_message(latActive=lat_active)
+    cc.actuators.torque = torque         # lane keeping pushing left
     self.msgs = {
-      'carControl': car.CarControl.new_message(latActive=lat_active),
+      'carControl': cc,
       'controlsState': log.ControlsState.new_message(curvature=curvature),
       'modelV2': model if model is not None else model_path({}),
     }
@@ -58,10 +60,13 @@ class Messages:
     return self.msgs[key]
 
 
-def car_state(v: float = V, angle_deg: float = 0.0, pressed: bool = False, lever_down: bool = True):
+def car_state(v: float = V, angle_deg: float = 0.0, pressed: bool = False, lever_down: bool = True, rate: float | None = None):
+  """pressed: the car port reports the driver steering; by default the motor spinning off the teeth the way it pushes
+  (left, 300 degrees a second)."""
   CS = car.CarState.new_message()
   CS.vEgo = v
   CS.steeringAngleDeg = angle_deg
+  CS.steeringRateDeg = (300.0 if pressed else 0.0) if rate is None else rate
   CS.steeringPressed = pressed
   CS.cruiseState.available = lever_down
   return CS
@@ -128,6 +133,10 @@ class TestTeethAlerts(unittest.TestCase):
     alerts = TeethAlerts(self.CP, SHORT_TEETH_REACH)
     alerts.update(car_state(), Messages(lat_active=False))
     self.assertFalse(alerts.update(car_state(pressed=True), Messages(lat_active=False))[1])
+    # nor when the driver turns the wheel against the motor (stand-alone reports that as pressed too)
+    alerts = TeethAlerts(self.CP, SHORT_TEETH_REACH)
+    alerts.update(car_state(), Messages())
+    self.assertFalse(alerts.update(car_state(pressed=True, rate=-40.0), Messages())[1])
 
   def test_motor_angle_refines_the_ratio_and_the_wheel_near_the_end_chimes(self):
     # straight for a while: the motor's angle then is the straight-ahead reference (it powered up 40 degrees off)

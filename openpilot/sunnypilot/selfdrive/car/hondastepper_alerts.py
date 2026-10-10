@@ -102,8 +102,11 @@ class TeethAlerts:
     curvature = float(sm['controlsState'].curvature)
     self._learn(CS, curvature, lat_active)
 
-    # the gear running off the teeth while lane keeping pushed
-    if CS.steeringPressed and not self.pressed_prev and lat_active:
+    # the gear running off the teeth while lane keeping pushed: the motor spinning the way it pushed. Stand-alone the
+    # car port also reports the driver turning the wheel against the motor as pressed; that turns the other way and
+    # gets no chime.
+    pushed_way = float(CS.steeringRateDeg) * float(sm['carControl'].actuators.torque) > 0.0
+    if CS.steeringPressed and not self.pressed_prev and lat_active and pushed_way:
       self.past_teeth_s = PAST_TEETH_S
     self.pressed_prev = bool(CS.steeringPressed)
     self.past_teeth_s = max(self.past_teeth_s - DT, 0.0)

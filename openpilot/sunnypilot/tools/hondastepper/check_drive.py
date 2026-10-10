@@ -13,12 +13,14 @@ device's hotspot (the setup page, phone.py: Part 2), or on the comma device over
 
   /data/openpilot/accord_setup.sh drive
 
-It reads the drive openpilot just recorded: the car's data, the motor's angle and the GPS. It checks the car's
-speed reading against the GPS speed (and finds it when it's somewhere else), and checks the motor's saved direction
-against which way the car actually turned, with nothing from part 1's turn test. It saves the result to
+It reads the drive openpilot just recorded: the motor's angle, the GPS and the comma device's own speed (stand-alone,
+the default) or the car's data (car_network). It checks the comma device's own speed against the GPS speed and saves
+the factor between them (car_network: the car's speed reading, and finds it when it's somewhere else), and checks the
+motor's saved direction against which way the car actually turned, with nothing from part 1's turn test. It saves the result to
 /data/hondastepper/config.json and restarts the comma device. Lane keeping turns on once both parts have passed.
 """
 import bz2
+import copy
 import datetime
 import glob
 import os
@@ -29,6 +31,7 @@ from dataclasses import dataclass, field
 
 from opendbc.car.hondastepper import discovery as dsc
 from opendbc.car.hondastepper.config import load_raw_config, parse_config, save_device_config
+from openpilot.sunnypilot.selfdrive.car.hondastepper_speed import device_reading
 from openpilot.sunnypilot.tools.hondastepper import VERSION
 from openpilot.sunnypilot.tools.hondastepper.prompter import Prompter
 
@@ -76,6 +79,12 @@ class Drive:
   gps: list[tuple[float, float]] = field(default_factory=list)          # (time, speed m/s), good fixes only
   headings: list[tuple[float, float, float]] = field(default_factory=list)  # (time, course clockwise from north, m/s)
   seconds: float = 0.0                                                   # how much driving the F-CAN covers
+  device: list[tuple[float, float]] = field(default_factory=list)       # (time, the comma device's own speed m/s), valid only
+
+  def start(self) -> float | None:
+    """The segment's first time, from whatever it recorded."""
+    times = [x[0] for x in (self.frames[:1] + self.motor[:1] + self.gps[:1] + self.device[:1])]
+    return min(times) if times else None
 
 
 def read_segment(path: str) -> Drive:
@@ -106,6 +115,10 @@ def read_segment(path: str) -> Drive:
             drive.frames.append((t, c.address, bytes(c.dat)))
           elif c.src == MOTOR_BUS and c.address == dsc.MOTOR_STATUS_ADDR and len(c.dat) == 8:
             drive.motor.append((t, dsc.motor_angle_fw(bytes(c.dat))))
+      elif which == "deviceMotion":
+        r = device_reading(t, evt.deviceMotion)
+        if r.ok and evt.valid:
+          drive.device.append((t, r.speed))
       elif which in ("gpsLocation", "gpsLocationExternal"):
         g = getattr(evt, which)
         if g.hasFix and 0 < g.speedAccuracy <= GPS_MAX_SPEED_ERROR:
@@ -124,13 +137,15 @@ def load_drive(segments: list[str], reader: Callable[[str], Drive] = read_segmen
   out = Drive()
   for i, path in enumerate(reversed(segments)):
     seg = reader(path)
-    if not seg.frames:
+    start = seg.start()
+    if start is None:
       continue
-    offset = i * 10_000.0 - seg.frames[0][0]
+    offset = i * 10_000.0 - start
     out.frames += [(t + offset, a, d) for t, a, d in seg.frames]
     out.motor += [(t + offset, a) for t, a in seg.motor]
     out.gps += [(t + offset, v) for t, v in seg.gps]
     out.headings += [(t + offset, b, v) for t, b, v in seg.headings]
+    out.device += [(t + offset, v) for t, v in seg.device]
     out.seconds += seg.seconds
   return out
 
@@ -147,6 +162,8 @@ def check(raw: dict, drive: Drive) -> DriveResult:
   """The speed check, the motor direction check, and, when part 1 found a steering angle on the car's network, a
   check of that against the car's turning: dropped from the config if it doesn't agree."""
   cfg = parse_config(raw)
+  if not cfg.car_network:
+    return check_standalone(raw, cfg, drive)
   stats = dsc.message_stats(drive.frames, max(drive.seconds, 1.0))
   fit = dsc.check_speed(cfg, drive.frames, drive.gps, stats)
   if not fit.ok:
@@ -166,6 +183,22 @@ def check(raw: dict, drive: Drive) -> DriveResult:
   new_raw.setdefault("setup", {})["drive"] = datetime.datetime.now().isoformat(timespec="seconds")
   parse_config(new_raw)
   return DriveResult(new_raw, fit, motor, angle)
+
+
+def check_standalone(raw: dict, cfg, drive: Drive) -> DriveResult:
+  """Stand-alone: the comma device's own speed against the GPS speed (the factor between them is saved and used
+  from then on), and the motor's direction against the car's turning."""
+  fit = dsc.check_device_speed(drive.device, drive.gps)
+  if not fit.ok:
+    return DriveResult(None, fit)
+  motor = dsc.motor_direction_from_drive(drive.motor, drive.headings, cfg.actuator.direction, cfg.actuator.angle_scale)
+  if not motor.ok:
+    return DriveResult(None, fit, motor)
+  new_raw = copy.deepcopy(raw)
+  new_raw["device_speed_scale"] = fit.scale
+  new_raw.setdefault("setup", {})["drive"] = datetime.datetime.now().isoformat(timespec="seconds")
+  parse_config(new_raw)
+  return DriveResult(new_raw, fit, motor)
 
 
 def run(print_fn: Callable[[str], None] = print, root: str = LOG_ROOT, save: Callable[[dict], str] = save_device_config) -> bool:
@@ -198,8 +231,8 @@ def run(print_fn: Callable[[str], None] = print, root: str = LOG_ROOT, save: Cal
 INTRO = f"""
 Honda Accord lane keeping, software {VERSION}: car setup, part 2 of 2 (drive check)
 
-This reads the drive the comma device just recorded. It checks the car's speed reading against the GPS, and the
-motor's direction against the way the car turned.
+This reads the drive the comma device just recorded. It checks the speed against the GPS (the comma device's own,
+or the car's when it is connected to the car), and the motor's direction against the way the car turned.
 """
 
 

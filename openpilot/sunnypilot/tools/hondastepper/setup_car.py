@@ -12,9 +12,10 @@ SSH, with the car parked, the engine running and the steering wheel straight:
 
   /data/openpilot/accord_setup.sh car
 
-It stops openpilot, then asks you to do simple things one at a time (press the brake, switch a blinker on, shift
-gears, turn the steering wheel) while it watches the car's data and the motor. It checks where the car keeps
-everything lane keeping needs, finds it when it's somewhere else, checks which way the motor turns, checks with the
+It stops openpilot, then asks you to do simple things one at a time while it watches the motor (and, connected to
+the car's network with car_network, the car's data: press the brake, switch a blinker on, shift gears; it checks
+where the car keeps everything lane keeping needs and finds it when it's somewhere else). It checks which way the
+motor turns from two turns of the steering wheel, checks with the
 steering wheel held that the motor's hardest push can't make its gear slip over the steering wheel teeth, saves the
 result to /data/hondastepper/config.json, and restarts the comma device, which rebuilds the software with it.
 
@@ -35,6 +36,16 @@ from opendbc.car.hondastepper.values import StepperControlStatus, StepperMode
 from openpilot.sunnypilot.tools.hondastepper import VERSION
 from openpilot.sunnypilot.tools.hondastepper.device import CanSession
 from openpilot.sunnypilot.tools.hondastepper.prompter import Prompter
+
+INTRO_STANDALONE = f"""
+Honda Accord lane keeping, software {VERSION}: car setup, part 1 of 2 (parked)
+
+This takes about 5 minutes. It asks you to do one simple thing at a time: turn or hold the steering wheel, and say
+which way it turned. Do it, then press Enter. At the end it saves what it learned and restarts the comma device.
+
+Before you start: car parked somewhere safe, engine running, steering wheel straight. It tells you when to pull
+the lift lever down.
+"""
 
 INTRO = f"""
 Honda Accord lane keeping, software {VERSION}: car setup, part 1 of 2 (parked)
@@ -319,7 +330,8 @@ class CarSetup:
   def motor_checks(self, res: ParkedResult) -> None:
     p, s = self.p, self.session
     a = self.cfg.actuator
-    p.say("\nPart 2: the motor. Engine still running, shifter in P.")
+    p.say("\nPart 2: the motor. Engine still running, shifter in P." if self.cfg.car_network else
+          "\nThe motor. Engine running, shifter in P.")
     res.teeth = self.which_teeth()
     if res.teeth is None:
       res.motor = dsc.MotorCheck(False, "no answer to which steering wheel teeth are on (type 15 or 29)")
@@ -350,8 +362,9 @@ class CarSetup:
     # the car's own steering angle, if it broadcasts one: it would follow the motor's angle during the turns
     stats = dsc.message_stats(self.frames, max(self.recorded_seconds, 1.0))
     res.stats = stats
-    res.findings.append(dsc.find_angle_signal(self.cfg, res.rest, [(left_frames, left_series), (right_frames, right_series)],
-                                              stats, a.angle_scale))
+    if self.cfg.car_network:
+      res.findings.append(dsc.find_angle_signal(self.cfg, res.rest, [(left_frames, left_series), (right_frames, right_series)],
+                                                stats, a.angle_scale))
     res.motor = dsc.motor_direction_from_turn(start, left, right, a.angle_scale, TEETH_SETS[res.teeth])
     if not res.motor.ok:
       # a turn that matches the other teeth means the answer about which teeth are on was wrong, not the gearing
@@ -488,7 +501,7 @@ def build_config(raw: dict, res: ParkedResult) -> tuple[dict, bool, list[str]]:
   """The config to save, whether the parked part passed, and plain-word problems."""
   problems = []
   by_name = {f.signal: f for f in res.findings}
-  if not by_name["BRAKE_PRESSED"].ok:
+  if parse_config(raw).car_network and not by_name["BRAKE_PRESSED"].ok:
     problems.append(f"{dsc.plain_name('BRAKE_PRESSED')}: {by_name['BRAKE_PRESSED'].detail}")
   new_raw = dsc.apply_findings(raw, res.findings)
   res.notes += dsc.update_message_rates(new_raw, res.stats)
@@ -531,7 +544,8 @@ def report(res: ParkedResult, problems: list[str], passed: bool) -> str:
   lines += ["", *[f"  note: {n}" for n in res.notes]]
   if problems:
     lines += ["", "Problems:", *[f"  {pr}" for pr in problems]]
-  lines += ["", "For the record, your car's messages (address: length): " + ", ".join(f"{a:#x}:{n}" for a, n in res.fingerprint.items())]
+  if res.fingerprint:
+    lines += ["", "For the record, your car's messages (address: length): " + ", ".join(f"{a:#x}:{n}" for a, n in res.fingerprint.items())]
   lines += ["", "RESULT: " + ("PASSED" if passed else "NOT PASSED")]
   return "\n".join(lines)
 
@@ -548,9 +562,12 @@ def run(session: CanSession, prompter: Prompter, manual: bool, save: Callable[[d
         report_dir: str | None = None) -> bool:
   raw = load_raw_config()
   setup = CarSetup(session, prompter, raw)
-  if not setup.check_car_data():
-    return False
-  res = setup.parked_checks(manual)
+  if setup.cfg.car_network:
+    if not setup.check_car_data():
+      return False
+    res = setup.parked_checks(manual)
+  else:
+    res = ParkedResult()      # stand-alone: nothing to read from the car, only the motor to check
   setup.motor_checks(res)
   new_raw, passed, problems = build_config(raw, res)
   text = report(res, problems, passed)
@@ -575,10 +592,14 @@ def main() -> int:
   from openpilot.sunnypilot.tools.hondastepper.device import PowerWatchdog, reboot, stop_openpilot
 
   p = Prompter()
-  p.say(INTRO)
-  answer = p.ask("Is the car an automatic or a manual? Type a or m and press Enter:", (("a", "Automatic"), ("m", "Manual")),
-                 "Is the car an automatic or a manual?").lower()
-  manual = answer.startswith("m")
+  manual = False
+  if parse_config(load_raw_config()).car_network:
+    p.say(INTRO)
+    answer = p.ask("Is the car an automatic or a manual? Type a or m and press Enter:", (("a", "Automatic"), ("m", "Manual")),
+                   "Is the car an automatic or a manual?").lower()
+    manual = answer.startswith("m")
+  else:
+    p.say(INTRO_STANDALONE)
   p.step("Car parked, engine running, comma device on its mount and plugged in. openpilot will stop and the screen will go dark until the end.",
          button="Start")
   if not stop_openpilot():

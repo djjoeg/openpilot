@@ -5,6 +5,7 @@ comma device. The checks are what the driver sees and hears: lane keeping turns 
 down and off when it comes up, with only the engage and disengage sounds, also when the lever was already down as the
 car started; the panda allows steering whenever openpilot steers; a motor gear off the steering wheel teeth is silent.
 """
+import contextlib
 import math
 import unittest
 from types import SimpleNamespace
@@ -13,6 +14,7 @@ from opendbc.car import gen_empty_fingerprint, structs
 from opendbc.car.can_definitions import CanData
 from opendbc.car.car_helpers import interfaces
 from opendbc.car.hondastepper.tests.sim import SimCar, SimMotor
+from opendbc.car.hondastepper.tests.test_hondastepper import raw_car_network, variant
 from opendbc.car.hondastepper.values import CAR, CanBus, StepperMode
 from opendbc.safety.tests.libsafety import libsafety_py
 from openpilot.cereal import custom, log
@@ -77,11 +79,11 @@ class Panda:
   def _timer(self, t: float):
     self.lib.set_timer(int(round(t * 1e6)))
 
-  def set_car_mode(self, t: float, alternative_experience: int):
+  def set_car_mode(self, t: float, alternative_experience: int, param: int = 0):
     self._timer(t)
     self.lib.set_alternative_experience(alternative_experience)
     self.lib.mads_apply_alternative_experience(alternative_experience)
-    self.lib.set_safety_hooks(SafetyModel.hondaStepper, 0)
+    self.lib.set_safety_hooks(SafetyModel.hondaStepper, param)
     self.mode = SafetyModel.hondaStepper
 
   def rx(self, t: float, frame: CanData):
@@ -134,6 +136,8 @@ def planned_path(curvature: float, v: float = DRIVE_KPH / 3.6):
 
 class LeverSystem:
   def __init__(self, lever_down: bool = False, t_init: float = 0.5, pandad_delay: float = 0.05):
+    """With the config in use: connected to the car (car_network, the car's messages on bus 0) or stand-alone (only
+    the motor; the comma device's own speed handed to the car port, usable unless speed_ok is cleared)."""
     self.t = 0.0
     self.t_init = t_init                       # selfdrived has started up; card starts sending
     self.t_car_mode = t_init + pandad_delay    # pandad puts the panda in this car's mode
@@ -151,6 +155,8 @@ class LeverSystem:
     self.params = FakeParams(INSTALLED_PARAMS)
     set_alternative_experience(self.CP, self.CP_SP, self.params)
     self.CI = CI(self.CP, self.CP_SP)
+    self.standalone = not self.CI.CS.car_network
+    self.speed_ok = True
     self.sd = Selfdrive(self.CP, self.CP_SP, self.params)
     self.car_events = CarEvents(self.CP)
     self.car_events_sp = CarSpecificEventsSP(self.CP, self.CP_SP)
@@ -171,13 +177,13 @@ class LeverSystem:
     end = self.t + seconds
     while self.t < end - 1e-9:
       self.t = round(self.t + 0.001, 6)
-      frames = [(ts, CanData(addr, dat, 0)) for ts, addr, dat in self.car.advance(self.t)]
+      frames = [(ts, CanData(addr, dat, 0)) for ts, addr, dat in self.car.advance(self.t)] if not self.standalone else []
       frames += [(ts, CanData(addr, dat, CanBus.SERVO)) for ts, addr, dat in self.motor.advance(self.t)]
       for ts, frame in sorted(frames, key=lambda f: f[0]):
         self.panda.rx(ts, frame)
         self.to_device.append((ts, frame))
       if self.panda.mode != SafetyModel.hondaStepper and self.t >= self.t_car_mode:
-        self.panda.set_car_mode(self.t, self.CP.alternativeExperience)
+        self.panda.set_car_mode(self.t, self.CP.alternativeExperience, self.CP.safetyConfigs[0].safetyParam)
       self.panda.tick(self.t)
       if self.t >= self.next_pandad:
         # pandad: the panda's state to openpilot and openpilot's heartbeat to the panda, 10 times a second
@@ -198,6 +204,8 @@ class LeverSystem:
       self.to_device = [(ts, f) for ts, f in self.to_device if ts >= t - 0.001]
       self.nanos = int(t * 1e9)
       batch = [(self.nanos, frames)]
+    if self.standalone:
+      self.CI.CS.set_device_speed(DRIVE_KPH / 3.6, self.speed_ok)
     CS, _ = self.CI.update(batch)
 
     # selfdrived
@@ -261,7 +269,7 @@ class LeverSystem:
     return next((r.t for r in self.since(t0) if cond(r)), None)
 
 
-class TestLeverSystem(unittest.TestCase):
+class LeverSystemTest(unittest.TestCase):
   def assertQuiet(self, rows, allowed_sounds=(), allowed_texts=()):
     """No alert on screen or sound, other than the given sounds and the alerts with the given texts."""
     for r in rows:
@@ -284,6 +292,15 @@ class TestLeverSystem(unittest.TestCase):
     self.assertIsNotNone(t_panda)
     self.assertIsNotNone(t_on)
     return t_panda, t_on
+
+
+
+class TestLeverSystem(LeverSystemTest):
+  """Connected to the car's network (car_network)."""
+  def setUp(self):
+    stack = contextlib.ExitStack()
+    self.addCleanup(stack.close)
+    stack.enter_context(variant(raw_car_network()))
 
   def test_lever_down_turns_lane_keeping_on_and_up_turns_it_off(self):
     s = LeverSystem(lever_down=False)
@@ -433,6 +450,86 @@ class TestLeverSystem(unittest.TestCase):
     self.assertTrue(all(r.mads == MadsState.enabled and r.panda_lateral for r in s.since(t_on)))
     self.assertQuiet(s.since(t_on + DT / 2))
 
+
+class TestLeverSystemStandalone(LeverSystemTest):
+  """The default: nothing from the car, only the motor. The same lift lever, the same sounds, the panda in step."""
+
+  def test_lever_down_and_up(self):
+    s = LeverSystem(lever_down=False)
+    self.assertTrue(s.standalone)
+    s.run(5.0)
+    self.assertFalse(any(r.mads_enabled or r.panda_lateral for r in s.log))
+    self.assertQuiet(s.log)
+    s.motor.lever(True)
+    s.run(4.0)
+    t_panda, t_on = self._engaged(s, 5.0)
+    self.assertAlmostEqual(t_panda, 5.0 + s.motor.boot_s + 2.0, delta=0.03)
+    self.assertLess(t_on - t_panda, 0.06)
+    self.assertTrue(any(r.lat_active for r in s.since(t_on)))
+    self.assertEqual(s.motor.mode, StepperMode.TORQUE_CONTROL)
+    self.assertQuiet(s.since(5.0), allowed_sounds=(AudibleAlert.engage,))
+    # lever up: openpilot within 0.12 s (nothing else on the network to time it by but its own CAN packets); the
+    # panda when its once-a-second check finds the motor's messages missing (the motor has no power by then)
+    s.motor.lever(False)
+    s.run(2.5)
+    t_off = s.first(9.0, lambda r: not r.mads_enabled)
+    self.assertLess(t_off - 9.0, 0.12)
+    t_panda_off = s.first(9.0, lambda r: not r.panda_lateral)
+    self.assertLess(t_panda_off - 9.0, 2.05)
+    self.assertEqual(sum(AudibleAlert.disengage in r.sounds for r in s.since(9.0)), 1)
+    self.assertQuiet(s.since(9.0), allowed_sounds=(AudibleAlert.disengage,))
+    self.assertInStep(s.log)
+    s.motor.lever(True)
+    s.run(2.5)
+    _, t_on = self._engaged(s, 11.5)
+    self.assertAlmostEqual(t_on, 11.5 + s.motor.boot_s + 2.0, delta=0.08)
+    self.assertInStep(s.log)
+
+  def test_lever_already_down_as_the_car_starts(self):
+    for t_init in (0.3, 2.5):
+      with self.subTest(t_init=t_init):
+        s = LeverSystem(lever_down=True, t_init=t_init)
+        s.run(t_init + 4.0)
+        t_panda, t_on = self._engaged(s, 0.0)
+        self.assertAlmostEqual(t_panda, s.t_car_mode + 2.0, delta=0.03)
+        self.assertLess(t_on - t_panda, 0.06)
+        self.assertQuiet(s.log, allowed_sounds=(AudibleAlert.engage,))
+        self.assertInStep(s.log)
+
+  def test_no_usable_speed_no_steering(self):
+    # the comma device's own speed not ready yet, or disagreeing with GPS: lane keeping stays on but doesn't push
+    s = LeverSystem(lever_down=True)
+    s.run(3.0)
+    _, t_on = self._engaged(s, 0.0)
+    s.speed_ok = False
+    s.run(1.0)
+    self.assertFalse(any(r.lat_active for r in s.since(3.05)))
+    self.assertNotEqual(s.motor.mode, StepperMode.TORQUE_CONTROL)
+    s.speed_ok = True
+    s.run(1.0)
+    self.assertTrue(s.log[-1].lat_active)
+    self.assertInStep(s.log)
+
+  def test_turning_the_wheel_against_the_motor(self):
+    # the driver holds the wheel while lane keeping pushes hard left, then turns it right (a lane change): the motor
+    # lets go at once, quietly, and takes over again 1.5 s after the wheel has stopped
+    s = LeverSystem(lever_down=True)
+    s.run(3.0)
+    _, t_on = self._engaged(s, 0.0)
+    s.motor.held = True
+    s.torque = lambda t: 0.9
+    s.run(1.5)
+    self.assertEqual(s.motor.mode, StepperMode.TORQUE_CONTROL)
+    s.motor.plan_turn(s.motor.wheel_deg - 20.0, 80.0)
+    s.run(0.6)
+    self.assertTrue(s.CI.CS.driver_override)
+    self.assertEqual(s.motor.mode, StepperMode.OFF)
+    s.run(2.5)
+    self.assertFalse(s.CI.CS.driver_override)
+    self.assertEqual(s.motor.mode, StepperMode.TORQUE_CONTROL)
+    self.assertTrue(all(r.mads_enabled for r in s.since(t_on)))
+    self.assertQuiet(s.since(t_on + DT / 2))
+    self.assertInStep(s.log)
 
 if __name__ == "__main__":
   unittest.main()

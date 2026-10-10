@@ -93,9 +93,11 @@ class Car:
     if CI is None:
       # wait for one pandaState and one CAN packet
       print("Waiting for CAN messages...")
+      # hondastepper stand-alone: nothing on the network but the motor, silent while its lift lever is up
+      no_car_network = (self.params.get("CarPlatformBundle") or {}).get("platform", None) == "HONDA_ACCORD_8G_STEPPER"
       while True:
         can = messaging.recv_one_retry(self.can_sock)
-        if len(can.can) > 0:
+        if len(can.can) > 0 or no_car_network:
           break
 
       alpha_long_allowed = self.params.get_bool("AlphaLongitudinalEnabled")
@@ -189,6 +191,14 @@ class Car:
     # log fingerprint in sentry
     sunnypilot_interfaces.log_fingerprint(self.CP)
 
+    # hondastepper stand-alone: the car port takes the comma device's own speed
+    self.hondastepper_speed = None
+    if self.CP.brand == 'hondastepper':
+      from opendbc.car.hondastepper.values import CONFIG, HondaStepperFlags
+      if self.CP.flags & HondaStepperFlags.STANDALONE:
+        from openpilot.sunnypilot.selfdrive.car.hondastepper_speed import DeviceSpeed
+        self.hondastepper_speed = DeviceSpeed(CONFIG.device_speed_scale)
+
   def state_update(self) -> tuple[car.CarState, custom.CarStateSP, structs.RadarDataT | None]:
     """carState update loop, driven by can"""
 
@@ -196,6 +206,8 @@ class Car:
     can_list = can_capnp_to_list(can_strs)
 
     # Update carState from CAN
+    if self.hondastepper_speed is not None:
+      self.CI.CS.set_device_speed(*self.hondastepper_speed.update())
     CS, CS_SP = self.CI.update(can_list)
     CS_SP = convert_to_capnp(CS_SP)
 

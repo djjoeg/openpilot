@@ -16,7 +16,9 @@ from opendbc.car.hondastepper.tests.sim import MESSAGES, MOVED_GEARS, MOVED_LAYO
 from openpilot.sunnypilot.tools.hondastepper import check_drive, setup_car
 from openpilot.sunnypilot.tools.hondastepper.device import CanSession
 
-DEFAULT_RAW = json.load(open(CONFIG_PATH))
+STANDALONE_RAW = json.load(open(CONFIG_PATH))   # the checked-in default: not connected to the car
+# most tests here run connected to the car's network (car_network), the setup that reads the car's data
+DEFAULT_RAW = {**copy.deepcopy(STANDALONE_RAW), "car_network": True}
 
 
 class SimClock:
@@ -130,9 +132,17 @@ class SimDriver:
     return ""
 
 
-def run_setup(car: SimCar, motor: SimMotor, driver: SimDriver | None = None, manual: bool = False, raw: dict | None = None):
+class NoCarPanda(FakePanda):
+  """Stand-alone: the panda hears only the motor; the car isn't connected."""
+
+  def can_recv(self):
+    return [(a, d, 1) for _, a, d in self.motor.advance(self.clock())]
+
+
+def run_setup(car: SimCar, motor: SimMotor, driver: SimDriver | None = None, manual: bool = False, raw: dict | None = None,
+              panda_cls=FakePanda):
   clock = SimClock()
-  panda = FakePanda(car, motor, clock)
+  panda = panda_cls(car, motor, clock)
   driver = driver or SimDriver(car, motor)
   printed: list[str] = []
   saved: list[dict] = []
@@ -483,6 +493,114 @@ class TestCheckDrive(unittest.TestCase):
       self.assertTrue(saved[0]["setup"]["drive"])
       self.assertIn("Both parts of the setup have passed", printed[-1])
 
+
+class TestStandalone(unittest.TestCase):
+  """The default: the comma device not connected to the car. Part 1 checks only the motor; part 2 checks the comma
+  device's own speed against GPS and saves the factor between them."""
+
+  def test_part_1_checks_only_the_motor(self):
+    car, motor = SimCar(), SimMotor(true_direction=-1)
+    motor.powered = False
+    passed, raw, text, driver = run_setup(car, motor, raw=STANDALONE_RAW, panda_cls=NoCarPanda)
+    self.assertTrue(passed, text)
+    cfg = parse_config(raw)
+    self.assertFalse(cfg.car_network)
+    self.assertEqual(cfg.actuator.direction, -1)
+    self.assertTrue(cfg.setup.get("parked"))
+    self.assertGreater(motor.wheel_deg - motor.teeth_center_deg, 2.0)   # the push turned the wheel left
+    asked = " ".join(driver.prompts)
+    for thing in ("brake", "gas pedal", "turn signal", "shifter to", "Open the driver"):
+      self.assertNotIn(thing, asked)                      # nothing asked about the car itself
+    self.assertNotIn("your car's messages", text)
+    self.assertNotIn("No data from the car", text)
+    for word in ("F-CAN", "pinion", "rim", "MADS", "panda", "gear ring", "gear lever", "arm", "MAIN"):
+      self.assertIsNone(re.search(rf"\b{re.escape(word)}\b", asked + text, re.IGNORECASE), word)
+
+  def test_part_1_without_the_motor(self):
+    car, motor = SimCar(), SimMotor()
+    driver = SimDriver(car, motor, motor_works=False)
+    motor.powered = False
+    passed, raw, text, _ = run_setup(car, motor, driver=driver, raw=STANDALONE_RAW, panda_cls=NoCarPanda)
+    self.assertFalse(passed)
+    self.assertNotIn("parked", raw.get("setup", {}))
+
+  def _drive(self, device_scale: float = 1.0, true_direction: int = 1, device: bool = True) -> check_drive.Drive:
+    import math
+    gps, dev = [], []
+    for i in range(4000):          # 200 s: the device's own speed 20 times a second, GPS twice
+      t = i * 0.05
+      v = 8 + 10 * (0.5 + 0.5 * math.sin(t / 12.5))
+      dev.append((t, v * device_scale))
+      if i % 10 == 0:
+        gps.append((t, v))
+    motor, headings = turning_drive(200.0, true_direction)
+    return check_drive.Drive([], motor, gps, headings, 0.0, dev if device else [])
+
+  def test_part_2_saves_the_speed_factor(self):
+    raw = {**copy.deepcopy(STANDALONE_RAW), "setup": {"parked": "2026-10-10T10:00:00"}}
+    r = check_drive.check(raw, self._drive(device_scale=0.96))
+    self.assertTrue(r.fit.ok, r.fit.detail)
+    self.assertTrue(r.motor.ok, r.motor.detail)
+    cfg = parse_config(r.new_raw)
+    self.assertTrue(cfg.verified)
+    self.assertAlmostEqual(cfg.device_speed_scale, 1 / 0.96, delta=0.005)
+    self.assertEqual(r.new_raw["fcan"], STANDALONE_RAW["fcan"])     # the car's map is left alone
+
+  def test_part_2_fails_without_the_devices_speed_or_with_a_wrong_direction(self):
+    raw = {**copy.deepcopy(STANDALONE_RAW), "setup": {"parked": "2026-10-10T10:00:00"}}
+    r = check_drive.check(raw, self._drive(device=False))
+    self.assertIsNone(r.new_raw)
+    self.assertIn("missing", r.fit.detail)
+    r = check_drive.check(raw, self._drive(device_scale=1.3))
+    self.assertIsNone(r.new_raw)
+    raw["actuator"]["direction"] = -1
+    r = check_drive.check(raw, self._drive(true_direction=1))
+    self.assertIsNone(r.new_raw)
+    self.assertTrue(r.motor.wrong_way)
+
+  def test_part_2_reads_the_devices_speed_from_the_recording(self):
+    from openpilot.cereal import log
+    import zstandard
+
+    drive = self._drive(device_scale=1.04)
+    raw = {**copy.deepcopy(STANDALONE_RAW), "setup": {"parked": "2026-10-10T10:00:00"}}
+    with tempfile.TemporaryDirectory() as root:
+      events = []
+      for t, v in drive.device:
+        evt = log.Event.new_message(logMonoTime=int(t * 1e9), valid=True)
+        dm = evt.init("deviceMotion")
+        dm.velocityDevice.x, dm.velocityDevice.y, dm.velocityDevice.z, dm.velocityDevice.valid = v, 0.0, 0.0, True
+        dm.inputsOK, dm.posenetOK = True, True
+        events.append(evt)
+      for t, angle in drive.motor:
+        evt = log.Event.new_message(logMonoTime=int(t * 1e9))
+        can = evt.init("can", 1)
+        data = bytearray(8)
+        data[5:7] = (round(angle / 0.125) & 0xFFFF).to_bytes(2, "little")
+        can[0].address, can[0].dat, can[0].src = 0x22F, bytes(data), 1
+        events.append(evt)
+      speeds = dict(drive.gps)
+      for t, b, _ in drive.headings:
+        evt = log.Event.new_message(logMonoTime=int(t * 1e9))
+        fix = evt.init("gpsLocation")
+        nearest = min(speeds, key=lambda x: abs(x - t))
+        fix.speed, fix.hasFix, fix.speedAccuracy = speeds[nearest], True, 0.3
+        fix.bearingDeg, fix.bearingAccuracyDeg = b, 1.0
+        events.append(evt)
+      events.sort(key=lambda e: e.logMonoTime)
+      path = os.path.join(root, "0000002b--abcdef1234--0")
+      os.makedirs(path)
+      with open(os.path.join(path, "rlog.zst"), "wb") as f:
+        f.write(zstandard.ZstdCompressor().compress(b"".join(e.to_bytes() for e in events)))
+      seg = check_drive.read_segment(path)
+      self.assertEqual(len(seg.device), len(drive.device))
+      self.assertEqual(seg.frames, [])
+      printed: list[str] = []
+      saved: list[dict] = []
+      with mock.patch.object(check_drive, "load_raw_config", lambda: copy.deepcopy(raw)):
+        self.assertTrue(check_drive.run(printed.append, root, save=lambda r: saved.append(r) or "x"), "\n".join(printed))
+      self.assertAlmostEqual(saved[0]["device_speed_scale"], 1 / 1.04, delta=0.01)
+      self.assertIn("Both parts of the setup have passed", printed[-1])
 
 if __name__ == "__main__":
   unittest.main()
