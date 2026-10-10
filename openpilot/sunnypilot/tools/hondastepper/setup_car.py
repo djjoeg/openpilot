@@ -31,7 +31,8 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from opendbc.car.hondastepper import discovery as dsc
-from opendbc.car.hondastepper.config import TEETH_SETS, load_raw_config, parse_config, save_device_config, device_config_path
+from opendbc.car.hondastepper.config import (MECHANICAL_RATIOS, TEETH_SETS, load_raw_config, parse_config, save_device_config,
+                                             device_config_path)
 from opendbc.car.hondastepper.values import StepperControlStatus, StepperMode
 from openpilot.sunnypilot.tools.hondastepper import VERSION
 from openpilot.sunnypilot.tools.hondastepper.device import CanSession
@@ -94,25 +95,28 @@ MSG_NO_MOTOR = " ".join((
   "and that the motor's cable is plugged in.",
 ))
 MSG_WHICH_TEETH = " ".join((
-  "Which steering wheel teeth are on the steering wheel: the short ones (they reach 15 degrees each way) or the long",
-  "ones (29 degrees each way)? Type 15 or 29 and press Enter:",
+  "Which steering wheel teeth are on the steering wheel: short ones (the short teeth, a ring of teeth or the short back",
+  "teeth: they reach 15 degrees each way), the long ones (29 degrees each way), or the long back teeth (45 degrees each",
+  "way)? Type 15, 29 or 45 and press Enter:",
 ))
 MSG_WHICH_TEETH_PHONE = " ".join((
-  "Which steering wheel teeth are on the steering wheel: the short ones (they reach 15 degrees each way) or the long",
-  "ones (29 degrees each way)?",
+  "Which steering wheel teeth are on the steering wheel: short ones (the short teeth, a ring of teeth or the short back",
+  "teeth: they reach 15 degrees each way), the long ones (29 degrees each way), or the long back teeth (45 degrees each",
+  "way)?",
 ))
-TEETH_CHOICES = (("15", "Short teeth (15)"), ("29", "Long teeth (29)"))
+TEETH_CHOICES = (("15", "Short teeth (15)"), ("29", "Long teeth (29)"), ("45", "Long back teeth (45)"))
+TEETH_NAMES = {15: "short ones", 29: "long ones", 45: "long back teeth"}
 MSG_TURN_LEFT = " ".join((
   "Next, you turn the steering wheel LEFT, slowly, taking about 5 seconds, until the motor gear has run off the end of",
   "the steering wheel teeth and stopped turning (a sixteenth of a turn with the short teeth, an eighth with the long",
-  "ones). Then hold the wheel still there. It records while you turn, and carries on by itself once the wheel has",
-  "been still for a moment. Press Enter, then turn.",
+  "ones, a sixth with the long back teeth). Then hold the wheel still there. It records while you turn, and carries on by",
+  "itself once the wheel has been still for a moment. Press Enter, then turn.",
 ))
 MSG_TURN_LEFT_PHONE = " ".join((
   "Next, you turn the steering wheel LEFT, slowly, taking about 5 seconds, until the motor gear has run off the end of",
   "the steering wheel teeth and stopped turning (a sixteenth of a turn with the short teeth, an eighth with the long",
-  "ones). Then hold the wheel still there. It records while you turn, and carries on by itself once the wheel has",
-  "been still for a moment. Press the button, then turn.",
+  "ones, a sixth with the long back teeth). Then hold the wheel still there. It records while you turn, and carries on by",
+  "itself once the wheel has been still for a moment. Press the button, then turn.",
 ))
 MSG_TURN_RIGHT = " ".join((
   "Now the same to the RIGHT: slowly, past the middle, until the motor gear has run off the other end of the teeth and",
@@ -334,7 +338,7 @@ class CarSetup:
           "\nThe motor. Engine running, shifter in P.")
     res.teeth = self.which_teeth()
     if res.teeth is None:
-      res.motor = dsc.MotorCheck(False, "no answer to which steering wheel teeth are on (type 15 or 29)")
+      res.motor = dsc.MotorCheck(False, "no answer to which steering wheel teeth are on (type 15, 29 or 45)")
       return
     start = None
     for _ in range(2):
@@ -515,6 +519,7 @@ def build_config(raw: dict, res: ParkedResult) -> tuple[dict, bool, list[str]]:
   if res.motor is not None and res.motor.ok:
     new_raw["actuator"]["direction"] = res.motor.direction
     new_raw["actuator"]["tracked_arc_deg"] = TEETH_SETS[res.teeth]
+    new_raw["actuator"]["mechanical_ratio"] = MECHANICAL_RATIOS[res.teeth]
   new_raw.setdefault("setup", {})
   # A new parked check can change the motor's direction or the signal map, so the drive check that confirmed the old
   # ones no longer counts: lane keeping waits for both again.
@@ -534,7 +539,7 @@ def report(res: ParkedResult, problems: list[str], passed: bool) -> str:
     marker = "OK  " if f.ok else ("    " if f.signal == "STEER_ANGLE" else "FAIL")   # the angle is a bonus, never a fault
     lines.append(f"  {marker} {dsc.plain_name(f.signal)}: {f.detail}")
   if res.teeth:
-    lines.append(f"  steering wheel teeth: the {'short' if res.teeth == min(TEETH_SETS) else 'long'} ones ({res.teeth} degrees each way)")
+    lines.append(f"  steering wheel teeth: the {TEETH_NAMES[res.teeth]} ({res.teeth} degrees each way)")
   if res.motor:
     lines.append(f"  {'OK  ' if res.motor.ok else 'FAIL'} motor direction: {res.motor.detail}")
   if res.push:

@@ -251,6 +251,19 @@ class TestSetupCar(unittest.TestCase):
     self.assertEqual(raw["actuator"]["tracked_arc_deg"], TEETH_SETS[15])
     self.assertIn("the short ones (15 degrees each way)", text)
 
+  def test_back_teeth(self):
+    car, motor = SimCar(), SimMotor(true_direction=1, arc_deg=TEETH_SETS[45])
+    passed, raw, text, _ = run_setup(car, motor, SimDriver(car, motor, teeth="45"))
+    self.assertTrue(passed, text)
+    self.assertEqual(raw["actuator"]["tracked_arc_deg"], TEETH_SETS[45])
+    self.assertAlmostEqual(raw["actuator"]["mechanical_ratio"], 166 / 16)
+    self.assertIn("the long back teeth (45 degrees each way)", text)
+    # the long teeth keep the other mounts' gearing
+    car, motor = SimCar(), SimMotor(true_direction=1, arc_deg=TEETH_SETS[29])
+    passed, raw, text, _ = run_setup(car, motor, SimDriver(car, motor, teeth="29"))
+    self.assertTrue(passed, text)
+    self.assertAlmostEqual(raw["actuator"]["mechanical_ratio"], 197 / 19)
+
   def test_wrong_teeth_answer(self):
     car, motor = SimCar(), SimMotor(true_direction=1, arc_deg=TEETH_SETS[15])
     passed, raw, text, _ = run_setup(car, motor, SimDriver(car, motor, teeth="29"))
