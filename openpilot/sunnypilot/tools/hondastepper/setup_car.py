@@ -31,8 +31,8 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from opendbc.car.hondastepper import discovery as dsc
-from opendbc.car.hondastepper.config import (MECHANICAL_RATIOS, TEETH_SETS, load_raw_config, parse_config, save_device_config,
-                                             device_config_path)
+from opendbc.car.hondastepper.config import (MECHANICAL_RATIOS, NO_ROLLER_ARCS, ROLL_PAST_TEETH_DEG, TEETH_SETS, load_raw_config,
+                                             parse_config, save_device_config, device_config_path)
 from opendbc.car.hondastepper.values import StepperControlStatus, StepperMode
 from openpilot.sunnypilot.tools.hondastepper import VERSION
 from openpilot.sunnypilot.tools.hondastepper.device import CanSession
@@ -44,8 +44,8 @@ Honda Accord lane keeping, software {VERSION}: car setup, part 1 of 2 (parked)
 This takes about 5 minutes. It asks you to do one simple thing at a time: turn or hold the steering wheel, and say
 which way it turned. Do it, then press Enter. At the end it saves what it learned and restarts the comma device.
 
-Before you start: car parked somewhere safe, engine running, steering wheel straight. It tells you when to pull
-the lift lever down.
+Before you start: car parked somewhere safe, engine running, steering wheel straight. It tells you when to switch
+the motor on.
 """
 
 INTRO = f"""
@@ -55,8 +55,8 @@ This takes about 10 minutes. It asks you to do one simple thing at a time: press
 move the shifter, turn or hold the steering wheel. Do it, press Enter, and hold it for 3 seconds while it watches.
 At the end it saves what it learned and restarts the comma device.
 
-Before you start: car parked somewhere safe, engine running, steering wheel straight. It tells you when to pull
-the lift lever down.
+Before you start: car parked somewhere safe, engine running, steering wheel straight. It tells you when to switch
+the motor on.
 """
 
 MSG_MORE_GEARS = " ".join((
@@ -86,23 +86,23 @@ MSG_NEVER_LEFT = " ".join((
   "each push: one of the two pushes turns it left",
 ))
 MSG_LEVER_DOWN = " ".join((
-  "Steering wheel straight. Pull the lift lever down until it clicks, so the motor gear drops onto the middle of the",
-  "steering wheel teeth.",
-  "Hands off the wheel.",
+  "Steering wheel straight. Switch the motor on with its gear on the middle of the steering wheel teeth: pull the",
+  "lift lever down until it clicks, or on the side-slide mount, pull the motor out along its shaft until the latch",
+  "clicks. Hands off the wheel.",
 ))
 MSG_NO_MOTOR = " ".join((
-  "No answer from the motor. Check that the lift lever is all the way down (it switches the motor's power on)",
-  "and that the motor's cable is plugged in.",
+  "No answer from the motor. Check that it is switched on (the lift lever all the way down, or the side-slide",
+  "mount's latch clicked) and that the motor's cable is plugged in.",
 ))
 MSG_WHICH_TEETH = " ".join((
-  "Which steering wheel teeth are on the steering wheel: short ones (the short teeth, a ring of teeth or the short back",
-  "teeth: they reach 15 degrees each way), the long ones (29 degrees each way), or the long back teeth (45 degrees each",
-  "way)? Type 15, 29 or 45 and press Enter:",
+  "Which steering wheel teeth are on the steering wheel: short ones (the short teeth, a ring of teeth, the short back",
+  "teeth or the side-slide mount's teeth: they reach 15 degrees each way), the long ones (29 degrees each way), or the",
+  "long back teeth (45 degrees each way)? Type 15, 29 or 45 and press Enter:",
 ))
 MSG_WHICH_TEETH_PHONE = " ".join((
-  "Which steering wheel teeth are on the steering wheel: short ones (the short teeth, a ring of teeth or the short back",
-  "teeth: they reach 15 degrees each way), the long ones (29 degrees each way), or the long back teeth (45 degrees each",
-  "way)?",
+  "Which steering wheel teeth are on the steering wheel: short ones (the short teeth, a ring of teeth, the short back",
+  "teeth or the side-slide mount's teeth: they reach 15 degrees each way), the long ones (29 degrees each way), or the",
+  "long back teeth (45 degrees each way)?",
 ))
 TEETH_CHOICES = (("15", "Short teeth (15)"), ("29", "Long teeth (29)"), ("45", "Long back teeth (45)"))
 TEETH_NAMES = {15: "short ones", 29: "long ones", 45: "long back teeth"}
@@ -127,14 +127,15 @@ MSG_TURN_RIGHT_PHONE = " ".join((
   "stopped turning, then hold the wheel still. Press the button, then turn.",
 ))
 MSG_PART1_PASSED = " ".join((
-  "Part 1 passed. Next: drive for at least 5 minutes with the lift lever DOWN (lane keeping stays off until both parts",
-  "pass, so the motor only rides along), at a mix of speeds between about 15 and 50 mph, with some curves or lane",
+  "Part 1 passed. Next: drive for at least 5 minutes with the motor switched ON (the lift lever down, or the side-slide",
+  "mount latched out; lane keeping stays off until both parts pass, so the motor only rides along), at a mix of speeds",
+  "between about 15 and 50 mph, with some curves or lane",
   "changes, where the comma device can see the sky. Then run part 2, the drive check (Part 2 on the setup page, or",
   "/data/openpilot/accord_setup.sh drive over SSH).",
 ))
 
 MSG_GRIP = " ".join((
-  "Grip test. Keep the lift lever clicked down. Start it, then within 3 seconds hold the steering wheel firmly with",
+  "Grip test. Keep the motor switched on. Start it, then within 3 seconds hold the steering wheel firmly with",
   "both hands at 9 and 3 o'clock, so it can't turn. The motor then pushes as hard as it can, about 2 seconds one way,",
   "then the other (about as hard as 3 kg pulling on the edge of the steering wheel). Keep holding until it has",
   "stopped pushing both ways, about 8 seconds after you start. Nothing should click or jump.",
@@ -146,9 +147,11 @@ MSG_GRIP_TRY_AGAIN = " ".join((
   "steering wheel. Check that their zip ties are tight, hold the wheel firmly, and it tries once more.",
 ))
 MSG_GRIP_SLIPPED = " ".join((
-  "the motor gear slipped over the steering wheel teeth. Check that the spring is in place, the lift lever is clicked",
-  "down, and neither the motor gear's teeth nor the steering wheel teeth are worn or broken, then run the car setup",
-  "again. If it slips again, put an M5 washer under the spring (see the build guide)",
+  "the motor gear slipped over the steering wheel teeth. Check that the motor is switched on and sits right (the lift",
+  "lever clicked down with its spring in place, or the side-slide mount latched out), and that neither the motor gear's",
+  "teeth nor the steering wheel teeth are worn or broken, then run the car setup again. If it slips again on a lift",
+  "lever mount, put an M5 washer under the spring (see the build guide); on the side-slide mount, check that the back",
+  "of the steering wheel doesn't move away from the motor as the wheel turns",
 ))
 MSG_GRIP_MOVED = " ".join((
   "the steering wheel moved during the grip test both times: it turned in your hands, or the steering wheel teeth",
@@ -181,9 +184,20 @@ class ParkedResult:
   motor: dsc.MotorCheck | None = None
   push: dsc.MotorCheck | None = None
   grip: dsc.MotorCheck | None = None
-  teeth: int | None = None     # which steering wheel teeth are on: 15 or 29 (TEETH_SETS)
+  teeth: int | None = None     # which steering wheel teeth are on: 15, 29 or 45 (TEETH_SETS)
+  arc: float = 0.0             # the steering wheel turn the motor followed on them, as designed (TEETH_SETS, NO_ROLLER_ARCS)
+  roll_past: float = ROLL_PAST_TEETH_DEG   # each side of it, the rolling band past the last tooth: 0 without a roller
   notes: list[str] = field(default_factory=list)
   rest: list = field(default_factory=list)   # the first recording: wheel straight, nothing pressed
+
+
+def teeth_arc(teeth: int, span_deg: float) -> tuple[float, float]:
+  """(tracked arc, rolling band each side) for the answered teeth: with a roller on the motor gear (TEETH_SETS), or
+  without one (NO_ROLLER_ARCS), whichever the turn the motor followed (span_deg) is nearer."""
+  arcs = [(TEETH_SETS[teeth], ROLL_PAST_TEETH_DEG)]
+  if teeth in NO_ROLLER_ARCS:
+    arcs.append((NO_ROLLER_ARCS[teeth], 0.0))
+  return min(arcs, key=lambda a: abs(span_deg / a[0] - 1.0))
 
 
 class CarSetup:
@@ -369,10 +383,14 @@ class CarSetup:
     if self.cfg.car_network:
       res.findings.append(dsc.find_angle_signal(self.cfg, res.rest, [(left_frames, left_series), (right_frames, right_series)],
                                                 stats, a.angle_scale))
-    res.motor = dsc.motor_direction_from_turn(start, left, right, a.angle_scale, TEETH_SETS[res.teeth])
+    # with a roller on the motor gear it follows the wheel past the teeth along the rolling band; without one (the
+    # side-slide mount, short teeth) over the teeth alone: the nearer of the two is what's fitted
+    res.arc, res.roll_past = teeth_arc(res.teeth, abs(left - right) * a.angle_scale)
+    res.motor = dsc.motor_direction_from_turn(start, left, right, a.angle_scale, res.arc)
     if not res.motor.ok:
       # a turn that matches the other teeth means the answer about which teeth are on was wrong, not the gearing
-      for other, arc in TEETH_SETS.items():
+      others = [(k, v) for k, v in TEETH_SETS.items()] + [(k, v) for k, v in NO_ROLLER_ARCS.items()]
+      for other, arc in others:
         if other != res.teeth and dsc.motor_direction_from_turn(start, left, right, a.angle_scale, arc, arc_tolerance=0.15).ok:
           detail = " ".join((f"the motor turned with the steering wheel as far as the {other} degree teeth reach,",
                              f"not the {res.teeth}: check which teeth are on"))
@@ -518,7 +536,8 @@ def build_config(raw: dict, res: ParkedResult) -> tuple[dict, bool, list[str]]:
     problems.append(f"grip test: {res.grip.detail if res.grip else 'not done'}")
   if res.motor is not None and res.motor.ok:
     new_raw["actuator"]["direction"] = res.motor.direction
-    new_raw["actuator"]["tracked_arc_deg"] = TEETH_SETS[res.teeth]
+    new_raw["actuator"]["tracked_arc_deg"] = res.arc
+    new_raw["actuator"]["roll_past_deg"] = res.roll_past
     new_raw["actuator"]["mechanical_ratio"] = MECHANICAL_RATIOS[res.teeth]
   new_raw.setdefault("setup", {})
   # A new parked check can change the motor's direction or the signal map, so the drive check that confirmed the old
@@ -539,7 +558,8 @@ def report(res: ParkedResult, problems: list[str], passed: bool) -> str:
     marker = "OK  " if f.ok else ("    " if f.signal == "STEER_ANGLE" else "FAIL")   # the angle is a bonus, never a fault
     lines.append(f"  {marker} {dsc.plain_name(f.signal)}: {f.detail}")
   if res.teeth:
-    lines.append(f"  steering wheel teeth: the {TEETH_NAMES[res.teeth]} ({res.teeth} degrees each way)")
+    roller = "" if res.roll_past or not res.arc else ", the motor gear without a roller"
+    lines.append(f"  steering wheel teeth: the {TEETH_NAMES[res.teeth]} ({res.teeth} degrees each way){roller}")
   if res.motor:
     lines.append(f"  {'OK  ' if res.motor.ok else 'FAIL'} motor direction: {res.motor.detail}")
   if res.push:

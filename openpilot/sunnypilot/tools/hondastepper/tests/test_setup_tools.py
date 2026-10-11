@@ -11,7 +11,7 @@ import unittest
 from unittest import mock
 
 from opendbc.car.hondastepper import discovery as dsc
-from opendbc.car.hondastepper.config import CONFIG_PATH, TEETH_SETS, parse_config
+from opendbc.car.hondastepper.config import CONFIG_PATH, NO_ROLLER_ARCS, ROLL_PAST_TEETH_DEG, TEETH_SETS, parse_config
 from opendbc.car.hondastepper.tests.sim import MESSAGES, MOVED_GEARS, MOVED_LAYOUT, SimCar, SimMotor, turning_drive
 from openpilot.sunnypilot.tools.hondastepper import check_drive, setup_car
 from openpilot.sunnypilot.tools.hondastepper.device import CanSession
@@ -79,6 +79,7 @@ class SimDriver:
     self.prompts: list[str] = []
 
   def _straight(self):
+    self.motor.plan = None          # a turn still going on stops: the driver turns back to straight and lets go
     self.motor.turn_wheel(self.motor.teeth_center_deg)
     self.push_start = self.motor.wheel_deg
 
@@ -107,7 +108,7 @@ class SimDriver:
       ("turn signal off", lambda: c.state.update(LEFT_BLINKER=0, RIGHT_BLINKER=0)),
       ("Open the driver's door", lambda: c.state.update(DOOR_OPEN=1)),
       ("Close the driver's door", lambda: c.state.update(DOOR_OPEN=0)),
-      ("Pull the lift lever down", lambda: setattr(m, "powered", self.motor_works)),
+      ("Switch the motor on with its gear", lambda: setattr(m, "powered", self.motor_works)),
       ("turn the steering wheel LEFT", lambda: m.plan_turn(m.teeth_center_deg + first, 15.0)),   # over the next seconds
       ("the same to the RIGHT", lambda: m.plan_turn(m.teeth_center_deg - first, 15.0)),
       ("back to straight", self._straight),
@@ -250,6 +251,22 @@ class TestSetupCar(unittest.TestCase):
     self.assertTrue(passed, text)
     self.assertEqual(raw["actuator"]["tracked_arc_deg"], TEETH_SETS[15])
     self.assertIn("the short ones (15 degrees each way)", text)
+
+  def test_short_teeth_with_and_without_a_roller(self):
+    # with a roller (every mount but the side-slide one) the motor follows the wheel along the rolling band too
+    car, motor = SimCar(), SimMotor(true_direction=1, arc_deg=TEETH_SETS[15])
+    passed, raw, text, _ = run_setup(car, motor, SimDriver(car, motor, teeth="15"))
+    self.assertTrue(passed, text)
+    self.assertEqual(raw["actuator"]["roll_past_deg"], ROLL_PAST_TEETH_DEG)
+    self.assertNotIn("without a roller", text)
+    # the side-slide mount's gear has none: the motor follows the teeth alone, and the full push reaches their end
+    car, motor = SimCar(), SimMotor(true_direction=1, arc_deg=NO_ROLLER_ARCS[15])
+    passed, raw, text, _ = run_setup(car, motor, SimDriver(car, motor, teeth="15"))
+    self.assertTrue(passed, text)
+    self.assertEqual(raw["actuator"]["tracked_arc_deg"], NO_ROLLER_ARCS[15])
+    self.assertEqual(raw["actuator"]["roll_past_deg"], 0.0)
+    self.assertAlmostEqual(parse_config(raw).actuator.full_push_reach_deg, NO_ROLLER_ARCS[15] / 2)
+    self.assertIn("the short ones (15 degrees each way), the motor gear without a roller", text)
 
   def test_back_teeth(self):
     car, motor = SimCar(), SimMotor(true_direction=1, arc_deg=TEETH_SETS[45])

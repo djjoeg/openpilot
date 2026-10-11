@@ -7,8 +7,9 @@ See the LICENSE.md file in the root directory for more details.
 
 Car setup for the Honda Accord with the add-on steering motor (hondastepper), part 2 of 2: the drive check.
 
-After part 1 has passed, drive for at least 5 minutes with the lift lever down (lane keeping stays off until this
-check passes), at a mix of speeds with some curves or lane changes. Park, then run it from a phone on the comma
+After part 1 has passed, drive for at least 5 minutes with the motor switched on (the lift lever down, or the
+side-slide mount latched out; lane keeping stays off until this check passes), at a mix of speeds with some curves or
+lane changes. Park, then run it from a phone on the comma
 device's hotspot (the setup page, phone.py: Part 2), or on the comma device over SSH:
 
   /data/openpilot/accord_setup.sh drive
@@ -44,15 +45,16 @@ GPS_MAX_SPEED_ERROR = 1.0  # m/s, GPS fixes less sure of their speed than this a
 GPS_MAX_BEARING_ERROR = 5.0  # degrees, same for the course
 
 MSG_DRIVE_MORE = " ".join((
-  "Nothing was saved. Drive at least 5 minutes with the lift lever down, at a mix of speeds between about 15 and",
+  "Nothing was saved. Drive at least 5 minutes with the motor switched on, at a mix of speeds between about 15 and",
   "50 mph with some curves or lane changes, where the comma device can see the sky, then run this again.",
 ))
 MSG_PART1_FIRST = "Run part 1 of the car setup first (Part 1 on the setup page, or /data/openpilot/accord_setup.sh car over SSH)."
 MSG_ALL_PASSED = " ".join((
   "Both parts of the setup have passed. After the restart, lane keeping turns on by itself about 2 seconds after you",
-  "pull the lift lever down until it clicks, and off when you lift it. If the lever is already down when you start the",
-  "car, lane keeping turns on by itself once sunnypilot is running. Do the first test in an empty parking lot (see",
-  "the build guide).",
+  "switch the motor on (pull the lift lever down until it clicks, or pull the side-slide mount's motor out until its",
+  "latch clicks), and off when you switch it off (lift the lever, or pull the latch's knob). If it is already on when",
+  "you start the car, lane keeping turns on by itself once sunnypilot is running. Do the first test in an empty",
+  "parking lot (see the build guide).",
 ))
 
 
