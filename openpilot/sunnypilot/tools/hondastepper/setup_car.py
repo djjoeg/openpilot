@@ -87,12 +87,12 @@ MSG_NEVER_LEFT = " ".join((
 ))
 MSG_LEVER_DOWN = " ".join((
   "Steering wheel straight. Switch the motor on with its gear on the middle of the steering wheel teeth: pull the",
-  "lift lever down until it clicks, or on the side-slide mount, pull the motor out along its shaft until the latch",
-  "clicks. Hands off the wheel.",
+  "lift lever down until it clicks, or on the side-slide mount, pull its lever out along the slot and then towards you",
+  "into the notch. Hands off the steering wheel.",
 ))
 MSG_NO_MOTOR = " ".join((
   "No answer from the motor. Check that it is switched on (the lift lever all the way down, or the side-slide",
-  "mount's latch clicked) and that the motor's cable is plugged in.",
+  "mount's lever all the way out and in its notch) and that the motor's cable is plugged in.",
 ))
 MSG_WHICH_TEETH = " ".join((
   "Which steering wheel teeth are on the steering wheel: short ones (the short teeth, a ring of teeth, the short back",

@@ -25,7 +25,7 @@ FCAN_BUS = 0
 MOTOR_BUS = 1
 MOTOR_STATUS_ADDR = 0x22F
 COMMAND_PERIOD = 0.02          # the motor wants a command every 20 ms and gives up after 60 ms
-MOTOR_TIMEOUT = 0.1            # no status for this long: the motor is switched off (lever up, latch let go) or not connected
+MOTOR_TIMEOUT = 0.1            # no status for this long: the motor is switched off (a lever out of its on place) or not connected
 
 POWER_WATCHDOG_FILE = "/var/tmp/power_watchdog"  # openpilot's manager keeps this fresh so the device stays on
 

@@ -51,10 +51,10 @@ MSG_DRIVE_MORE = " ".join((
 MSG_PART1_FIRST = "Run part 1 of the car setup first (Part 1 on the setup page, or /data/openpilot/accord_setup.sh car over SSH)."
 MSG_ALL_PASSED = " ".join((
   "Both parts of the setup have passed. After the restart, lane keeping turns on by itself about 2 seconds after you",
-  "switch the motor on (pull the lift lever down until it clicks, or pull the side-slide mount's motor out until its",
-  "latch clicks), and off when you switch it off (lift the lever, or pull the latch's knob). If it is already on when",
-  "you start the car, lane keeping turns on by itself once sunnypilot is running. Do the first test in an empty",
-  "parking lot (see the build guide).",
+  "switch the motor on (pull the lift lever down until it clicks, or pull the side-slide mount's lever out and towards",
+  "you into its notch), and off when you switch it off (lift the lever, or push the side-slide mount's lever away from",
+  "you, out of its notch). If it is already on when you start the car, lane keeping turns on by itself once sunnypilot",
+  "is running. Do the first test in an empty parking lot (see the build guide).",
 ))
 
 
