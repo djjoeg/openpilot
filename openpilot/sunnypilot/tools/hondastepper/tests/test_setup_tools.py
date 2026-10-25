@@ -268,6 +268,24 @@ class TestSetupCar(unittest.TestCase):
     self.assertAlmostEqual(parse_config(raw).actuator.full_push_reach_deg, NO_ROLLER_ARCS[15] / 2)
     self.assertIn("the short ones (15 degrees each way), the motor gear without a roller", text)
 
+  def test_side_slide_teeth_sets(self):
+    # the side-slide mount's other two sets: straight roads (10 teeth, answer 11) and winding roads (18 teeth, answer 20),
+    # both without a roller, on the face gear's ratio
+    for answer, name in ((11, "straight-roads ones"), (20, "winding-roads ones")):
+      car, motor = SimCar(), SimMotor(true_direction=1, arc_deg=NO_ROLLER_ARCS[answer])
+      passed, raw, text, _ = run_setup(car, motor, SimDriver(car, motor, teeth=str(answer)))
+      self.assertTrue(passed, text)
+      self.assertEqual(raw["actuator"]["tracked_arc_deg"], NO_ROLLER_ARCS[answer])
+      self.assertEqual(raw["actuator"]["roll_past_deg"], 0.0)
+      self.assertAlmostEqual(raw["actuator"]["mechanical_ratio"], 166 / 16)
+      self.assertAlmostEqual(parse_config(raw).actuator.full_push_reach_deg, NO_ROLLER_ARCS[answer] / 2)
+      self.assertIn(f"the {name} ({answer} degrees each way), the motor gear without a roller", text)
+    # the straight-roads teeth on the car with the highway teeth answered: the turn gives it away
+    car, motor = SimCar(), SimMotor(true_direction=1, arc_deg=NO_ROLLER_ARCS[11])
+    passed, raw, text, _ = run_setup(car, motor, SimDriver(car, motor, teeth="15"))
+    self.assertFalse(passed)
+    self.assertIn("as far as the 11 degree teeth reach, not the 15: check which teeth are on", text)
+
   def test_back_teeth(self):
     car, motor = SimCar(), SimMotor(true_direction=1, arc_deg=TEETH_SETS[45])
     passed, raw, text, _ = run_setup(car, motor, SimDriver(car, motor, teeth="45"))

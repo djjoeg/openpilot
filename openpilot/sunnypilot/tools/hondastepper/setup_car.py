@@ -31,7 +31,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from opendbc.car.hondastepper import discovery as dsc
-from opendbc.car.hondastepper.config import (MECHANICAL_RATIOS, NO_ROLLER_ARCS, ROLL_PAST_TEETH_DEG, TEETH_SETS, load_raw_config,
+from opendbc.car.hondastepper.config import (ALL_TEETH, MECHANICAL_RATIOS, NO_ROLLER_ARCS, ROLL_PAST_TEETH_DEG, TEETH_SETS, load_raw_config,
                                              parse_config, save_device_config, device_config_path)
 from opendbc.car.hondastepper.values import StepperControlStatus, StepperMode
 from openpilot.sunnypilot.tools.hondastepper import VERSION
@@ -95,27 +95,30 @@ MSG_NO_MOTOR = " ".join((
   "mount's lever all the way out and in its notch) and that the motor's cable is plugged in.",
 ))
 MSG_WHICH_TEETH = " ".join((
-  "Which steering wheel teeth are on the steering wheel: short ones (the short teeth, a ring of teeth, the short back",
-  "teeth or the side-slide mount's teeth: they reach 15 degrees each way), the long ones (29 degrees each way), or the",
-  "long back teeth (45 degrees each way)? Type 15, 29 or 45 and press Enter:",
+  "Which steering wheel teeth are on the steering wheel? The number on the printed piece: 11 (the side-slide mount's",
+  "straight-roads teeth, 11 degrees each way), 15 (the short teeth, a ring of teeth, the short back teeth or the",
+  "side-slide mount's highway teeth: 15 degrees each way), 20 (the side-slide mount's winding-roads teeth, 20 degrees",
+  "each way), 29 (the long teeth) or 45 (the long back teeth). Type the number and press Enter:",
 ))
 MSG_WHICH_TEETH_PHONE = " ".join((
-  "Which steering wheel teeth are on the steering wheel: short ones (the short teeth, a ring of teeth, the short back",
-  "teeth or the side-slide mount's teeth: they reach 15 degrees each way), the long ones (29 degrees each way), or the",
-  "long back teeth (45 degrees each way)?",
+  "Which steering wheel teeth are on the steering wheel? The number on the printed piece: 11 (the side-slide mount's",
+  "straight-roads teeth, 11 degrees each way), 15 (the short teeth, a ring of teeth, the short back teeth or the",
+  "side-slide mount's highway teeth: 15 degrees each way), 20 (the side-slide mount's winding-roads teeth, 20 degrees",
+  "each way), 29 (the long teeth) or 45 (the long back teeth).",
 ))
-TEETH_CHOICES = (("15", "Short teeth (15)"), ("29", "Long teeth (29)"), ("45", "Long back teeth (45)"))
-TEETH_NAMES = {15: "short ones", 29: "long ones", 45: "long back teeth"}
+TEETH_CHOICES = (("11", "Straight-roads teeth (11)"), ("15", "Short or highway teeth (15)"), ("20", "Winding-roads teeth (20)"),
+                 ("29", "Long teeth (29)"), ("45", "Long back teeth (45)"))
+TEETH_NAMES = {11: "straight-roads ones", 15: "short ones", 20: "winding-roads ones", 29: "long ones", 45: "long back teeth"}
 MSG_TURN_LEFT = " ".join((
   "Next, you turn the steering wheel LEFT, slowly, taking about 5 seconds, until the motor gear has run off the end of",
-  "the steering wheel teeth and stopped turning (a sixteenth of a turn with the short teeth, an eighth with the long",
-  "ones, a sixth with the long back teeth). Then hold the wheel still there. It records while you turn, and carries on by",
+  "the steering wheel teeth and stopped turning (about a thirtieth of a turn with the 11 teeth, a sixteenth with 15 or",
+  "20, an eighth with 29, a sixth with 45). Then hold the wheel still there. It records while you turn, and carries on by",
   "itself once the wheel has been still for a moment. Press Enter, then turn.",
 ))
 MSG_TURN_LEFT_PHONE = " ".join((
   "Next, you turn the steering wheel LEFT, slowly, taking about 5 seconds, until the motor gear has run off the end of",
-  "the steering wheel teeth and stopped turning (a sixteenth of a turn with the short teeth, an eighth with the long",
-  "ones, a sixth with the long back teeth). Then hold the wheel still there. It records while you turn, and carries on by",
+  "the steering wheel teeth and stopped turning (about a thirtieth of a turn with the 11 teeth, a sixteenth with 15 or",
+  "20, an eighth with 29, a sixth with 45). Then hold the wheel still there. It records while you turn, and carries on by",
   "itself once the wheel has been still for a moment. Press the button, then turn.",
 ))
 MSG_TURN_RIGHT = " ".join((
@@ -184,7 +187,7 @@ class ParkedResult:
   motor: dsc.MotorCheck | None = None
   push: dsc.MotorCheck | None = None
   grip: dsc.MotorCheck | None = None
-  teeth: int | None = None     # which steering wheel teeth are on: 15, 29 or 45 (TEETH_SETS)
+  teeth: int | None = None     # which steering wheel teeth are on: 11, 15, 20, 29 or 45 (ALL_TEETH)
   arc: float = 0.0             # the steering wheel turn the motor followed on them, as designed (TEETH_SETS, NO_ROLLER_ARCS)
   roll_past: float = ROLL_PAST_TEETH_DEG   # each side of it, the rolling band past the last tooth: 0 without a roller
   notes: list[str] = field(default_factory=list)
@@ -194,7 +197,9 @@ class ParkedResult:
 def teeth_arc(teeth: int, span_deg: float) -> tuple[float, float]:
   """(tracked arc, rolling band each side) for the answered teeth: with a roller on the motor gear (TEETH_SETS), or
   without one (NO_ROLLER_ARCS), whichever the turn the motor followed (span_deg) is nearer."""
-  arcs = [(TEETH_SETS[teeth], ROLL_PAST_TEETH_DEG)]
+  arcs = []
+  if teeth in TEETH_SETS:
+    arcs.append((TEETH_SETS[teeth], ROLL_PAST_TEETH_DEG))
   if teeth in NO_ROLLER_ARCS:
     arcs.append((NO_ROLLER_ARCS[teeth], 0.0))
   return min(arcs, key=lambda a: abs(span_deg / a[0] - 1.0))
@@ -341,7 +346,7 @@ class CarSetup:
   def which_teeth(self) -> int | None:
     for _ in range(3):
       answer = self.p.ask(MSG_WHICH_TEETH, TEETH_CHOICES, MSG_WHICH_TEETH_PHONE).strip()
-      if answer.isdigit() and int(answer) in TEETH_SETS:
+      if answer.isdigit() and int(answer) in ALL_TEETH:
         return int(answer)
     return None
 
@@ -352,7 +357,7 @@ class CarSetup:
           "\nThe motor. Engine running, shifter in P.")
     res.teeth = self.which_teeth()
     if res.teeth is None:
-      res.motor = dsc.MotorCheck(False, "no answer to which steering wheel teeth are on (type 15, 29 or 45)")
+      res.motor = dsc.MotorCheck(False, "no answer to which steering wheel teeth are on (type 11, 15, 20, 29 or 45)")
       return
     start = None
     for _ in range(2):
@@ -386,15 +391,21 @@ class CarSetup:
     # with a roller on the motor gear it follows the wheel past the teeth along the rolling band; without one (the
     # side-slide mount, short teeth) over the teeth alone: the nearer of the two is what's fitted
     res.arc, res.roll_past = teeth_arc(res.teeth, abs(left - right) * a.angle_scale)
-    res.motor = dsc.motor_direction_from_turn(start, left, right, a.angle_scale, res.arc)
+    # without a roller the gear leaves the last tooth cleanly, so the turn is a closer match: a tighter allowance there
+    # tells the side-slide mount's three sets (11, 15, 20) apart
+    res.motor = dsc.motor_direction_from_turn(start, left, right, a.angle_scale, res.arc,
+                                              arc_tolerance=0.35 if res.roll_past else 0.2)
     if not res.motor.ok:
-      # a turn that matches the other teeth means the answer about which teeth are on was wrong, not the gearing
-      others = [(k, v) for k, v in TEETH_SETS.items()] + [(k, v) for k, v in NO_ROLLER_ARCS.items()]
-      for other, arc in others:
-        if other != res.teeth and dsc.motor_direction_from_turn(start, left, right, a.angle_scale, arc, arc_tolerance=0.15).ok:
-          detail = " ".join((f"the motor turned with the steering wheel as far as the {other} degree teeth reach,",
-                             f"not the {res.teeth}: check which teeth are on"))
-          res.motor = dataclasses.replace(res.motor, detail=detail)
+      # a turn that matches other teeth means the answer about which teeth are on was wrong, not the gearing: the
+      # set whose arc the turn is nearest to
+      span = abs(left - right) * a.angle_scale
+      others = [(abs(span / arc - 1.0), other) for other, arc in list(TEETH_SETS.items()) + list(NO_ROLLER_ARCS.items())
+                if other != res.teeth]
+      off, other = min(others)
+      if off <= 0.15:
+        detail = " ".join((f"the motor turned with the steering wheel as far as the {other} degree teeth reach,",
+                           f"not the {res.teeth}: check which teeth are on"))
+        res.motor = dataclasses.replace(res.motor, detail=detail)
       return
 
     # The direction so far rests on which way the wheel was turned first. The person's own eyes check it: the motor
