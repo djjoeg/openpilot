@@ -6,7 +6,7 @@ See the LICENSE.md file in the root directory for more details.
 
 The settings the Honda Accord with the add-on steering motor (hondastepper) needs. The manager makes them every time
 sunnypilot starts, before anything else runs, so an install straight from GitHub needs no laptop, and a setting
-changed in a menu can't switch off something the lift lever relies on. Only these settings are touched.
+changed in a menu can't switch off something lane keeping's on and off relies on. Only these settings are touched.
 """
 import json
 import os
@@ -19,7 +19,7 @@ CAR_LIST = os.path.join(BASEDIR, "openpilot", "sunnypilot", "selfdrive", "car", 
 # key: (value, where a comma 3X shows it)
 FIXED = {
   "Mads": (True, "Steering > Modular Assistive Driving System: on"),
-  # the lift lever switches the motor's power, and the car port reports that as the main switch
+  # the car port reports the motor having power (the lift lever on the earlier mounts) as the main switch
   "MadsMainCruiseAllowed": (True, "Customize MADS > Toggle with Main Cruise: on"),
   "MadsSteeringMode": (1, "Customize MADS > Steering Mode on Brake Pedal: Pause"),
   "NeuralNetworkLateralControl": (False, "Steering > Neural Network Lateral Control: off"),

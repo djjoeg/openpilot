@@ -108,7 +108,7 @@ class SimDriver:
       ("turn signal off", lambda: c.state.update(LEFT_BLINKER=0, RIGHT_BLINKER=0)),
       ("Open the driver's door", lambda: c.state.update(DOOR_OPEN=1)),
       ("Close the driver's door", lambda: c.state.update(DOOR_OPEN=0)),
-      ("Switch the motor on with its gear", lambda: setattr(m, "powered", self.motor_works)),
+      ("Slide the motor toward the steering wheel", lambda: setattr(m, "powered", self.motor_works)),
       ("turn the steering wheel LEFT", lambda: m.plan_turn(m.teeth_center_deg + first, 15.0)),   # over the next seconds
       ("the same to the RIGHT", lambda: m.plan_turn(m.teeth_center_deg - first, 15.0)),
       ("back to straight", self._straight),
@@ -219,10 +219,10 @@ class TestSetupCar(unittest.TestCase):
     passed, raw, text, driver = run_setup(car, motor)
     self.assertTrue(passed, text)
     self.assertEqual(sum("Grip test" in p for p in driver.prompts), 1)
-    # it pushed with the most the board gives: 58 firmware units, 5.4 Nm at the steering wheel with the 45 Ncm motor
+    # it pushed with the most the board gives: 58 firmware units, 7.3 Nm at the steering wheel with the 45 Ncm 1.5 A motor
     a = parse_config(raw).actuator
     self.assertEqual(setup_car.grip_torque_fw(a), 7.25)
-    self.assertIn("nothing slipped with 5.4 Nm at the steering wheel each way", text)
+    self.assertIn("nothing slipped with 7.3 Nm at the steering wheel each way", text)
     self.assertEqual(motor.slips, 0)
 
   def test_grip_test_slipping(self):
@@ -463,11 +463,11 @@ class TestCheckDrive(unittest.TestCase):
     self.assertIsNone(new_raw)
     self.assertTrue(motor.wrong_way)
 
-  def test_needs_the_lift_lever_down(self):
+  def test_needs_the_motor(self):
     r = check_drive.check(copy.deepcopy(PARKED_RAW), self._drive(SimCar(), with_motor=False))
     new_raw, motor = r.new_raw, r.motor
     self.assertIsNone(new_raw)
-    self.assertIn("lift lever down", motor.detail)
+    self.assertIn("lights on its board", motor.detail)
 
   def test_too_little_driving(self):
     car = SimCar()

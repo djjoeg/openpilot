@@ -7,9 +7,8 @@ See the LICENSE.md file in the root directory for more details.
 
 Car setup for the Honda Accord with the add-on steering motor (hondastepper), part 2 of 2: the drive check.
 
-After part 1 has passed, drive for at least 5 minutes with the motor switched on (the lift lever down, or the
-side-slide mount latched out; lane keeping stays off until this check passes), at a mix of speeds with some curves or
-lane changes. Park, then run it from a phone on the comma
+After part 1 has passed, drive for at least 5 minutes with the motor gear in the teeth (lane keeping stays off until
+this check passes), at a mix of speeds with some curves or lane changes. Park, then run it from a phone on the comma
 device's hotspot (the setup page, phone.py: Part 2), or on the comma device over SSH:
 
   /data/openpilot/accord_setup.sh drive
@@ -45,16 +44,15 @@ GPS_MAX_SPEED_ERROR = 1.0  # m/s, GPS fixes less sure of their speed than this a
 GPS_MAX_BEARING_ERROR = 5.0  # degrees, same for the course
 
 MSG_DRIVE_MORE = " ".join((
-  "Nothing was saved. Drive at least 5 minutes with the motor switched on, at a mix of speeds between about 15 and",
-  "50 mph with some curves or lane changes, where the comma device can see the sky, then run this again.",
+  "Nothing was saved. Drive at least 5 minutes with the motor gear in the teeth, at a mix of speeds between about 15",
+  "and 50 mph with some curves or lane changes, where the comma device can see the sky, then run this again.",
 ))
 MSG_PART1_FIRST = "Run part 1 of the car setup first (Part 1 on the setup page, or /data/openpilot/accord_setup.sh car over SSH)."
 MSG_ALL_PASSED = " ".join((
-  "Both parts of the setup have passed. After the restart, lane keeping turns on by itself about 2 seconds after you",
-  "switch the motor on (pull the lift lever down until it clicks, or pull the side-slide mount's lever out and towards",
-  "you into its notch), and off when you switch it off (lift the lever, or push the side-slide mount's lever away from",
-  "you, out of its notch). If it is already on when you start the car, lane keeping turns on by itself once sunnypilot",
-  "is running. Do the first test in an empty parking lot (see the build guide).",
+  "Both parts of the setup have passed. After the restart, lane keeping is on whenever the car is on and the motor",
+  "gear is in the teeth: you hear the engage sound once sunnypilot is running, and it starts pushing about a second",
+  "after the steering wheel first turns the motor. To switch it off, slide the motor back out of the teeth (on the",
+  "earlier mounts: lift the lever). Do the first test in an empty parking lot (see the build guide).",
 ))
 
 

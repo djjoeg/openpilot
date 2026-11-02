@@ -4,6 +4,10 @@ openpilot's car port, car events, MADS and state machines run together on one cl
 comma device. The checks are what the driver sees and hears: lane keeping turns on about 2 s after the lift lever goes
 down and off when it comes up, with only the engage and disengage sounds, also when the lever was already down as the
 car started; the panda allows steering whenever openpilot steers; a motor gear off the steering wheel teeth is silent.
+
+On the right-arm mount the motor has power whenever the car is on (the lever stays down here), and the driver switches
+lane keeping by sliding the motor gear into or out of the steering wheel teeth: lane keeping comes on with the engage
+sound, but pushes only once the steering wheel has turned the motor (find_teeth), and with the gear out it stays quiet.
 """
 import contextlib
 import math
@@ -260,6 +264,14 @@ class LeverSystem:
       alerts=[a for a in alerts if a.audible_alert != AudibleAlert.none or a.alert_size != AlertSize.none],
       sounds={a.audible_alert for a in alerts if a.audible_alert != AudibleAlert.none}))
 
+  def find_teeth(self):
+    """The driver turns the wheel a little and back, as when the car moves off: with the motor gear in the teeth that
+    turns the motor, and lane keeping may push 1 s later."""
+    self.motor.turn_wheel(self.motor.wheel_deg + 3.0)
+    self.run(0.1)
+    self.motor.turn_wheel(self.motor.wheel_deg - 3.0)
+    self.run(1.1)
+
   # ***** reading the log *****
 
   def since(self, t0: float) -> list[SimpleNamespace]:
@@ -287,8 +299,10 @@ class LeverSystemTest(unittest.TestCase):
     self.assertFalse(any(r.soft_off for r in rows))
 
   def _engaged(self, s: LeverSystem, t_down: float) -> tuple[float, float]:
+    """When the panda allowed steering and when lane keeping came on (MADS enabled; overriding until the steering
+    wheel has turned the motor)."""
     t_panda = s.first(t_down, lambda r: r.panda_lateral)
-    t_on = s.first(t_down, lambda r: r.mads == MadsState.enabled)
+    t_on = s.first(t_down, lambda r: r.mads_enabled)
     self.assertIsNotNone(t_panda)
     self.assertIsNotNone(t_on)
     return t_panda, t_on
@@ -316,26 +330,31 @@ class TestLeverSystem(LeverSystemTest):
     self.assertGreaterEqual(t_on, t_panda)
     self.assertLess(t_on - t_panda, 0.06)
     on = s.since(t_on)
-    self.assertTrue(all(r.mads == MadsState.enabled and r.panda_lateral for r in on))
+    self.assertTrue(all(r.mads_enabled and r.panda_lateral for r in on))
     self.assertTrue(any(r.lat_active for r in on))
+    self.assertEqual(s.motor.mode, StepperMode.OFF)              # not until the steering wheel has turned the motor
+    s.find_teeth()
+    self.assertEqual(s.log[-1].mads, MadsState.enabled)
     self.assertEqual(s.motor.mode, StepperMode.TORQUE_CONTROL)   # steering
     self.assertQuiet(s.since(5.0), allowed_sounds=(AudibleAlert.engage,))
     self.assertEqual(sum(AudibleAlert.engage in r.sounds for r in s.log), 1)
 
+    t_up = s.t
     s.motor.lever(False)
     s.run(1.0)
-    t_off = s.first(9.0, lambda r: not r.mads_enabled)
-    self.assertLess(t_off - 9.0, 0.12)
+    t_off = s.first(t_up, lambda r: not r.mads_enabled)
+    self.assertLess(t_off - t_up, 0.12)
     self.assertFalse(s.log[-1].panda_lateral)
-    self.assertEqual(sum(AudibleAlert.disengage in r.sounds for r in s.since(9.0)), 1)
-    self.assertQuiet(s.since(9.0), allowed_sounds=(AudibleAlert.disengage,))
+    self.assertEqual(sum(AudibleAlert.disengage in r.sounds for r in s.since(t_up)), 1)
+    self.assertQuiet(s.since(t_up), allowed_sounds=(AudibleAlert.disengage,))
     self.assertInStep(s.log)
 
     # and again: down, on 2 s later
+    t_down = s.t
     s.motor.lever(True)
     s.run(2.5)
-    t_panda, t_on = self._engaged(s, 10.0)
-    self.assertAlmostEqual(t_on, 10.0 + s.motor.boot_s + 2.0, delta=0.08)
+    t_panda, t_on = self._engaged(s, t_down)
+    self.assertAlmostEqual(t_on, t_down + s.motor.boot_s + 2.0, delta=0.08)
     self.assertInStep(s.log)
 
   def test_lever_already_down_as_the_car_starts(self):
@@ -349,7 +368,7 @@ class TestLeverSystem(LeverSystemTest):
         self.assertAlmostEqual(t_panda, s.t_car_mode + 2.0, delta=0.03)
         self.assertGreaterEqual(t_on, t_panda)
         self.assertLess(t_on - t_panda, 0.06)
-        self.assertTrue(all(r.mads == MadsState.enabled for r in s.since(t_on)))
+        self.assertTrue(all(r.mads_enabled for r in s.since(t_on)))
         self.assertQuiet(s.log, allowed_sounds=(AudibleAlert.engage,))
         self.assertEqual(sum(AudibleAlert.engage in r.sounds for r in s.log), 1)
         self.assertInStep(s.log)
@@ -358,12 +377,15 @@ class TestLeverSystem(LeverSystemTest):
     s = LeverSystem(lever_down=True)
     s.run(3.0)
     _, t_on = self._engaged(s, 0.0)
+    s.find_teeth()
+    t_on = s.t
     s.torque = lambda t: 0.3        # lane keeping pushes left, as in a long left curve
     s.run(0.5)
     # the driver turns the wheel left past the end of the steering wheel teeth: the motor gear comes off them
+    t_turn = s.t
     s.motor.turn_wheel(s.motor.teeth_center_deg + 50.0)
     s.run(3.0)
-    held = [r for r in s.since(4.0) if r.mads == MadsState.overriding]
+    held = [r for r in s.since(t_turn) if r.mads == MadsState.overriding]
     self.assertTrue(held)
     self.assertEqual(s.motor.mode, StepperMode.OFF)
     spun = s.motor.free_spin_deg
@@ -389,18 +411,20 @@ class TestLeverSystem(LeverSystemTest):
     s = LeverSystem(lever_down=True)
     s.run(3.0)
     _, t_on = self._engaged(s, 0.0)
+    s.find_teeth()
     self.assertQuiet(s.since(t_on + DT / 2))
     # the driving model plans a curve 1 s ahead that needs about 40 degrees of steering wheel: past the long teeth
     VM = s.car_events_sp.hondastepper.VM
+    t_plan = s.t
     s.sd.sm["modelV2"] = planned_path(VM.calc_curvature(math.radians(40.0), DRIVE_KPH / 3.6, 0.0))
     s.run(3.5)
-    chimes = [r for r in s.since(3.0) if r.alerts]
+    chimes = [r for r in s.since(t_plan) if r.alerts]
     self.assertTrue(chimes)
-    self.assertLess(chimes[0].t - 3.0, 0.05)
+    self.assertLess(chimes[0].t - t_plan, 0.05)
     self.assertAlmostEqual(chimes[-1].t - chimes[0].t, 3.0, delta=0.05)   # shows for 3 s, then quiet for a while
     self.assertTrue(all(a.alert_text_1 == "Steer: the curve ahead is past the teeth" for r in chimes for a in r.alerts))
     self.assertIn(AudibleAlert.prompt, chimes[0].sounds)
-    self.assertTrue(all(r.mads_enabled and r.lat_active for r in s.since(3.0)))   # the chime changes nothing else
+    self.assertTrue(all(r.mads_enabled and r.lat_active for r in s.since(t_plan)))   # the chime changes nothing else
     # a gentler curve, 20 degrees: within the long teeth, quiet
     s.sd.sm["modelV2"] = planned_path(VM.calc_curvature(math.radians(20.0), DRIVE_KPH / 3.6, 0.0))
     s.run(12.0)
@@ -411,6 +435,7 @@ class TestLeverSystem(LeverSystemTest):
     s = LeverSystem(lever_down=True)
     s.run(3.0)
     _, t_on = self._engaged(s, 0.0)
+    s.find_teeth()
     s.car.state["BRAKE_PRESSED"] = 1
     s.run(1.0)
     self.assertEqual(s.log[-1].mads, MadsState.paused)
@@ -445,9 +470,11 @@ class TestLeverSystem(LeverSystemTest):
     s = LeverSystem(lever_down=True)
     s.run(3.0)
     _, t_on = self._engaged(s, 0.0)
+    s.find_teeth()
+    t_found = s.t
     s.stalled_until = s.t + 0.3
     s.run(1.0)
-    self.assertTrue(all(r.mads == MadsState.enabled and r.panda_lateral for r in s.since(t_on)))
+    self.assertTrue(all(r.mads == MadsState.enabled and r.panda_lateral for r in s.since(t_found)))
     self.assertQuiet(s.since(t_on + DT / 2))
 
 
@@ -466,23 +493,26 @@ class TestLeverSystemStandalone(LeverSystemTest):
     self.assertAlmostEqual(t_panda, 5.0 + s.motor.boot_s + 2.0, delta=0.03)
     self.assertLess(t_on - t_panda, 0.06)
     self.assertTrue(any(r.lat_active for r in s.since(t_on)))
+    s.find_teeth()
     self.assertEqual(s.motor.mode, StepperMode.TORQUE_CONTROL)
     self.assertQuiet(s.since(5.0), allowed_sounds=(AudibleAlert.engage,))
-    # lever up: openpilot within 0.12 s (nothing else on the network to time it by but its own CAN packets); the
+    # power off: openpilot within 0.12 s (nothing else on the network to time it by but its own CAN packets); the
     # panda when its once-a-second check finds the motor's messages missing (the motor has no power by then)
+    t_up = s.t
     s.motor.lever(False)
     s.run(2.5)
-    t_off = s.first(9.0, lambda r: not r.mads_enabled)
-    self.assertLess(t_off - 9.0, 0.12)
-    t_panda_off = s.first(9.0, lambda r: not r.panda_lateral)
-    self.assertLess(t_panda_off - 9.0, 2.05)
-    self.assertEqual(sum(AudibleAlert.disengage in r.sounds for r in s.since(9.0)), 1)
-    self.assertQuiet(s.since(9.0), allowed_sounds=(AudibleAlert.disengage,))
+    t_off = s.first(t_up, lambda r: not r.mads_enabled)
+    self.assertLess(t_off - t_up, 0.12)
+    t_panda_off = s.first(t_up, lambda r: not r.panda_lateral)
+    self.assertLess(t_panda_off - t_up, 2.05)
+    self.assertEqual(sum(AudibleAlert.disengage in r.sounds for r in s.since(t_up)), 1)
+    self.assertQuiet(s.since(t_up), allowed_sounds=(AudibleAlert.disengage,))
     self.assertInStep(s.log)
+    t_down = s.t
     s.motor.lever(True)
     s.run(2.5)
-    _, t_on = self._engaged(s, 11.5)
-    self.assertAlmostEqual(t_on, 11.5 + s.motor.boot_s + 2.0, delta=0.08)
+    _, t_on = self._engaged(s, t_down)
+    self.assertAlmostEqual(t_on, t_down + s.motor.boot_s + 2.0, delta=0.08)
     self.assertInStep(s.log)
 
   def test_lever_already_down_as_the_car_starts(self):
@@ -501,9 +531,12 @@ class TestLeverSystemStandalone(LeverSystemTest):
     s = LeverSystem(lever_down=True)
     s.run(3.0)
     _, t_on = self._engaged(s, 0.0)
+    s.find_teeth()
+    self.assertEqual(s.motor.mode, StepperMode.TORQUE_CONTROL)
+    t_bad = s.t
     s.speed_ok = False
     s.run(1.0)
-    self.assertFalse(any(r.lat_active for r in s.since(3.05)))
+    self.assertFalse(any(r.lat_active for r in s.since(t_bad + 0.05)))
     self.assertNotEqual(s.motor.mode, StepperMode.TORQUE_CONTROL)
     s.speed_ok = True
     s.run(1.0)
@@ -516,6 +549,7 @@ class TestLeverSystemStandalone(LeverSystemTest):
     s = LeverSystem(lever_down=True)
     s.run(3.0)
     _, t_on = self._engaged(s, 0.0)
+    s.find_teeth()
     s.motor.held = True
     s.torque = lambda t: 0.9
     s.run(1.5)
@@ -530,6 +564,52 @@ class TestLeverSystemStandalone(LeverSystemTest):
     self.assertTrue(all(r.mads_enabled for r in s.since(t_on)))
     self.assertQuiet(s.since(t_on + DT / 2))
     self.assertInStep(s.log)
+
+  def test_gear_slid_out_of_the_teeth_is_quiet(self):
+    # the right-arm mount with lane keeping switched off: the motor has power (the car is on) but is slid back, its
+    # gear out of the teeth. Lane keeping comes on with the engage sound and then does nothing at all: no push, no
+    # chime, no alert, however the driver steers. Slid in again, it pushes 1 s after the wheel first turns the motor.
+    s = LeverSystem(lever_down=True)
+    s.motor.gear_in = False
+    s.run(3.0)
+    _, t_on = self._engaged(s, 0.0)
+    for target in (30.0, -30.0, 0.0):
+      s.motor.plan_turn(target, 30.0)
+      s.run(3.0)
+    s.run(60.0)
+    self.assertTrue(all(r.mads_enabled for r in s.since(t_on)))
+    self.assertEqual(s.motor.free_spin_deg, 0.0)
+    self.assertFalse(any(r.motor_mode == StepperMode.TORQUE_CONTROL for r in s.log))
+    self.assertQuiet(s.log, allowed_sounds=(AudibleAlert.engage,))
+    self.assertEqual(sum(AudibleAlert.engage in r.sounds for r in s.log), 1)
+    s.motor.gear_in = True
+    t_in = s.t
+    s.find_teeth()
+    self.assertEqual(s.log[-1].mads, MadsState.enabled)
+    self.assertEqual(s.motor.mode, StepperMode.TORQUE_CONTROL)
+    self.assertQuiet(s.since(t_in))
+    self.assertInStep(s.log)
+
+  def test_gear_slid_out_while_steering_chimes_once(self):
+    # slid back while lane keeping pushes: the motor spins for a moment, is caught, and "Past the teeth: steer
+    # yourself" chimes once; then quiet for as long as the gear stays out
+    s = LeverSystem(lever_down=True)
+    s.run(3.0)
+    self._engaged(s, 0.0)
+    s.find_teeth()
+    s.torque = lambda t: 0.3
+    s.run(0.5)
+    t_out = s.t
+    s.motor.gear_in = False
+    s.run(30.0)
+    chimes = [r for r in s.since(t_out) if r.alerts]
+    self.assertTrue(chimes)
+    self.assertTrue(all(a.alert_text_1 == "Past the teeth: steer yourself" for r in chimes for a in r.alerts))
+    self.assertLess(chimes[-1].t - chimes[0].t, 2.1)        # one chime, shown for 2 s
+    self.assertEqual(s.motor.mode, StepperMode.OFF)
+    self.assertGreater(s.motor.free_spin_deg, 0.0)
+    self.assertInStep(s.log)
+
 
 if __name__ == "__main__":
   unittest.main()

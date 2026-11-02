@@ -86,25 +86,25 @@ MSG_NEVER_LEFT = " ".join((
   "each push: one of the two pushes turns it left",
 ))
 MSG_LEVER_DOWN = " ".join((
-  "Steering wheel straight. Switch the motor on with its gear on the middle of the steering wheel teeth: pull the",
-  "lift lever down until it clicks, or on the side-slide mount, pull its lever out along the slot and then towards you",
-  "into the notch. Hands off the steering wheel.",
+  "Steering wheel straight. Slide the motor toward the steering wheel until it stops, so its gear sits in the middle",
+  "of the steering wheel teeth, and tighten its wing bolt (on the earlier mounts: pull the lift lever down). Hands off",
+  "the steering wheel.",
 ))
 MSG_NO_MOTOR = " ".join((
-  "No answer from the motor. Check that it is switched on (the lift lever all the way down, or the side-slide",
-  "mount's lever all the way out and in its notch) and that the motor's cable is plugged in.",
+  "No answer from the motor. Check that the lights on its board are on (they come on with the car) and that its",
+  "cable is plugged in.",
 ))
 MSG_WHICH_TEETH = " ".join((
-  "Which steering wheel teeth are on the steering wheel? The number on the printed piece: 11 (the side-slide mount's",
-  "straight-roads teeth, 11 degrees each way), 15 (the short teeth, a ring of teeth, the short back teeth or the",
-  "side-slide mount's highway teeth: 15 degrees each way), 20 (the side-slide mount's winding-roads teeth, 20 degrees",
-  "each way), 29 (the long teeth) or 45 (the long back teeth). Type the number and press Enter:",
+  "Which steering wheel teeth are on the steering wheel? The number on the printed piece: 11 (straight-roads teeth,",
+  "11 degrees each way), 15 (highway teeth, or on the earlier mounts the short teeth, a ring of teeth or the short back",
+  "teeth: 15 degrees each way), 20 (winding-roads teeth, 20 degrees each way), 29 (the long teeth) or 45 (the long back",
+  "teeth). Type the number and press Enter:",
 ))
 MSG_WHICH_TEETH_PHONE = " ".join((
-  "Which steering wheel teeth are on the steering wheel? The number on the printed piece: 11 (the side-slide mount's",
-  "straight-roads teeth, 11 degrees each way), 15 (the short teeth, a ring of teeth, the short back teeth or the",
-  "side-slide mount's highway teeth: 15 degrees each way), 20 (the side-slide mount's winding-roads teeth, 20 degrees",
-  "each way), 29 (the long teeth) or 45 (the long back teeth).",
+  "Which steering wheel teeth are on the steering wheel? The number on the printed piece: 11 (straight-roads teeth,",
+  "11 degrees each way), 15 (highway teeth, or on the earlier mounts the short teeth, a ring of teeth or the short back",
+  "teeth: 15 degrees each way), 20 (winding-roads teeth, 20 degrees each way), 29 (the long teeth) or 45 (the long back",
+  "teeth).",
 ))
 TEETH_CHOICES = (("11", "Straight-roads teeth (11)"), ("15", "Short or highway teeth (15)"), ("20", "Winding-roads teeth (20)"),
                  ("29", "Long teeth (29)"), ("45", "Long back teeth (45)"))
@@ -130,17 +130,16 @@ MSG_TURN_RIGHT_PHONE = " ".join((
   "stopped turning, then hold the wheel still. Press the button, then turn.",
 ))
 MSG_PART1_PASSED = " ".join((
-  "Part 1 passed. Next: drive for at least 5 minutes with the motor switched ON (the lift lever down, or the side-slide",
-  "mount latched out; lane keeping stays off until both parts pass, so the motor only rides along), at a mix of speeds",
-  "between about 15 and 50 mph, with some curves or lane",
-  "changes, where the comma device can see the sky. Then run part 2, the drive check (Part 2 on the setup page, or",
+  "Part 1 passed. Next: drive for at least 5 minutes with the motor gear IN the teeth (lane keeping stays off until",
+  "both parts pass, so the motor only rides along), at a mix of speeds between about 15 and 50 mph, with some curves or",
+  "lane changes, where the comma device can see the sky. Then run part 2, the drive check (Part 2 on the setup page, or",
   "/data/openpilot/accord_setup.sh drive over SSH).",
 ))
 
 MSG_GRIP = " ".join((
-  "Grip test. Keep the motor switched on. Start it, then within 3 seconds hold the steering wheel firmly with",
+  "Grip test. Keep the motor gear in the teeth. Start it, then within 3 seconds hold the steering wheel firmly with",
   "both hands at 9 and 3 o'clock, so it can't turn. The motor then pushes as hard as it can, about 2 seconds one way,",
-  "then the other (about as hard as 3 kg pulling on the edge of the steering wheel). Keep holding until it has",
+  "then the other (about as hard as 4 kg pulling on the edge of the steering wheel). Keep holding until it has",
   "stopped pushing both ways, about 8 seconds after you start. Nothing should click or jump.",
 ))
 MSG_GRIP_HOLD = "Hold the steering wheel now: the motor starts pushing in 3 seconds."
@@ -150,11 +149,10 @@ MSG_GRIP_TRY_AGAIN = " ".join((
   "steering wheel. Check that their zip ties are tight, hold the wheel firmly, and it tries once more.",
 ))
 MSG_GRIP_SLIPPED = " ".join((
-  "the motor gear slipped over the steering wheel teeth. Check that the motor is switched on and sits right (the lift",
-  "lever clicked down with its spring in place, or the side-slide mount latched out), and that neither the motor gear's",
-  "teeth nor the steering wheel teeth are worn or broken, then run the car setup again. If it slips again on a lift",
-  "lever mount, put an M5 washer under the spring (see the build guide); on the side-slide mount, check that the back",
-  "of the steering wheel doesn't move away from the motor as the wheel turns",
+  "the motor gear slipped over the steering wheel teeth. Check that the motor is slid fully in against its stop with",
+  "its wing bolt tight, that every other wing bolt on its mount is tight, that the gear's set screw is tight on the",
+  "shaft's flat, and that neither the motor gear's teeth nor the steering wheel teeth are worn or broken, then run the",
+  "car setup again. If it slips again, set the gear a little deeper with the stop screw (see the build guide)",
 ))
 MSG_GRIP_MOVED = " ".join((
   "the steering wheel moved during the grip test both times: it turned in your hands, or the steering wheel teeth",
