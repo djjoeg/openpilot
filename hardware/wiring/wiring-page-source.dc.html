@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wiring: Accord lane keeping</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#ffffff}
+a{color:#1f5fbf}a:hover{color:#163f80}
+</style>
+</helmet>
+<div style="position: relative; width: 1056px; height: 816px; overflow: hidden; background: #ffffff; color: #1b1b1b; font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif">
+
+<div style="position: absolute; left: 560px; top: 104px; width: 448px; height: 92px; background: #edf2f7; border-radius: 12px"></div>
+<div style="position: absolute; left: 792px; top: 400px; width: 216px; height: 128px; background: #f1eee8; border-radius: 12px"></div>
+<div style="position: absolute; left: 48px; top: 120px; width: 380px; height: 380px; box-sizing: border-box; border: 18px solid #e4e1da; border-radius: 50%"></div>
+<div style="position: absolute; left: 192px; top: 264px; width: 92px; height: 92px; background: #ebe8e1; border-radius: 50%"></div>
+
+<svg width="8" height="94" viewBox="0 0 8 94" preserveAspectRatio="none" style="position: absolute; left: 560px; top: 312px; width: 8px; height: 94px; overflow: visible; fill: none; stroke: #c8102e; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 4 0 L 4 94"></path></svg>
+<svg width="8" height="94" viewBox="0 0 8 94" preserveAspectRatio="none" style="position: absolute; left: 578px; top: 312px; width: 8px; height: 94px; overflow: visible; fill: none; stroke: #8b5a2b; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 4 0 L 4 94"></path></svg>
+<svg width="8" height="94" viewBox="0 0 8 94" preserveAspectRatio="none" style="position: absolute; left: 668px; top: 312px; width: 8px; height: 94px; overflow: visible; fill: none; stroke: #1b1b1b; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 4 0 L 4 94"></path></svg>
+<svg width="8" height="134" viewBox="0 0 8 134" preserveAspectRatio="none" style="position: absolute; left: 500px; top: 250px; width: 8px; height: 134px; overflow: visible; fill: none; stroke: #e0498a; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 4 0 L 4 134"></path></svg>
+<svg width="8" height="128" viewBox="0 0 8 128" preserveAspectRatio="none" style="position: absolute; left: 516px; top: 274px; width: 8px; height: 128px; overflow: visible; fill: none; stroke: #1f5fbf; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 4 0 L 4 128"></path></svg>
+<svg width="8" height="54" viewBox="0 0 8 54" preserveAspectRatio="none" style="position: absolute; left: 458px; top: 454px; width: 8px; height: 54px; overflow: visible; fill: none; stroke: #1b1b1b; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 4 0 L 4 54"></path></svg>
+<svg width="8" height="62" viewBox="0 0 8 62" preserveAspectRatio="none" style="position: absolute; left: 678px; top: 446px; width: 8px; height: 62px; overflow: visible; fill: none; stroke: #1b1b1b; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 4 0 L 4 62"></path></svg>
+<svg width="8" height="38" viewBox="0 0 8 38" preserveAspectRatio="none" style="position: absolute; left: 598px; top: 446px; width: 8px; height: 38px; overflow: visible; fill: none; stroke: #c8102e; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 4 0 L 4 38"></path></svg>
+<svg width="8" height="72" viewBox="0 0 8 72" preserveAspectRatio="none" style="position: absolute; left: 688px; top: 144px; width: 8px; height: 72px; overflow: visible; fill: none; stroke: #707070; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 4 0 L 4 72"></path></svg>
+<svg width="44" height="8" viewBox="0 0 44 8" preserveAspectRatio="none" style="position: absolute; left: 504px; top: 246px; width: 44px; height: 8px; overflow: visible; fill: none; stroke: #e0498a; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 0 4 L 44 4"></path></svg>
+<svg width="22" height="8" viewBox="0 0 22 8" preserveAspectRatio="none" style="position: absolute; left: 482px; top: 380px; width: 22px; height: 8px; overflow: visible; fill: none; stroke: #e0498a; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 0 4 L 22 4"></path></svg>
+<svg width="28" height="8" viewBox="0 0 28 8" preserveAspectRatio="none" style="position: absolute; left: 520px; top: 270px; width: 28px; height: 8px; overflow: visible; fill: none; stroke: #1f5fbf; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 0 4 L 28 4"></path></svg>
+<svg width="38" height="8" viewBox="0 0 38 8" preserveAspectRatio="none" style="position: absolute; left: 482px; top: 398px; width: 38px; height: 8px; overflow: visible; fill: none; stroke: #1f5fbf; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 0 4 L 38 4"></path></svg>
+<svg width="64" height="8" viewBox="0 0 64 8" preserveAspectRatio="none" style="position: absolute; left: 482px; top: 416px; width: 64px; height: 8px; overflow: visible; fill: none; stroke: #c8102e; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 0 4 L 64 4"></path></svg>
+<svg width="220" height="8" viewBox="0 0 220 8" preserveAspectRatio="none" style="position: absolute; left: 462px; top: 504px; width: 220px; height: 8px; overflow: visible; fill: none; stroke: #1b1b1b; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 0 4 L 220 4"></path></svg>
+<svg width="60" height="8" viewBox="0 0 60 8" preserveAspectRatio="none" style="position: absolute; left: 746px; top: 436px; width: 60px; height: 8px; overflow: visible; fill: none; stroke: #1b1b1b; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 0 4 L 60 4"></path></svg>
+<svg width="28" height="8" viewBox="0 0 28 8" preserveAspectRatio="none" style="position: absolute; left: 668px; top: 480px; width: 28px; height: 8px; overflow: visible; fill: none; stroke: #ffffff; stroke-width: 12; stroke-linecap: butt; stroke-linejoin: round" aria-hidden="true"><path d="M 0 4 L 28 4"></path></svg>
+<svg width="204" height="8" viewBox="0 0 204 8" preserveAspectRatio="none" style="position: absolute; left: 602px; top: 480px; width: 204px; height: 8px; overflow: visible; fill: none; stroke: #c8102e; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 0 4 L 204 4"></path></svg>
+<svg width="128" height="8" viewBox="0 0 128 8" preserveAspectRatio="none" style="position: absolute; left: 692px; top: 140px; width: 128px; height: 8px; overflow: visible; fill: none; stroke: #707070; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round" aria-hidden="true"><path d="M 0 4 L 128 4"></path></svg>
+
+<div style="position: absolute; left: 820px; top: 112px; width: 172px; height: 76px; box-sizing: border-box; padding: 10px; display: flex; align-items: center; justify-content: center; text-align: center; background: #ffffff; border: 1.5px solid #a8a296; border-radius: 10px; font-size: 14px; line-height: 18px; color: #3a3a3a"><span><b style="font-size: 16px; line-height: 20px; color: #141414">comma four</b><br>top middle of the windshield</span></div>
+<div style="position: absolute; left: 548px; top: 216px; width: 168px; height: 96px; box-sizing: border-box; padding: 10px; display: flex; align-items: center; justify-content: center; text-align: center; background: #ffffff; border: 1.5px solid #a8a296; border-radius: 10px; font-size: 14px; line-height: 18px; color: #3a3a3a"><span><b style="font-size: 16px; line-height: 20px; color: #141414">comma harness</b><br>its box: under the dash, right of the column</span></div>
+<div style="position: absolute; left: 806px; top: 216px; width: 202px; height: 176px; box-sizing: border-box; padding: 10px 12px; display: flex; align-items: center; justify-content: flex-start; text-align: left; background: #ffffff; border: 1.5px dashed #a8a296; border-radius: 10px; font-size: 14px; line-height: 18px; color: #3a3a3a"><span><b style="color: #141414">Not used:</b> tape each bare end on its own: both orange, both green, the 2nd pink and blue. Leave the short grey loop as it is. The harness's wires are only 12&nbsp;cm (4.7&nbsp;in): the nuts sit right by its box.</span></div>
+<div style="position: absolute; left: 312px; top: 362px; width: 170px; height: 92px; box-sizing: border-box; padding: 10px; display: flex; align-items: center; justify-content: center; text-align: center; background: #ffffff; border: 1.5px solid #a8a296; border-radius: 10px; font-size: 14px; line-height: 18px; color: #3a3a3a"><span><b style="font-size: 16px; line-height: 20px; color: #141414">Motor + board</b><br>behind the rim at 4 o'clock</span></div>
+<div style="position: absolute; left: 806px; top: 420px; width: 188px; height: 96px; box-sizing: border-box; padding: 10px; display: flex; align-items: center; justify-content: center; text-align: center; background: #ffffff; border: 1.5px solid #a8a296; border-radius: 10px; font-size: 14px; line-height: 18px; color: #3a3a3a"><span><b style="font-size: 16px; line-height: 20px; color: #141414">12&nbsp;V socket plug</b><br>in the console's 12&nbsp;V socket; 15&nbsp;A fuse inside</span></div>
+<div style="position: absolute; left: 540px; top: 400px; width: 96px; height: 52px; box-sizing: border-box; padding: 4px; display: flex; align-items: center; justify-content: center; text-align: center; background: #fbe5e1; border: 2px solid #b42318; border-radius: 8px; font-size: 13px; line-height: 16px; color: #7a1a10"><b>+ lever nut</b></div>
+<div style="position: absolute; left: 656px; top: 400px; width: 96px; height: 52px; box-sizing: border-box; padding: 4px; display: flex; align-items: center; justify-content: center; text-align: center; background: #ececec; border: 2px solid #1b1b1b; border-radius: 8px; font-size: 13px; line-height: 16px; color: #1b1b1b"><b>− lever nut</b></div>
+
+<div style="position: absolute; left: 560px; top: 402px; width: 8px; height: 8px; background: #2b2b2b; border-radius: 2px"></div>
+<div style="position: absolute; left: 578px; top: 402px; width: 8px; height: 8px; background: #2b2b2b; border-radius: 2px"></div>
+<div style="position: absolute; left: 596px; top: 402px; width: 8px; height: 8px; box-sizing: border-box; background: #ffffff; border: 1.5px dashed #1b1b1b; border-radius: 2px"></div>
+<div style="position: absolute; left: 542px; top: 416px; width: 8px; height: 8px; background: #2b2b2b; border-radius: 2px"></div>
+<div style="position: absolute; left: 598px; top: 442px; width: 8px; height: 8px; background: #2b2b2b; border-radius: 2px"></div>
+<div style="position: absolute; left: 668px; top: 402px; width: 8px; height: 8px; background: #2b2b2b; border-radius: 2px"></div>
+<div style="position: absolute; left: 686px; top: 402px; width: 8px; height: 8px; box-sizing: border-box; background: #ffffff; border: 1.5px dashed #1b1b1b; border-radius: 2px"></div>
+<div style="position: absolute; left: 742px; top: 436px; width: 8px; height: 8px; background: #2b2b2b; border-radius: 2px"></div>
+<div style="position: absolute; left: 678px; top: 442px; width: 8px; height: 8px; background: #2b2b2b; border-radius: 2px"></div>
+<div style="position: absolute; left: 728px; top: 402px; width: 8px; height: 8px; box-sizing: border-box; background: #ffffff; border: 1.5px dashed #1b1b1b; border-radius: 2px"></div>
+
+<div style="position: absolute; left: 48px; top: 32px; font-size: 28px; line-height: 34px; font-weight: 700; color: #141414">Wiring: Accord lane keeping</div>
+<div style="position: absolute; left: 48px; top: 70px; width: 940px; font-size: 16px; line-height: 22px; color: #444444">Laid out as you see it from the driver's seat. Each colored line is one wire; it ends in a lever nut or a board.</div>
+<div style="position: absolute; left: 808px; top: 40px; width: 200px; text-align: right; font-size: 13px; line-height: 16px; color: #666666">software 1.3.0 · 5 Nov 2026</div>
+<div style="position: absolute; left: 576px; top: 112px; font-size: 12px; line-height: 14px; font-weight: 700; letter-spacing: 0.08em; color: #4d5d6e">WINDSHIELD</div>
+<div style="position: absolute; left: 806px; top: 404px; font-size: 12px; line-height: 14px; font-weight: 700; letter-spacing: 0.08em; color: #6b5f4a">CENTER CONSOLE</div>
+<div style="position: absolute; left: 158px; top: 186px; width: 160px; text-align: center; font-size: 12px; line-height: 16px; color: #66625a"><b style="letter-spacing: 0.08em">STEERING WHEEL</b><br>from your seat</div>
+
+<div style="position: absolute; left: 704px; top: 120px; width: 112px; text-align: center; font-size: 13px; line-height: 16px; color: #333333">long OBD-C cable</div>
+<div style="position: absolute; left: 424px; top: 186px; width: 120px; text-align: right; font-size: 13px; line-height: 16px; color: #333333"><b>pink → CANH</b><br><b>blue → CANL</b><br>keep them twisted</div>
+<div style="position: absolute; left: 524px; top: 340px; width: 36px; text-align: right; font-size: 12px; line-height: 15px; color: #333333">2 red</div>
+<div style="position: absolute; left: 590px; top: 340px; width: 72px; font-size: 12px; line-height: 15px; color: #333333">2 brown</div>
+<div style="position: absolute; left: 680px; top: 340px; width: 60px; font-size: 12px; line-height: 15px; color: #333333">2 black</div>
+<div style="position: absolute; left: 682px; top: 360px; width: 96px; font-size: 12px; line-height: 15px; color: #333333">pairs twisted,<br>one hole each</div>
+<div style="position: absolute; left: 488px; top: 430px; width: 40px; font-size: 13px; line-height: 16px; color: #333333">Vin</div>
+<div style="position: absolute; left: 470px; top: 470px; width: 40px; font-size: 13px; line-height: 16px; color: #333333">GND</div>
+<div style="position: absolute; left: 708px; top: 494px; width: 60px; font-size: 13px; line-height: 16px; color: #333333">+ lead</div>
+<div style="position: absolute; left: 756px; top: 414px; width: 48px; font-size: 13px; line-height: 16px; color: #333333">− lead</div>
+
+<div style="position: absolute; left: 48px; top: 528px; width: 960px; height: 1px; background: #cfcac0"></div>
+
+<div style="position: absolute; left: 48px; top: 540px; width: 464px; display: flex; flex-direction: column; gap: 4px; font-size: 16px; line-height: 22px; color: #222222">
+<div style="font-size: 13px; line-height: 18px; font-weight: 700; letter-spacing: 0.08em; color: #7a1a10; margin-bottom: 2px">CHECK FIRST, WITH THE MULTIMETER</div>
+<div><b>1.</b> Motor, at its plug (Ω): black–green and red–blue 2–3&nbsp;Ω each; black–red reads nothing.</div>
+<div><b>2.</b> Plug and harness in the nuts, plug out (Ω): + nut to − nut must not read 0.</div>
+<div><b>3.</b> Plug in, key to ACC (V DC, red probe on +): about 12&nbsp;V, no minus sign. Key off, plug out.</div>
+<div><b>4.</b> Board in, no power (Ω): + to − still not 0; pink to blue about 120&nbsp;Ω (the board's own).</div>
+</div>
+
+<div style="position: absolute; left: 548px; top: 540px; width: 460px; display: flex; flex-direction: column; gap: 4px; font-size: 16px; line-height: 22px; color: #222222">
+<div style="font-size: 13px; line-height: 18px; font-weight: 700; letter-spacing: 0.08em; color: #7a1a10; margin-bottom: 2px">FIRST POWER-UP</div>
+<div><b>5.</b> Motor gear out of the teeth. Plug in, key on: the board may turn the motor slowly to set itself up. If its blue light stays on, press F1. Then plug in the comma four.</div>
+<div style="font-size: 13px; line-height: 18px; font-weight: 700; letter-spacing: 0.08em; color: #7a1a10; margin-top: 6px; margin-bottom: 2px">GOOD TO KNOW</div>
+<div>Pink and blue join the wires to the board with the inline lever nuts, one wire in each end. No extra resistor: left out on purpose. The only fuse is the 15&nbsp;A one in the plug (the socket takes 10&nbsp;A; this draws under 4&nbsp;A). Extend pink and blue with one twisted pair (old ethernet cable).</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1056,"height":816}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
