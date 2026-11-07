@@ -20,3 +20,12 @@ Probed so far (human turns are even, assistant turns odd):
 So rightarm.py / rightcheck.py / stiffness.py / midteeth.py were first written before turn 240 and edited up to
 about turn 365 (the v6 fit print 3 Nov, the plate fit test and paper template 5 Nov). The gear came from an earlier
 mount's program (faceparts.py or sideparts.py), earlier still.
+
+## 7 Nov, first pass (ten helpers)
+All ten slices stopped at read_conversation's hourly cap (256 calls an hour, shared). Done: 0-23, 40-67, 80-103,
+120-144, 160-165, 200-224, 240-279, 280-307, 320-336, 360-398. Still to read: 24-39, 68-79, 104-119, 145-159,
+166-199, 225-239, 308-319, 337-359. Large turns were copied byte-exact by small parsers (recovery/tools,
+_tools_120_159, _helpers_280_319) from the saved tool results.
+549 operations indexed so far (453 shell commands, 62 full writes, 34 edits). recovery/assemble.py replays them in
+order in a sandbox (running a design program is skipped, since its 3D libraries can't be installed here; ruff is
+skipped, so a few unused imports it once removed may remain).
