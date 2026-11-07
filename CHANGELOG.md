@@ -48,6 +48,13 @@ opendbc from your copy, at that branch's commit (checked on GitHub). Install wit
 
 ### Printed parts
 
+Changed on 7 Nov (no part changed): the design programs, lost when my workspace was replaced on 5 Nov, are rebuilt
+from the chat record and kept on GitHub, branch `hardware` of `github.com/djjoeg/openpilot`, folder `hardware/cad`
+(39 programs; `RECOVERED.md` there says what each makes). Checked so far: platefit2.py replays identical to the
+copy that survived, and the frame-plate fit test from platefit.py matches your print file plate 15 in size and
+volume. Not run yet, because their 3D library can't be installed in my workspace, so the other parts haven't been
+re-made and compared with the print files you have. From now on every design-file change also goes to that branch.
+
 Changed on 5 and 6 Nov (no software change; the version stays 1.3.0): the frame plate is being worked out again from
 the plate alone, on paper first, because the v4 plate didn't fit the car. Your notes (5 Nov): the spare screws only
 reached the cover's edge (two #8 x 2 in stainless pan head screws to buy), the long slot didn't reach far enough, and
