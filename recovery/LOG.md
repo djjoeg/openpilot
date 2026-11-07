@@ -44,3 +44,11 @@ checked: each is a run of a program, a read of an output that isn't here (logs, 
 script's data (photo-matching pickles), or T088 S36, whose failed assert the chat itself re-applied in S38 and S39.
 Checks: platefit2.py identical to the surviving copy; platefit.py's fit-test plate matches plate-15's mesh in size
 (166 x 147 x 6) and volume (64.9 cm3). The other parts are not yet re-made: manifold3d can't be installed here.
+
+## 7 Nov, verified
+manifold3d 3.5.4 built from source (github.com/elalish/manifold, tag v3.5.4, cmake -DMANIFOLD_PYBIND=ON with the
+builtin nanobind and Clipper2). Ran rightarm.py, midteeth.py, platefit.py, allinone.py, rightcheck.py, stiffness.py
+on the rebuilt programs. recovery/tools/compare3mf.py against the print files: plates 13, 14 and 15 identical part
+for part (0.000 mm, same triangle counts). The user's plates 12 and 13b hold an earlier arm and carrier (pre-v6);
+replaced in hardware/print with the v6 ones the programs make. rightcheck: 8391 checks, 0 failed. stiffness:
+the change log's numbers to the hundredth of a mm.

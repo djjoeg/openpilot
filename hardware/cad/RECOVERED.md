@@ -25,15 +25,22 @@ The current build (right-arm mount):
 Earlier mounts, kept for the record: accord_lka_parts.py, mountparts.py, assembly.py (the first mount);
 column*, face*, pop*, side*, slide* (the column, back-teeth, pop-off, side-slide and slide mounts).
 
-## How far it has been checked
+## How far it has been checked (7 Nov)
 
-- All 39 programs are valid Python.
-- platefit2.py, the one program that survived, comes out of the replay identical to the surviving copy, byte for byte.
-- The frame-plate fit test from platefit.py matches the printed file plate-15 exactly in size (166 x 147 x 6 mm). Its
-  volume also matches: 64.9 cm3 in the file, and 68.8 cm3 drawn less about 3.9 cm3 of slots.
-- **Not yet run.** The programs need the 3D library manifold3d, which can't be installed in this workspace. So
-  the other parts haven't been re-made and compared against the print files yet.
-- Five times in the chat, a tidy-up tool (`ruff --fix`) changed files automatically, and what it changed is not in
-  the record. At most this leaves an unused import or two. It does not change any part.
+The programs were run with the 3D library manifold3d 3.5.4, built from its source. Each result was compared with
+your print files and with the numbers in the change log:
+
+- **Plate 13, the whole reprint:** the frame plate v5, the arm v6, the carrier and the teeth v3 all come out
+  identical to your file. The sizes, volumes and triangle counts are the same, and the surfaces are 0.000 mm apart.
+- **Plate 14 (teeth fit sample) and plate 15 (frame-plate fit test):** identical to your files.
+- **Your copies of plates 12 and 13b are older than plate 13.** They hold an arm from before v6 (115 mm long, where
+  v6 is 127). The rebuilt programs make them with v6, as the change log says they should be. The new copies are
+  in hardware/print, and the old ones stay in this branch's history.
+- **rightcheck.py:** 8,391 checks, 0 failed, the same as the change log.
+- **stiffness.py:** +0.15 / -0.46 mm and +0.49 / -0.93 mm, up to +0.28 / -0.71 and +0.69 / -1.27, all passing.
+  These are the change log's numbers exactly.
+- platefit2.py, the one program that survived, comes out of the replay identical to the surviving copy.
+- Five times in the chat a tidy-up tool (`ruff --fix`) changed files, and what it changed isn't recorded. At most
+  that leaves an unused import; the results above show no part changed.
 - incar.py reads your original car photos from the chat's upload folder, so it needs those photos put back
   before it can run.
