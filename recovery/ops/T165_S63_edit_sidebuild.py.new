@@ -1,0 +1,1 @@
+  note("lever: pull it out along the slot,\nthen towards you into the notch", (F - 11, 78), (204, 57), color=C["lever"])

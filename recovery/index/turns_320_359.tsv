@@ -1,0 +1,59 @@
+321	10	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T321_S10_bash.sh	v5 docstring/constants patch of rightarm.py (also cp backups of rightarm.py, rightcheck.py to scratchpad)
+321	11	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T321_S11_bash.sh	patch rightarm.py: arm() deep part, groove, carrier
+321	12	bash	/home/claude/deliver/hardware/cad/rightcheck.py	-	T321_S12_bash.sh	patch rightcheck.py docstring/hardware (imports cyl_x)
+321	13	bash	/home/claude/deliver/hardware/cad/rightcheck.py	-	T321_S13_bash.sh	patch rightcheck.py helpers and sections; likely failed its assert (S15 says redo of section 1; S16 redoes the rest)
+321	15	bash	/home/claude/deliver/hardware/cad/rightcheck.py	-	T321_S15_bash.sh	patch rightcheck.py section 1 (receiver bolt, dx range)
+321	16	write	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/patch_rc.py	-	T321_S16_write_patch_rc.py	scratch patch script that edits rightcheck.py (helpers, sections 2-5, section 7); run in S17
+321	17	bash	/home/claude/deliver/hardware/cad/rightcheck.py	-	T321_S17_bash.sh	runs scratchpad/patch_rc.py (S16) on rightcheck.py, then runs rightcheck.py
+321	18	bash	/home/claude/deliver/hardware/cad/rightarm.py,/home/claude/deliver/hardware/cad/rightcheck.py	-	T321_S18_bash.sh	patch rightarm.py (SLIDE_NUT_W, nut pocket) and rightcheck.py; then prints checks
+321	19	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T321_S19_bash.sh	fix pocket translate SLIDE_NUT_U[1]->[0] in rightarm.py; then prints
+321	21	bash	/home/claude/deliver/hardware/cad/rightcheck.py	-	T321_S21_bash.sh	patch rightcheck.py: NUT_LOCK for nut-turn checks, M5_E_MIN comment; then runs
+321	25	write	/home/claude/deliver/hardware/cad/stiffness.py	-	T321_S25_write_stiffness.py	new stiffness.py (FE stiffness model, v5)
+321	28	bash	/home/claude/deliver/hardware/cad/visuals.py,/home/claude/deliver/hardware/cad/incar.py,/home/claude/deliver/hardware/cad/carphoto.py	-	T321_S28_bash.sh	patch visuals.py for v5; incar.py and carphoto.py: RC.hardware(0.0, RA.STOP_GAP) -> RC.hardware(0.0)
+321	29	bash	/home/claude/deliver/hardware/cad/incar.py	-	T321_S29_bash.sh	incar.py docstring v3->v5 wording; then sed prints viewer3d.py
+321	32	bash	/home/claude/deliver/hardware/cad/viewer3d.py,/home/claude/deliver/hardware/cad/viewer3d_page.html	-	T321_S32_bash.sh	patch viewer3d.py for v5; viewer3d_page.html h1 v4->v5 (HTML template read by viewer3d.py)
+321	34	bash	/home/claude/deliver/hardware/cad/rightarm.py,/home/claude/deliver/hardware/cad/allinone.py	-	T321_S34_bash.sh	plate 12 title/suptitle v4->v5 in rightarm.py; allinone.py docstring v4->v5
+321	59	bash	/home/claude/deliver/hardware/cad/viewer3d_page.html	-	T321_S59_bash.sh	viewer3d_page.html step text (HTML template read by viewer3d.py); then runs viewer3d.py
+321	62	bash	/home/claude/deliver/hardware/cad/render.py	-	T321_S62_bash.sh	render.py: tight_layout rect when suptitle; then runs visuals.py
+321	68	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T321_S68_bash.sh	rightarm.py: bu, bv = BAR_UV -> bv = BAR_UV[1] (lint)
+321	69	bash	/home/claude/deliver/hardware/cad/render.py	-	T321_S69_bash.sh	ruff --fix on render.py (result of fix not in record; backup cp to scratchpad)
+323	5	write	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/patch_ra6.py	-	T323_S05_write_patch_ra6.py	scratch patch script for rightarm.py (fit print: frame plate v5, arm/carrier v6); applied in S06
+323	6	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T323_S06_bash.sh	cp backups rightarm.v5.py/rightcheck.v5.py to scratchpad, runs patch_ra6.py (S05) on rightarm.py, prints
+323	7	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T323_S07_bash.sh	sed -i rightarm.py: RGROOVE_X comment (-43.3,-0.7)->(-42.8,-1.2); then greps
+323	18	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/v6/carparts.py	-	T323_S18_bash.sh	scratch one-off analysis script (not in deliver): v5/v6 parts vs car scene key/stalk/dash; runs it
+323	24	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/v6/slide_vs_teeth.py	-	T323_S24_bash.sh	scratch one-off analysis script (not in deliver): arm slide vs grip/teeth; runs it
+323	26	write	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/patch_ra6b.py	-	T323_S26_write_patch_ra6b.py	scratch patch script for rightarm.py v6 second pass; applied in S27
+323	27	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T323_S27_bash.sh	runs patch_ra6b.py (S26) on rightarm.py, prints
+323	28	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/v6/margins.py	-	T323_S28_bash.sh	scratch one-off analysis script (not in deliver): car parts margins to v6 parts; runs it
+323	29	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T323_S29_bash.sh	rightarm.py BLOCK constant change
+323	30	write	/home/claude/deliver/hardware/cad/rightcheck.py	-	T323_S30_write_rightcheck.py	full rewrite of rightcheck.py (v6)
+323	31	bash	/home/claude/deliver/hardware/cad/rightcheck.py	-	T323_S31_bash.sh	patch rightcheck.py; then runs it
+323	32	bash	/home/claude/deliver/hardware/cad/stiffness.py	-	T323_S32_bash.sh	patch stiffness.py (v6)
+323	33	bash	/home/claude/deliver/hardware/cad/stiffness.py	-	T323_S33_bash.sh	replace stiffness.py main() by slicing def main..__main__; then runs
+323	36	bash	/home/claude/deliver/hardware/cad/visuals.py	-	T323_S36_bash.sh	patch visuals.py (v6/frame plate v5)
+323	39	bash	/home/claude/deliver/hardware/cad/rightarm.py,/home/claude/deliver/hardware/cad/rightcheck.py	-	T323_S39_bash.sh	patch rightarm.py (BLOCK, arm nut etc.) and rightcheck.py
+323	40	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T323_S40_bash.sh	sed -i rightarm.py: label cut -SL.LABEL_H - 0.01 -> + 0.01; then runs checks
+323	41	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/v6/stalk_dx.py	-	T323_S41_bash.sh	scratch one-off analysis script (not in deliver): motor vs wiper stalk; runs it
+323	42	bash	/home/claude/deliver/hardware/cad/rightcheck.py	-	T323_S42_bash.sh	sed -i rightcheck.py: GEAR_IN, GEAR_OUT 3.0,5.0 -> 3.0,3.0 and comment (adds a line)
+323	46	bash	/home/claude/deliver/hardware/cad/viewer3d.py,/home/claude/deliver/hardware/cad/viewer3d_page.html,/home/claude/deliver/hardware/cad/allinone.py	-	T323_S46_bash.sh	patch viewer3d.py, viewer3d_page.html (HTML template read by viewer3d.py), allinone.py
+323	48	bash	/home/claude/deliver/hardware/cad/allinone.py	-	T323_S48_bash.sh	replace allinone.py docstring (slice from One print to python3 allinone.py)
+323	58	bash	/home/claude/deliver/hardware/cad/visuals.py	-	T323_S58_bash.sh	visuals.py receiver picture caption
+323	66	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/v6/gear_in.py	-	T323_S66_bash.sh	scratch one-off analysis script (not in deliver): teeth/grip vs gear; runs it
+323	67	bash	/home/claude/deliver/hardware/cad/rightcheck.py	-	T323_S67_bash.sh	rightcheck.py GEAR_IN/GEAR_OUT block; then runs
+323	74	bash	/home/claude/deliver/hardware/cad/viewer3d.py	-	T323_S74_bash.sh	viewer3d.py part list entry (rbolt label); then runs
+323	83	bash	/home/claude/deliver/hardware/cad/visuals.py	-	T323_S83_bash.sh	visuals.py PUTTING IT ON caption; then ruff/grep
+323	89	bash	/home/claude/deliver/hardware/cad/stiffness.py,/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/v6/stiff_washer.py	-	T323_S89_bash.sh	stiffness.py: WASHER_R constant replaces 81.0; also writes scratch stiff_washer.py (not in deliver) and runs it
+323	90	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/v6/stiff_var.py	-	T323_S90_bash.sh	scratch one-off analysis script (not in deliver): stiffness variants; runs it
+323	92	bash	/home/claude/deliver/hardware/cad/stiffness.py	-	T323_S92_bash.sh	patch stiffness.py (WASHER_R value/comments)
+323	94	bash	/home/claude/deliver/README.md,/home/claude/deliver/hardware/cad/viewer3d.py	-	T323_S94_bash.sh	README.md (skip) and viewer3d.py step text: fender washer
+323	101	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T323_S101_bash.sh	rightarm.py text (groove on your side comment/docstring)
+327	1	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/v6/skew/skew.py	-	T327_S01_bash.sh	scratch one-off analysis script (not in deliver): gear mesh vs shaft skew alpha/beta; runs it
+333	4	write	/home/claude/deliver/hardware/cad/platefit.py	-	T333_S04_write_platefit.py	new platefit.py (frame plate fit test, plate 15)
+333	6	bash	/home/claude/deliver/hardware/cad/platefit.py	-	T333_S06_bash.sh	ruff check --fix on platefit.py (what it fixed is not in the record)
+333	9	bash	/home/claude/deliver/hardware/cad/platefit.py	-	T333_S09_bash.sh	sed -i platefit.py: arrowprops dict() -> dict literal; then runs it
+333	11	bash	/home/claude/deliver/hardware/cad/platefit.py	-	T333_S11_bash.sh	platefit.py: move two drawing labels; then runs it
+335	3	bash	/home/claude/deliver/hardware/cad/platefit.py	-	T335_S03_bash.sh	platefit.py: add MM and paper_template() (full-size PDF), call it in main, docstring; then builds the PDF
+335	5	bash	/home/claude/deliver/hardware/cad/platefit.py	-	T335_S05_bash.sh	platefit.py: drop unused pw, ph = letter; then rebuilds PDF and renders it
+337	2	bash	/home/claude/deliver/hardware/cad/platefit.py	-	T337_S02_bash.sh	platefit.py: paper_template(path, printer_scale) rewrite (scaled drawing, 3 rulers), YOUR_PRINTER const, second PDF in main; then builds both
+337	5	bash	/home/claude/deliver/hardware/cad/platefit.py	-	T337_S05_bash.sh	platefit.py: wrap f-string pair in parens (lint); then builds both PDFs and measures them
+339	1	bash	/home/claude/deliver/hardware/cad/platefit.py,/home/claude/deliver/CHANGELOG.md	-	T339_S01_bash.sh	platefit.py: add PAPER_SCALE const (4 1/32 in bar); also CHANGELOG.md (skip)

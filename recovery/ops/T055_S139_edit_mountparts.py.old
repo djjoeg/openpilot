@@ -1,0 +1,1 @@
+BLOCK_BACK = -46.0                    # the block and walls reach back over the motor body this far (motor is 48 long)

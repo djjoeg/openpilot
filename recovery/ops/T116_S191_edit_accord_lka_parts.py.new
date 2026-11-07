@@ -1,0 +1,2 @@
+           f"Zip tie slots at {tt['zip_tie_slots_deg']} degrees; no inner wall inside {tt['notch_radius_mm']:.0f} mm from "
+           f"{tt['notch_for_the_right_spoke_deg'][0]} to "

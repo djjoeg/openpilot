@@ -1,0 +1,4 @@
+def vm_for(sr: float) -> VehicleModel:
+  vm = VehicleModel(CP)
+  vm.update_params(1.0, sr)
+  return vm

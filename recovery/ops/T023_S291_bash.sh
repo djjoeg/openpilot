@@ -1,0 +1,6 @@
+sed -i 's/def support_area(m, max_angle: float = 45.0):/def support_area(m, max_angle: float = 46.0):/; s/  """Area (mm^2) of downward faces steeper than max_angle from upright that are not on the bed, and the bed area."""/  """Area (mm^2) of downward faces more than max_angle from upright that are not on the bed (faces at exactly 45\n  degrees print fine and are not counted), and the bed area."""/' accord_lka_parts.py && grep -n "def support_area" -A 3 accord_lka_parts.py && rm -rf ../stl ../report && PYTHONPATH=/home/claude/pylib python3 accord_lka_parts.py > /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/cadwork/build.log 2>&1; echo "exit $?"; cat ../report/parts_report.json | python3 -c "
+import json, sys
+r = json.load(sys.stdin)
+for p in r['parts']: print('%-42s %-28s fits=%s support=%s' % (p['file'], p['size_mm'], p['fits_bed'], p['overhang_needing_support_mm2']))
+print(json.dumps(r['lift_lever'], indent=0)[:600]); print(r['clearances']); print(r['problems'])
+"

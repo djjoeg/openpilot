@@ -1,0 +1,2 @@
+           f"{tt['pitch_radius_mm']:.0f} mm from the column's axis), the motor gear {tt['motor_gear_teeth']} teeth: ratio {tt['gear_ratio']}. The teeth reach "
+           f"{tt['full_push_reach_deg']} degrees each way;

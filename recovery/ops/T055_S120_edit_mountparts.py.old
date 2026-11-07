@@ -1,0 +1,10 @@
+# Spring that presses the motor gear onto the steering wheel teeth: Lee Spring LCM100E03S (stainless steel, 9 mm
+# outside, 7 mm inside, 1 mm wire, 28.5 mm long, 1.98 N/mm, 10.5 mm fully squashed, 35.2 N most load). Any spring of
+# those sizes and about 2 N/mm does the same job.
+SPRING_OD, SPRING_ID, SPRING_FREE, SPRING_RATE, SPRING_SOLID, SPRING_MAX_N = 9.0, 7.0, 28.5, 1.98, 10.5, 35.18
+SPRING_Z = -4.0                       # spring's axis, in front of the hinge
+SPRING_ARM = SPRING_Z - HINGE[1]      # its distance from the hinge axis
+SPRING_SEAT_R = 5.2                   # shallow seat in the carrier's top for the spring's lower end
+SPRING_SEAT_D = 2.0
+SPRING_POCKET_R = 5.5                 # pocket in the hinge block's underside for its upper end
+SPRING_POCKET_D = 4.5

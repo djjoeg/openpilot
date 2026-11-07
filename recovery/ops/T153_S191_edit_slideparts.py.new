@@ -1,0 +1,19 @@
+# ***** the cam *****
+# With the lever on, the cam's flat sits square on the pusher's nose CAM_FLAT from the bolt; the flat's corners are the
+# high point the lever passes over just before (and just after) on, so it stays on until you push the handle back. Its
+# sides fall evenly from there to the round part round the bolt, which faces the pusher with the lever off. The sides
+# are shaped so the cam always touches the nose's flat face, never its edge.
+
+def cam_reach(a: float) -> tuple:
+  """(p, dp/da): the cam's reach along the pusher and its rate, a radians short of on (a >= 0)."""
+  if a <= _CAM_A1:
+    return _CAM_C * math.cos(a - _CAM_AC), -_CAM_C * math.sin(a - _CAM_AC)
+  if a <= _CAM_A2:
+    return _CAM_P1 - CAM_RATE * (a - _CAM_A1), -CAM_RATE
+  if a <= _CAM_A3:
+    s = a - _CAM_A2
+    return _CAM_P2 - CAM_RATE * s + CAM_RATE * s * s / (2.0 * CAM_BLEND), -CAM_RATE + CAM_RATE * s / CAM_BLEND
+  return CAM_MIN, 0.0
+
+
+_SUPPORT = {}

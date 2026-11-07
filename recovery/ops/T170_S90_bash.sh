@@ -1,0 +1,1 @@
+sed -i 's/  name = f"side_teeth2_{n_teeth}_/  name = f"side_teeth3_{n_teeth}_/' sideassembly.py && grep -n "side_teeth3" sideassembly.py && tail -2 /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/build8.log; ls /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/swlogs/

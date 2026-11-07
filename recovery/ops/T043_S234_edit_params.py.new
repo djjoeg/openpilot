@@ -1,0 +1,5 @@
+# Two sets of steering wheel teeth, named by how far they reach each way from straight ahead (degrees of steering wheel
+# turn): the teeth printed, centred on 12 o'clock, and the zip tie positions each side of 12 o'clock. The motor pushes
+# with its full strength only as far as the teeth reach, so the short set is for getting used to lane keeping. Past
+# the last tooth the motor gear's roller still rides on the rolling band for a few degrees, and its grip there can push
+# the steering wheel weakly (the report gives how far and how hard).

@@ -1,0 +1,1 @@
+sed -i 's/arrowprops=dict(arrowstyle="->", color="#1f5fa8", lw=1.2))/arrowprops={"arrowstyle": "->", "color": "#1f5fa8", "lw": 1.2})/' platefit.py && ruff check platefit.py | tail -1 && PYTHONPATH=/home/claude/pylib timeout 600 python3 platefit.py

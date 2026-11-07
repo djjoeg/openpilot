@@ -1,0 +1,2 @@
+  arm = CrossSection.batch_hull([CrossSection.circle(6.5, 48), CrossSection.circle(5.0, 48).translate((L - 3.0, 0.0))])
+  pad = CrossSection.circle(PAD_R, 48).translate((L - 3.5, 0.0))

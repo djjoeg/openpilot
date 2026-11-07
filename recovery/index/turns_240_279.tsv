@@ -1,0 +1,22 @@
+255	10	write	/home/claude/deliver/hardware/cad/visuals.py	-	T255_S10_write_visuals.py	new file: review pictures of everything to print (assembly + part sheets)
+261	46	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T261_S46_bash.sh	cp rightarm.py to scratchpad backup; python rep() edits rightarm.py: docstring, new uvz/uv_cyl_z/bar/sleeve/bracket/carrier/motor_and_gear, parts_on_bed adds right-carrier
+261	47	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T261_S47_bash.sh	sed -i rightarm.py: right-carrier on_bed rotate 90 -> -90; then reads
+261	48	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T261_S48_bash.sh	python edit rightarm.py: plate 12 parts dict adds right-carrier (motor carrier); then runs a size check
+261	49	write	/home/claude/deliver/hardware/cad/rightcheck.py	-	T261_S49_write_rightcheck.py	new file: clearance checks for the right arm v2 (slide, bolts, wheel turn)
+261	50	bash	/home/claude/deliver/hardware/cad/rightarm.py; /home/claude/deliver/hardware/cad/rightcheck.py	-	T261_S50_bash.sh	python edit rightarm.py TONGUE_Z, STOP_P; rightcheck.py: section 3 bolts/nuts rewritten, hardware_shank removed, pin/pn rotate sign; then runs rightcheck
+261	51	bash	/home/claude/deliver/hardware/cad/rightcheck.py	-	T261_S51_bash.sh	python edit rightcheck.py: stop nut and jam nut use turned hex; then runs checks
+261	55	bash	/home/claude/deliver/hardware/cad/rightcheck.py	-	T261_S55_bash.sh	python edit rightcheck.py: check 5 gear in mesh over teeth arc, MESH_PHASE constant; then runs rightcheck and RA.build() (writes stl/plates outputs)
+261	57	bash	/home/claude/deliver/hardware/cad/visuals.py	-	T261_S57_bash.sh	python edit visuals.py: docstring, import rightcheck, hardware(dz), assembly_parts(dz)+CARRIER colour, assembly_picture/slide_picture, main; then runs visuals
+261	66	bash	/home/claude/deliver/hardware/cad/visuals.py; /home/claude/deliver/hardware/cad/rightcheck.py	-	T261_S66_bash.sh	ruff --fix F401 on rightcheck.py and visuals.py (removes unused imports; exact result not in record); python removes unused line 's = -1.0 if down else 1.0' from visuals.py
+265	1	bash	/home/claude/deliver/hardware/cad/rightarm.py; /home/claude/deliver/hardware/cad/rightcheck.py; /home/claude/deliver/hardware/cad/visuals.py	-	T265_S01_bash.sh	cp rightarm/rightcheck/visuals to scratchpad *_v2_backup.py (backups only; design files unchanged); then grep
+265	11	write	/home/claude/deliver/hardware/cad/rightarm.py	-	T265_S11_write_rightarm.py	full rewrite: right arm v3 (simpler sliding carrier)
+265	13	write	/home/claude/deliver/hardware/cad/rightcheck.py	-	T265_S13_write_rightcheck.py	full rewrite for arm v3
+265	14	edit	/home/claude/deliver/hardware/cad/rightcheck.py	false	T265_S14_edit_rightcheck.py.old; T265_S14_edit_rightcheck.py.new	receiver bolt placed at arm face
+265	15	edit	/home/claude/deliver/hardware/cad/rightcheck.py	false	T265_S15_edit_rightcheck.py.old; T265_S15_edit_rightcheck.py.new	arm slid across check
+265	17	write	/home/claude/deliver/hardware/cad/visuals.py	-	T265_S17_write_visuals.py	full rewrite of review pictures for arm v3
+265	19	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T265_S19_bash.sh	sed -i rightarm.py: DZ_END sign fix (TOWER_Z[1] - PLATE_Z[0]); then runs rightcheck
+265	27	edit	/home/claude/deliver/hardware/cad/visuals.py	false	T265_S27_edit_visuals.py.old; T265_S27_edit_visuals.py.new	slide picture view titles
+265	35	edit	/home/claude/deliver/hardware/cad/rightarm.py	false	T265_S35_edit_rightarm.py.old; T265_S35_edit_rightarm.py.new	DZ_OUT/DZ_END constants comment, web on tower top
+265	36	edit	/home/claude/deliver/hardware/cad/rightarm.py	false	T265_S36_edit_rightarm.py.old; T265_S36_edit_rightarm.py.new	web uses WEB_Z0
+265	38	bash	/home/claude/deliver/hardware/cad/rightcheck.py; /home/claude/deliver/hardware/cad/visuals.py	-	T265_S38_bash.sh	python s.replace edits rightcheck.py and visuals.py (DZ_END -> DZ_OUT etc.); then grep
+267	1	bash	/home/claude/deliver/hardware/cad/rightarm.py; /home/claude/deliver/hardware/cad/rightcheck.py; /home/claude/deliver/hardware/cad/visuals.py	-	T267_S01_bash.sh	lint fixes: sed -i on rightarm.py (pattern with \\n, likely no-op); python: rightarm tw = NUT_TRAP[0]; rightcheck drop cyl_y import; visuals OUT title wrapped in parens; then ruff check (no fix)

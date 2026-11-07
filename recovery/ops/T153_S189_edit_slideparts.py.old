@@ -1,0 +1,2 @@
+CAM_FLAT = CAM_MIN + CLEAR_OFF + STROKE + PUSH_TRAVEL_ON                # the flat's distance from the bolt
+PUSH_FACE_STOP = PIVOT[0] + STROKE + CAM_MIN + CLEAR_OFF                 # the pusher's nose (y), out against its stop

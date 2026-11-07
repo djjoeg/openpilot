@@ -1,0 +1,3 @@
+    if (viewTween) {
+      const k = clamp((now - viewTween.t0) / viewTween.dur, 0, 1), e = k < 0.5 ? 2 * k * k : 1 - 2 * (1 - k) * (1 - k);
+      const a = viewTween.from, b = viewTween.to;

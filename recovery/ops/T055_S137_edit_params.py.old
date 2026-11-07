@@ -1,0 +1,2 @@
+TEETH_ON_WHEEL = TEETH_SETS[29]["teeth"]
+MOST_TORQUE_NM = 4.5  # the most torque lane keeping may use at the steering wheel (the safety chip's limit)

@@ -1,0 +1,8 @@
+  for dx in (-SW_PITCH / 2, SW_PITCH / 2):
+    x = SW_X + dx
+    hole = Manifold.batch_hull([cyl(M2_CLEAR / 2, CAGE_BACK[0] - 1, CAGE_FRONT[1] + 1, x=x, y=SW_HOLES + s, segments=20)
+                                for s in (-SW_SLOT, SW_SLOT)])
+    nut = Manifold.batch_hull([hex_prism_z_at(M2_NUT_AF, CAGE_BACK[0] - 1.0, CAGE_BACK[0] + M2_NUT_T, x, SW_HOLES + s)
+                               for s in (-SW_SLOT, SW_SLOT)])
+    part = part - hole - nut
+  return clean(part)

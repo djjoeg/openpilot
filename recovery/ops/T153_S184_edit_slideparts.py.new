@@ -1,0 +1,2 @@
+  nose = box(PUSHER_X - NOSE_HALF[0], PUSHER_X + NOSE_HALF[0], PUSH_FACE_STOP, PUSH_BODY_Y + 0.01,
+             PIVOT[1] - NOSE_HALF[1], PIVOT[1] + NOSE_HALF[1])

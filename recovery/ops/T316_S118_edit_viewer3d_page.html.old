@@ -1,0 +1,1 @@
+  function followParts() { if (activeView && !viewTween) { cam.dist = viewState(activeView).dist; dirty = true; } }

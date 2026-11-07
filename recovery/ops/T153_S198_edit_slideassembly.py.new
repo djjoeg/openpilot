@@ -1,0 +1,17 @@
+  # the lever swung from off to on as it really moves things: the cam slides the carrier on, then pushes the pusher back
+  # (normally; and with the teeth meeting tip to tip, the carrier stopped 4.5 mm off while the lever goes all the way).
+  # The wheel may be at any angle while you do it: the teeth are taken as everywhere round it.
+  ring = A.teeth_ring()
+  for t2t in (0.0, 4.5):
+    tag = "lever swinging" + (" (teeth tip to tip)" if t2t else "")
+    for d in np.arange(SP.LEVER_SWING, -0.01, -lever_step):
+      st = SP.cam_state(float(d), t2t)
+      off = st["carrier_off"]
+      back = max(0.0, (SP.cam_support(float(d)) - SP.CAM_MIN - SP.CLEAR_OFF) - (SP.STROKE - off))
+      lev = A.lever(off, SP.SWING_SIGN * float(d))
+      parts = [("gear", A.gear(off)), ("carrier", A.carrier(off)), ("motor, board and plugs", A.motor(off)),
+               ("rods and collars", A.rods(off)), ("latch lever", lev)]
+      for name, part in parts:
+        if not (name == "gear" and off < SP.STROKE - 1e-6):   # the gear going into the teeth (or stopped on their
+          key = f"{tag}: teeth anywhere round/{name} (worst)"  # tips): the mesh sweep checks that
+          res[key] = max(res.get(key, 0.0), overlap(ring, part))

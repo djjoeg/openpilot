@@ -1,0 +1,1 @@
+  walls = union([box(SIDE_X[0], SIDE_X[1], 0.0, TOP_Y[1], WALL_BACK, t), box(-SIDE_X[1], -SIDE_X[0], 0.0, TOP_Y[1], WALL_BACK, t)])

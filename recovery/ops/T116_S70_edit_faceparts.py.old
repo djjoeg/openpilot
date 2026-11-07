@@ -1,0 +1,2 @@
+  spots = [(t.rr - t.rho - WALL / 2.0, -4.0), (t.rr + t.rho + WALL / 2.0, -4.0),
+           (FACE_BAND[0] + 3.0, (t.z_bridge + t.z_root) / 2.0), (FACE_BAND[1], (t.z_bridge + t.z_root) / 2.0)]

@@ -1,0 +1,2 @@
+  bearing = [extrude_x(bear_cs, LEVER_EAR_X[0], lx1), extrude_x(bear_cs, -lx1, -LEVER_EAR_X[0])]
+  cx0 = SW_THICK / 2 + 0.3

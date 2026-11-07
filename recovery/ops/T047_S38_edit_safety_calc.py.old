@@ -1,0 +1,4 @@
+def vm_for(sr: float) -> VehicleModel:
+  cp = copy.deepcopy(CP)
+  cp.steerRatio = sr
+  return VehicleModel(cp)

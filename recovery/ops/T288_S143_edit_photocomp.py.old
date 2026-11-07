@@ -1,0 +1,2 @@
+def composite(photo, L, gain, wb=(1.0, 1.0, 1.0), focus=250.0, aperture_mm=3.4, f_px=1900.0, noise=0.0,
+              occ_depth=None, slices=7, seed=2):

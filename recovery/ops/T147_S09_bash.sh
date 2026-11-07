@@ -1,0 +1,1 @@
+cd /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/snap && sed -i 's/            import popparts as PP/            pb = SOL[si][2]\n            import popparts as PP/' coverfit.py && PYTHONPATH=/home/claude/pylib timeout 600 python3 coverfit.py

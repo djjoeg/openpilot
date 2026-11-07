@@ -1,0 +1,1 @@
+BACKLASH = 0.175      # each gear's teeth are this much thinner than nominal (mm at the pitch circle)

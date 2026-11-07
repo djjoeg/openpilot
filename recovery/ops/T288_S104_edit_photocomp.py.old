@@ -1,0 +1,2 @@
+  if L["occ"].max() > 0:
+    zo = occ_depth if occ_depth is not None else float(np.median(L["Zocc"][L["occ"] > 0.5]))

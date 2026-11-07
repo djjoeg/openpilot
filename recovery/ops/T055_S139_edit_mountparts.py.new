@@ -1,0 +1,2 @@
+BLOCK_BACK = -46.0                    # the block over the motor reaches back this far (under the hinge)
+WALL_BACK = -NEMA_LEN + 1.0           # the walls beside the motor stop just short of its back, clear of the board's plugs

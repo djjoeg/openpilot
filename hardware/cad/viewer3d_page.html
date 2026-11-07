@@ -1,0 +1,808 @@
+<title>Right Arm Mount</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600&display=swap">
+<style>
+/* Layout: the model fills a workbench stage; the assembly steps and the part switches sit beside it (wide screens) or under it (phones). */
+:root {
+  --bg: #e7eaee;
+  --stage: #eef1f4;
+  --panel: #f8f9fb;
+  --ink: #1a1f26;
+  --muted: #56606c;
+  --line: #d0d6dd;
+  --chip: #eceff3;
+  --onink: #f8f9fb;
+  --focus: #2d6bd1;
+  --ring: rgba(26, 31, 38, 0.28);
+  --font-ui: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-head: "Barlow Semi Condensed", "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111417; --stage: #1c2127; --panel: #15191d; --ink: #e4e8ec; --muted: #9ba6b1; --line: #2b3239;
+    --chip: #20262c; --onink: #15191d; --focus: #6ea2ff; --ring: rgba(228, 232, 236, 0.45); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111417; --stage: #1c2127; --panel: #15191d; --ink: #e4e8ec; --muted: #9ba6b1; --line: #2b3239;
+  --chip: #20262c; --onink: #15191d; --focus: #6ea2ff; --ring: rgba(228, 232, 236, 0.45); color-scheme: dark;
+}
+[hidden] { display: none !important; }
+html { height: 100%; box-sizing: border-box; }
+*, *::before, *::after { box-sizing: inherit; }
+body { height: 100%; margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 15px; line-height: 1.45; }
+button { font: inherit; color: inherit; }
+button:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.app { height: 100%; display: grid; grid-template-rows: minmax(0, 1fr) auto; }
+.stage { position: relative; min-height: 0; background: var(--stage); overflow: hidden; }
+canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+canvas:active { cursor: grabbing; }
+
+.head { position: absolute; top: 12px; left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); pointer-events: none; text-shadow: 0 0 2px var(--stage), 0 0 6px var(--stage), 0 0 12px var(--stage); }
+.head h1 { margin: 0; font-family: var(--font-head); font-weight: 600; font-size: 19px; letter-spacing: 0.01em; text-wrap: balance; }
+.head p { margin: 0; color: var(--muted); font-size: 13px; }
+
+.views { position: absolute; left: max(16px, env(safe-area-inset-left, 0px)); bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px; right: max(16px, env(safe-area-inset-right, 0px)); }
+.views button, .stepnav button, .ghost {
+  border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 5px 12px; font-size: 13.5px; font-weight: 500; cursor: pointer;
+}
+.views button[aria-pressed="true"] { background: var(--ink); color: var(--onink); border-color: var(--ink); }
+.views button:hover, .stepnav button:hover:not(:disabled), .ghost:hover { border-color: var(--muted); }
+
+.card { position: absolute; top: 64px; right: max(16px, env(safe-area-inset-right, 0px)); width: min(330px, calc(100% - 32px)); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12); display: grid; gap: 8px; }
+.cardtop { display: flex; gap: 10px; align-items: start; justify-content: space-between; }
+.cardtop strong { font-family: var(--font-head); font-weight: 600; font-size: 16px; }
+.card p { margin: 0; font-size: 14px; color: var(--ink); }
+.x { border: 0; background: none; font-size: 20px; line-height: 1; padding: 0 2px; cursor: pointer; color: var(--muted); }
+.ghost { justify-self: start; padding: 3px 10px; font-size: 13px; }
+
+.status { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; padding-inline: 24px; text-align: center; color: var(--muted); pointer-events: none; }
+
+.panel { background: var(--panel); border-top: 1px solid var(--line); max-height: 46vh; overflow-y: auto; padding-block: 14px 18px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 16px; align-content: start; }
+.eyebrow { font-family: var(--font-head); font-weight: 600; font-size: 12.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); font-variant-numeric: tabular-nums; }
+.stephead { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.stepnav { display: flex; gap: 6px; }
+.stepnav button:disabled { opacity: 0.4; cursor: default; }
+.steptext { margin: 6px 0 10px; min-height: 5.8em; max-width: 62ch; }
+input[type="range"] { width: 100%; margin: 0; accent-color: var(--ink); }
+.ends { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.parts h2 { margin: 0 0 8px; font-family: var(--font-head); font-weight: 600; font-size: 12.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; align-items: baseline; }
+.parts h2 button { border: 0; background: none; padding: 0; font: 500 13px var(--font-ui); letter-spacing: 0; text-transform: none; color: var(--ink); text-decoration: underline; cursor: pointer; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); background: var(--chip); border-radius: 999px; padding: 4px 11px 4px 8px; font-size: 13.5px; cursor: pointer; }
+.chip .dot { width: 11px; height: 11px; border-radius: 50%; border: 1px solid var(--ring); flex: none; }
+.chip[aria-pressed="false"] { color: var(--muted); background: transparent; text-decoration: line-through; }
+.chip[aria-pressed="false"] .dot { background: transparent !important; }
+.fine { margin: 0; font-size: 12.5px; color: var(--muted); max-width: 62ch; }
+
+@media (min-width: 860px) {
+  .app { grid-template-rows: none; grid-template-columns: minmax(0, 1fr) 360px; }
+  .panel { max-height: none; border-top: 0; border-left: 1px solid var(--line); padding-block: 20px; padding-left: 20px; }
+  .head { top: 16px; }
+  .head h1 { font-size: 22px; }
+  .card { top: 16px; }
+  .views { bottom: 16px; }
+}
+@media (max-width: 520px) {
+  .views { gap: 5px; }
+  .views button { padding: 5px 10px; font-size: 13px; }
+  .card { top: auto; bottom: 52px; left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); width: auto; }
+}
+</style>
+
+<div class="app">
+  <main class="stage" id="stage">
+    <canvas id="gl" tabindex="0" aria-label="The right arm mount in 3D. Drag to turn it, pinch or scroll to zoom."></canvas>
+    <div class="head">
+      <h1>Right arm mount v6</h1>
+      <p>2010 Accord, just above 4 o'clock on the steering wheel</p>
+    </div>
+    <div class="views" role="group" aria-label="Views">
+      <button type="button" data-view="overview" aria-pressed="true">Overview</button>
+      <button type="button" data-view="seat" aria-pressed="false">Your seat</button>
+      <button type="button" data-view="right" aria-pressed="false">Right side</button>
+      <button type="button" data-view="below" aria-pressed="false">Below</button>
+    </div>
+    <div class="card" id="card" hidden>
+      <div class="cardtop"><strong id="cardName"></strong><button type="button" class="x" id="cardClose" aria-label="Close">&times;</button></div>
+      <p id="cardNote"></p>
+      <button type="button" class="ghost" id="cardHide">Hide this part</button>
+    </div>
+    <p class="status" id="status">Loading the parts&hellip;</p>
+  </main>
+  <aside class="panel">
+    <section aria-labelledby="stepLabel">
+      <div class="stephead">
+        <span class="eyebrow" id="stepLabel">Together</span>
+        <div class="stepnav">
+          <button type="button" id="prev">&lsaquo; Back</button>
+          <button type="button" id="next">Next &rsaquo;</button>
+        </div>
+      </div>
+      <p class="steptext" id="stepText"></p>
+      <input type="range" id="assy" min="0" max="800" step="1" value="800" aria-label="Apart to together">
+      <div class="ends" aria-hidden="true"><span>Apart</span><span>Together</span></div>
+    </section>
+    <section class="parts">
+      <h2><span>Show</span><button type="button" id="showAll" hidden>Show all</button></h2>
+      <div class="chips" id="chips"></div>
+    </section>
+    <p class="fine">Drag to turn. Pinch or scroll to zoom. Two fingers, or right-drag, to move it. Tap a part for its name.</p>
+    <p class="fine">The printed parts are drawn from the same shapes as the print files (plates 9, 11 and 12), where they go on the car. The motor, gear, bolts and nuts are drawn to size. The board on the motor's back is a plain box, and the column cover is approximate.</p>
+  </aside>
+</div>
+
+<script type="application/json" id="meta">__META__</script>
+<script type="application/octet-stream" id="mesh-data">
+__DATA__
+</script>
+<script>
+(() => {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const meta = JSON.parse($("meta").textContent);
+  const canvas = $("gl"), stage = $("stage"), status = $("status");
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const NSTEP = meta.steps.length;
+
+  const gl = canvas.getContext("webgl", { antialias: true, alpha: false }) ||
+             canvas.getContext("experimental-webgl", { antialias: true, alpha: false });
+  if (!gl) {
+    status.textContent = "This page needs WebGL to draw the parts, and this browser has it turned off. Try another browser.";
+    return;
+  }
+
+  // ---- small vector helpers ----
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+  const mul = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const norm = (a) => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+  const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+
+  // steering wheel frame (x right, y up the wheel, z along the column towards you) -> level, Y up: the column rises
+  const TA = meta.tilt_deg * Math.PI / 180, cT = Math.cos(TA), sT = Math.sin(TA);
+  const ROT = new Float32Array([1, 0, 0, 0, cT, -sT, 0, sT, cT]);          // column-major
+  const toWorld = (v) => [v[0], v[1] * cT + v[2] * sT, -v[1] * sT + v[2] * cT];
+
+  // ---- the parts' shapes ----
+  const bin = atob($("mesh-data").textContent.replace(/\s+/g, ""));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  const buf = bytes.buffer;
+
+  const COS_SMOOTH = Math.cos(32 * Math.PI / 180), COS_EDGE = Math.cos(32 * Math.PI / 180);
+
+  function buildMesh(m) {
+    const q = new Int16Array(buf, m.po, m.nv * 3), idx = new Uint16Array(buf, m.io, m.nt * 3);
+    const nv = m.nv, nt = m.nt, s = meta.q;
+    const pos = new Float32Array(nv * 3);
+    for (let i = 0; i < nv * 3; i++) pos[i] = q[i] * s;
+    const fn = new Float32Array(nt * 3), fa = new Float32Array(nt);
+    for (let t = 0; t < nt; t++) {
+      const a = idx[3 * t] * 3, b = idx[3 * t + 1] * 3, c = idx[3 * t + 2] * 3;
+      const ux = pos[b] - pos[a], uy = pos[b + 1] - pos[a + 1], uz = pos[b + 2] - pos[a + 2];
+      const vx = pos[c] - pos[a], vy = pos[c + 1] - pos[a + 1], vz = pos[c + 2] - pos[a + 2];
+      const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+      const l = Math.hypot(nx, ny, nz);
+      fa[t] = l;
+      if (l > 0) { fn[3 * t] = nx / l; fn[3 * t + 1] = ny / l; fn[3 * t + 2] = nz / l; }
+    }
+    // which faces meet at each corner
+    const start = new Uint32Array(nv + 1);
+    for (let i = 0; i < idx.length; i++) start[idx[i] + 1]++;
+    for (let v = 0; v < nv; v++) start[v + 1] += start[v];
+    const fill = start.slice(0, nv), vf = new Uint32Array(idx.length);
+    for (let i = 0; i < idx.length; i++) vf[fill[idx[i]]++] = (i / 3) | 0;
+    // smooth across shallow angles, sharp across steep ones
+    const out = new Float32Array(nt * 18);
+    for (let t = 0; t < nt; t++) {
+      const fx = fn[3 * t], fy = fn[3 * t + 1], fz = fn[3 * t + 2];
+      for (let k = 0; k < 3; k++) {
+        const v = idx[3 * t + k];
+        let sx = 0, sy = 0, sz = 0;
+        for (let j = start[v]; j < start[v + 1]; j++) {
+          const g = vf[j];
+          const gx = fn[3 * g], gy = fn[3 * g + 1], gz = fn[3 * g + 2];
+          if (fx * gx + fy * gy + fz * gz >= COS_SMOOTH) { const w = fa[g]; sx += gx * w; sy += gy * w; sz += gz * w; }
+        }
+        const l = Math.hypot(sx, sy, sz) || 1, o = (3 * t + k) * 6;
+        out[o] = pos[3 * v]; out[o + 1] = pos[3 * v + 1]; out[o + 2] = pos[3 * v + 2];
+        out[o + 3] = sx / l; out[o + 4] = sy / l; out[o + 5] = sz / l;
+      }
+    }
+    // the outline: edges where the faces meet at a steep angle
+    const seen = new Map(), lines = [];
+    for (let t = 0; t < nt; t++) {
+      for (let k = 0; k < 3; k++) {
+        const a = idx[3 * t + k], b = idx[3 * t + (k + 1) % 3];
+        const key = a < b ? a * nv + b : b * nv + a;
+        const o = seen.get(key);
+        if (o === undefined) { seen.set(key, t); continue; }
+        seen.delete(key);
+        if (fn[3 * t] * fn[3 * o] + fn[3 * t + 1] * fn[3 * o + 1] + fn[3 * t + 2] * fn[3 * o + 2] < COS_EDGE) lines.push(a, b);
+      }
+    }
+    for (const key of seen.keys()) lines.push(Math.floor(key / nv), key % nv);
+    // each outline corner carries the other end of its edge too, so the shader can drop edges seen end-on
+    const lp = new Float32Array(lines.length * 6);
+    for (let i = 0; i < lines.length; i++) {
+      const v = lines[i], w = lines[i ^ 1];
+      lp.set([pos[3 * v], pos[3 * v + 1], pos[3 * v + 2], pos[3 * w], pos[3 * w + 1], pos[3 * w + 2]], 6 * i);
+    }
+    const tri = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, tri);
+    gl.bufferData(gl.ARRAY_BUFFER, out, gl.STATIC_DRAW);
+    const line = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, line);
+    gl.bufferData(gl.ARRAY_BUFFER, lp, gl.STATIC_DRAW);
+    return { tri, ntv: nt * 3, line, nlv: lines.length };
+  }
+
+  // ---- shaders ----
+  const VS = `
+    attribute vec3 aPos; attribute vec3 aNrm;
+    uniform mat4 uProj; uniform mat4 uView; uniform mat3 uRot; uniform mat3 uNrmM; uniform vec3 uOff;
+    varying vec3 vN; varying vec3 vP;
+    void main() {
+      vec4 p = uView * vec4(uRot * (aPos + uOff), 1.0);
+      vP = p.xyz; vN = uNrmM * aNrm;
+      gl_Position = uProj * p;
+    }`;
+  const FS = `
+    precision mediump float;
+    varying vec3 vN; varying vec3 vP;
+    uniform vec3 uColor; uniform float uAlpha; uniform float uSpec; uniform float uShine;
+    uniform vec3 uUp; uniform float uTint; uniform float uPick; uniform vec3 uPickC;
+    void main() {
+      if (uPick > 0.5) { gl_FragColor = vec4(uPickC, 1.0); return; }
+      vec3 n = normalize(vN);
+      if (!gl_FrontFacing) n = -n;
+      vec3 v = normalize(-vP);
+      vec3 l1 = normalize(vec3(-0.35, 0.6, 0.75));
+      vec3 l2 = normalize(vec3(0.55, -0.3, 0.45));
+      float hemi = 0.5 + 0.5 * dot(n, uUp);
+      vec3 amb = mix(vec3(0.28, 0.28, 0.31), vec3(0.48, 0.49, 0.52), hemi);
+      float d = 0.62 * max(dot(n, l1), 0.0) + 0.22 * max(dot(n, l2), 0.0);
+      float s = uSpec * pow(max(dot(n, normalize(l1 + v)), 0.0), uShine);
+      float rim = pow(1.0 - max(dot(n, v), 0.0), 3.0) * 0.12;
+      vec3 c = uColor * (amb + d) + vec3(s + rim);
+      c = mix(c, vec3(1.0, 0.9, 0.45), uTint);
+      gl_FragColor = vec4(c, uAlpha);
+    }`;
+  // the outlines are drawn a hair nearer than the faces (0.2 % of the way to the eye), so they show on their own
+  // faces but not through anything in front of them; an edge seen end-on (under 1.5 px long) is left out
+  const LVS = `
+    attribute vec3 aPos; attribute vec3 aOther;
+    uniform mat4 uProj; uniform mat4 uView; uniform mat3 uRot; uniform vec3 uOff; uniform vec2 uVp;
+    void main() {
+      vec4 p = uView * vec4(uRot * (aPos + uOff), 1.0);
+      vec4 q = uView * vec4(uRot * (aOther + uOff), 1.0);
+      p.xyz *= 0.998; q.xyz *= 0.998;
+      vec4 cp = uProj * p, cq = uProj * q;
+      gl_Position = cp;
+      if (cp.w > 0.0 && cq.w > 0.0) {
+        vec2 d = (cp.xy / cp.w - cq.xy / cq.w) * 0.5 * uVp;
+        if (dot(d, d) < 2.25) gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+      }
+    }`;
+  const LFS = `precision mediump float; uniform vec4 uColor; void main() { gl_FragColor = uColor; }`;
+
+  function program(vs, fs) {
+    const p = gl.createProgram();
+    for (const [type, src] of [[gl.VERTEX_SHADER, vs], [gl.FRAGMENT_SHADER, fs]]) {
+      const sh = gl.createShader(type);
+      gl.shaderSource(sh, src);
+      gl.compileShader(sh);
+      if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh));
+      gl.attachShader(p, sh);
+    }
+    gl.bindAttribLocation(p, 0, "aPos");
+    gl.bindAttribLocation(p, 1, vs.includes("aOther") ? "aOther" : "aNrm");
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+    const u = {};
+    const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < n; i++) { const info = gl.getActiveUniform(p, i); u[info.name] = gl.getUniformLocation(p, info.name); }
+    return { p, u };
+  }
+  const P = program(VS, FS), L = program(LVS, LFS);
+
+  // ---- matrices ----
+  function perspective(fovy, aspect, near, far) {
+    const f = 1 / Math.tan(fovy / 2), nf = 1 / (near - far);
+    return new Float32Array([f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (far + near) * nf, -1, 0, 0, 2 * far * near * nf, 0]);
+  }
+  const FOV = 35 * Math.PI / 180, EL_MAX = 89 * Math.PI / 180;
+  const cam = { t: [0, 0, 0], dist: 600, az: 0, el: 0 };
+  function eyeDir() { return [Math.cos(cam.el) * Math.sin(cam.az), Math.sin(cam.el), Math.cos(cam.el) * Math.cos(cam.az)]; }
+  function basis() {
+    const f = mul(eyeDir(), -1);
+    const r = norm(cross(f, [0, 1, 0]));
+    return { f, r, u: cross(r, f) };
+  }
+
+  // ---- state ----
+  const meshes = [];
+  const parts = meta.parts.map((p, i) => ({ ...p, i, visible: true, off: [0, 0, 0] }));
+  let assy = NSTEP, selected = -1, dirty = true, ready = false;
+  let bg = [0.93, 0.94, 0.95];
+  let W = 1, H = 1, pickFB = null, pickTex = null, pickDepth = null, pickW = 0, pickH = 0;
+
+  function ease(x) { return x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x); }
+  function placeParts() {
+    for (const p of parts) {
+      let o = [0, 0, 0];
+      for (const [step, s0, s1, dx, dy, dz] of p.moves) {
+        const r = 1 - ease((assy - (step - 1) - s0) / (s1 - s0));
+        if (r > 0) o = add(o, [dx * r, dy * r, dz * r]);
+      }
+      p.off = o;
+    }
+  }
+  function lineColor(c) {
+    const lum = 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2];
+    return lum > 0.28 ? [c[0] * 0.4, c[1] * 0.4, c[2] * 0.4, 1] : [Math.min(1, c[0] + 0.2), Math.min(1, c[1] + 0.2), Math.min(1, c[2] + 0.2), 1];
+  }
+
+  function readBg() {
+    const s = getComputedStyle(document.documentElement).getPropertyValue("--stage").trim();
+    const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(s);
+    if (m) bg = [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255];
+    dirty = true;
+  }
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.max(1, Math.round(stage.clientWidth * dpr)), h = Math.max(1, Math.round(stage.clientHeight * dpr));
+    if (w !== W || h !== H) { W = w; H = h; canvas.width = w; canvas.height = h; dirty = true; followParts(); }
+  }
+
+  // ---- drawing ----
+  function frameSetup(prog) {
+    const aspect = W / H;
+    const near = Math.max(2, cam.dist * 0.04), far = cam.dist * 12 + 2000;
+    const eye = add(cam.t, mul(eyeDir(), cam.dist));
+    const { f, r, u } = basis();
+    const z = mul(f, -1);
+    const view = new Float32Array([r[0], u[0], z[0], 0, r[1], u[1], z[1], 0, r[2], u[2], z[2], 0,
+                                   -dot(r, eye), -dot(u, eye), -dot(z, eye), 1]);
+    gl.useProgram(prog.p);
+    gl.uniformMatrix4fv(prog.u.uProj, false, perspective(FOV, aspect, near, far));
+    gl.uniformMatrix4fv(prog.u.uView, false, view);
+    gl.uniformMatrix3fv(prog.u.uRot, false, ROT);
+    if (prog.u.uVp) gl.uniform2f(prog.u.uVp, W, H);
+    if (prog.u.uNrmM) {
+      // normals: the view's rotation after the column's tilt (rows r, u, z of the view times ROT)
+      const R = (i, j) => ROT[j * 3 + i];
+      const rows = [r, u, z], nm = new Float32Array(9);
+      for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) {
+        nm[j * 3 + i] = rows[i][0] * R(0, j) + rows[i][1] * R(1, j) + rows[i][2] * R(2, j);
+      }
+      gl.uniformMatrix3fv(prog.u.uNrmM, false, nm);
+      gl.uniform3f(prog.u.uUp, r[1], u[1], z[1]);
+    }
+  }
+  function bindTri(m) {
+    gl.bindBuffer(gl.ARRAY_BUFFER, m.tri);
+    gl.enableVertexAttribArray(0);
+    gl.enableVertexAttribArray(1);
+    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 24, 0);
+    gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 24, 12);
+  }
+  function bindLine(m) {
+    gl.bindBuffer(gl.ARRAY_BUFFER, m.line);
+    gl.enableVertexAttribArray(0);
+    gl.enableVertexAttribArray(1);
+    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 24, 0);
+    gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 24, 12);
+  }
+
+  function draw() {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, W, H);
+    gl.clearColor(bg[0], bg[1], bg[2], 1);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    if (!ready) return;
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LEQUAL);
+    gl.disable(gl.CULL_FACE);
+    gl.disable(gl.BLEND);
+    gl.depthMask(true);
+    // the solid parts
+    frameSetup(P);
+    gl.uniform1f(P.u.uPick, 0);
+    for (const p of parts) {
+      if (!p.visible) continue;
+      gl.uniform3fv(P.u.uOff, p.off);
+      gl.uniform1f(P.u.uTint, p.i === selected ? 0.3 : 0);
+      for (const ms of p.meshes) {
+        if (ms.a < 1) continue;
+        const m = meshes[ms.m];
+        bindTri(m);
+        gl.uniform3fv(P.u.uColor, ms.c);
+        gl.uniform1f(P.u.uAlpha, 1);
+        gl.uniform1f(P.u.uSpec, ms.s);
+        gl.uniform1f(P.u.uShine, ms.sh);
+        gl.drawArrays(gl.TRIANGLES, 0, m.ntv);
+      }
+    }
+    // their outlines
+    frameSetup(L);
+    for (const p of parts) {
+      if (!p.visible) continue;
+      gl.uniform3fv(L.u.uOff, p.off);
+      for (const ms of p.meshes) {
+        if (ms.a < 1) continue;
+        const m = meshes[ms.m];
+        if (!m.nlv) continue;
+        bindLine(m);
+        gl.uniform4fv(L.u.uColor, lineColor(ms.c));
+        gl.drawArrays(gl.LINES, 0, m.nlv);
+      }
+    }
+    // the see-through parts last
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.depthMask(false);
+    gl.enable(gl.CULL_FACE);
+    for (const p of parts) {
+      if (!p.visible) continue;
+      for (const ms of p.meshes) {
+        if (ms.a >= 1) continue;
+        const m = meshes[ms.m];
+        frameSetup(P);
+        gl.uniform1f(P.u.uPick, 0);
+        gl.uniform1f(P.u.uTint, 0);
+        gl.uniform3fv(P.u.uOff, p.off);
+        bindTri(m);
+        gl.uniform3fv(P.u.uColor, ms.c);
+        gl.uniform1f(P.u.uAlpha, ms.a);
+        gl.uniform1f(P.u.uSpec, ms.s);
+        gl.uniform1f(P.u.uShine, ms.sh);
+        gl.drawArrays(gl.TRIANGLES, 0, m.ntv);
+        if (m.nlv) {
+          frameSetup(L);
+          gl.uniform3fv(L.u.uOff, p.off);
+          bindLine(m);
+          const lc = lineColor(ms.c);
+          gl.uniform4fv(L.u.uColor, [lc[0], lc[1], lc[2], 0.35]);
+          gl.drawArrays(gl.LINES, 0, m.nlv);
+        }
+      }
+    }
+    gl.disable(gl.CULL_FACE);
+    gl.depthMask(true);
+    gl.disable(gl.BLEND);
+  }
+
+  // ---- tap a part: draw each part in its own flat colour off screen, read the colour under the finger ----
+  function pickAt(clientX, clientY) {
+    if (!ready) return -1;
+    if (!pickFB || pickW !== W || pickH !== H) {
+      if (pickFB) { gl.deleteFramebuffer(pickFB); gl.deleteTexture(pickTex); gl.deleteRenderbuffer(pickDepth); }
+      pickW = W; pickH = H;
+      pickTex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, pickTex);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, W, H, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      pickDepth = gl.createRenderbuffer();
+      gl.bindRenderbuffer(gl.RENDERBUFFER, pickDepth);
+      gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, W, H);
+      pickFB = gl.createFramebuffer();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, pickFB);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pickTex, 0);
+      gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, pickDepth);
+    }
+    const rect = canvas.getBoundingClientRect();
+    const x = clamp(Math.floor((clientX - rect.left) / rect.width * W), 0, W - 1);
+    const y = clamp(Math.floor((1 - (clientY - rect.top) / rect.height) * H), 0, H - 1);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, pickFB);
+    gl.viewport(0, 0, W, H);
+    gl.enable(gl.SCISSOR_TEST);
+    gl.scissor(x, y, 1, 1);
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.enable(gl.DEPTH_TEST);
+    gl.disable(gl.BLEND);
+    gl.disable(gl.CULL_FACE);
+    frameSetup(P);
+    gl.uniform1f(P.u.uPick, 1);
+    for (const p of parts) {
+      if (!p.visible || !p.pick) continue;
+      gl.uniform3fv(P.u.uOff, p.off);
+      gl.uniform3f(P.u.uPickC, (p.i + 1) / 255, 0, 0);
+      for (const ms of p.meshes) {
+        if (ms.a < 1) continue;
+        bindTri(meshes[ms.m]);
+        gl.drawArrays(gl.TRIANGLES, 0, meshes[ms.m].ntv);
+      }
+    }
+    const px = new Uint8Array(4);
+    gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    gl.disable(gl.SCISSOR_TEST);
+    gl.uniform1f(P.u.uPick, 0);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    dirty = true;
+    return px[3] ? px[0] - 1 : -1;
+  }
+
+  // ---- the info card ----
+  const card = $("card");
+  function select(i) {
+    selected = i;
+    if (i < 0) { card.hidden = true; }
+    else { $("cardName").textContent = parts[i].name; $("cardNote").textContent = parts[i].note; card.hidden = false; }
+    dirty = true;
+  }
+  $("cardClose").addEventListener("click", () => select(-1));
+  $("cardHide").addEventListener("click", () => { if (selected >= 0) { parts[selected].visible = false; select(-1); syncChips(); } });
+
+  // ---- part switches ----
+  const chipEls = [];
+  for (const c of meta.chips) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip";
+    b.dataset.chip = c.id;
+    const dot = document.createElement("span");
+    dot.className = "dot";
+    dot.style.background = `rgb(${c.c.map((x) => Math.round(x * 255)).join(",")})`;
+    b.append(dot, document.createTextNode(c.label));
+    b.addEventListener("click", () => {
+      const group = parts.filter((p) => p.chip === c.id);
+      const show = !group.some((p) => p.visible);
+      for (const p of group) p.visible = show;
+      if (!show && selected >= 0 && parts[selected].chip === c.id) select(-1);
+      syncChips();
+    });
+    $("chips").append(b);
+    chipEls.push(b);
+  }
+  function syncChips() {
+    for (const b of chipEls) b.setAttribute("aria-pressed", String(parts.some((p) => p.chip === b.dataset.chip && p.visible)));
+    $("showAll").hidden = parts.every((p) => p.visible);
+    dirty = true;
+  }
+  $("showAll").addEventListener("click", () => { for (const p of parts) p.visible = true; syncChips(); });
+  syncChips();
+
+  // ---- the steps ----
+  const slider = $("assy");
+  slider.max = String(NSTEP * 100);
+  slider.value = String(NSTEP * 100);
+  function caption() {
+    const label = $("stepLabel"), text = $("stepText");
+    if (assy >= NSTEP - 1e-6) {
+      label.textContent = "Together";
+      text.textContent = "The motor slid up the groove by its wing bolt, the gear in the teeth: lane keeping on. Press Back, or slide left, to take it apart in the order it goes together.";
+    } else if (assy <= 1e-6) {
+      label.textContent = "Apart";
+      text.textContent = "Every piece apart, near where it goes; the arm's pieces off to the right, where they go together off the car. Press Next, or slide right, to put it together one step at a time.";
+    } else {
+      const k = Math.ceil(assy - 1e-6);
+      label.textContent = `Step ${k} of ${NSTEP}`;
+      text.textContent = meta.steps[k - 1];
+    }
+    $("prev").disabled = assy <= 1e-6;
+    $("next").disabled = assy >= NSTEP - 1e-6;
+  }
+  function setAssy(a, fromSlider) {
+    assy = clamp(a, 0, NSTEP);
+    if (!fromSlider) slider.value = String(Math.round(assy * 100));
+    placeParts();
+    followParts();
+    caption();
+    dirty = true;
+  }
+  let assyTween = null;
+  function animateAssy(to) {
+    to = clamp(to, 0, NSTEP);
+    if (reduceMotion) { assyTween = null; setAssy(to); return; }
+    assyTween = { from: assy, to, t0: performance.now(), dur: Math.max(250, Math.abs(to - assy) * 1400) };
+  }
+  slider.addEventListener("input", () => { assyTween = null; setAssy(Number(slider.value) / 100, true); });
+  $("prev").addEventListener("click", () => animateAssy(Math.ceil(assy - 1e-6) - 1));
+  $("next").addEventListener("click", () => animateAssy(Math.floor(assy + 1e-6) + 1));
+
+  // ---- views ----
+  // A view button's view keeps every part that moves in the picture, clear of the title and the view buttons, so
+  // the parts stay in sight as it comes apart: it slides over (as little as it can) and backs off (never closer
+  // than its own distance). Once you turn, zoom or move it yourself, it stays where you put it.
+  const movers = parts.filter((p) => p.bb && p.moves.length);
+  const headEl = document.querySelector(".head"), viewsEl = document.querySelector(".views");
+  function fitView(t, dir, base) {
+    const f = mul(dir, -1), r = norm(cross(f, [0, 1, 0])), u = cross(r, f);
+    const sr = stage.getBoundingClientRect(), hr = headEl.getBoundingClientRect(), vr = viewsEl.getBoundingClientRect();
+    const Hs = Math.max(1, sr.height), Ws = Math.max(1, sr.width), ty = Math.tan(FOV / 2);
+    const A = ty * Ws / Hs * (1 - 2 * 14 / Ws);                                   // the sides, 14 px in
+    const T = ty * (1 - 2 * clamp(hr.bottom - sr.top + 8, 0, 0.35 * Hs) / Hs);    // under the title
+    const B = ty * (1 - 2 * clamp(sr.bottom - vr.top + 8, 0, 0.35 * Hs) / Hs);    // above the view buttons
+    const pts = [];
+    for (const p of movers) {
+      const b = p.bb, o = p.off;
+      for (let k = 0; k < 8; k++) {
+        const q = sub(toWorld([(k & 1 ? b[3] : b[0]) + o[0], (k & 2 ? b[4] : b[1]) + o[1], (k & 4 ? b[5] : b[2]) + o[2]]), t);
+        pts.push([dot(q, r), dot(q, u), dot(q, dir)]);       // across, up, towards the eye
+      }
+    }
+    // seen from d away, a point (x, y, z) is on the screen at x / ((d - z) * A) across, y / ((d - z) * T or B) up;
+    // sliding the view over by (sx, sy) takes sx from x and sy from y
+    let xa = -Infinity, xb = Infinity, ya = -Infinity, yb = Infinity;
+    for (const [x, y, z] of pts) {
+      xa = Math.max(xa, x + A * z); xb = Math.min(xb, x - A * z);
+      ya = Math.max(ya, y + T * z); yb = Math.min(yb, y - B * z);
+    }
+    const d = Math.max(base, (xa - xb) / (2 * A), (ya - yb) / (T + B));
+    let x0 = -Infinity, x1 = Infinity, y0 = -Infinity, y1 = Infinity;
+    for (const [x, y, z] of pts) {
+      x0 = Math.max(x0, x - A * (d - z)); x1 = Math.min(x1, x + A * (d - z));
+      y0 = Math.max(y0, y - T * (d - z)); y1 = Math.min(y1, y + B * (d - z));
+    }
+    const sx = clamp(0, x0, x1), sy = clamp(0, y0, y1);
+    return { t: add(t, add(mul(r, sx), mul(u, sy))), dist: d };
+  }
+  function viewState(name) {
+    const v = meta.views[name];
+    const t = toWorld(v.target);
+    let dir, dist;
+    if (v.eye) { const d = sub(toWorld(v.eye), t); dir = norm(d); dist = v.dist || Math.hypot(d[0], d[1], d[2]); }
+    else if (v.world_dir) { dir = norm(v.world_dir); dist = v.dist; }
+    else { dir = norm(toWorld(v.dir)); dist = v.dist; }
+    const aspect = W / H;
+    const fit = fitView(t, dir, dist * Math.max(1, 0.95 / aspect));
+    return { t: fit.t, dist: fit.dist, az: Math.atan2(dir[0], dir[2]), el: Math.asin(clamp(dir[1], -1, 1)) };
+  }
+  let viewTween = null, activeView = null;
+  const viewButtons = [...document.querySelectorAll(".views button")];
+  function pressView(name) {
+    activeView = name;
+    for (const b of viewButtons) b.setAttribute("aria-pressed", String(b.dataset.view === name));
+  }
+  function followParts() {
+    if (!activeView || viewTween) return;
+    const s = viewState(activeView);
+    cam.t = s.t; cam.dist = s.dist; dirty = true;
+  }
+  function goView(name, instant) {
+    const to = viewState(name);
+    pressView(name);
+    if (instant || reduceMotion) { Object.assign(cam, { t: to.t, dist: to.dist, az: to.az, el: to.el }); viewTween = null; dirty = true; return; }
+    let daz = to.az - cam.az;
+    daz = Math.atan2(Math.sin(daz), Math.cos(daz));
+    viewTween = { name, from: { t: cam.t.slice(), dist: cam.dist, az: cam.az, el: cam.el }, to: { ...to, az: cam.az + daz }, t0: performance.now(), dur: 750 };
+  }
+  for (const b of viewButtons) b.addEventListener("click", () => goView(b.dataset.view));
+
+  // ---- turning, zooming, moving ----
+  const pointers = new Map();
+  let mode = null, downX = 0, downY = 0, downT = 0, travel = 0, pinch = null;
+  const ROT_SPEED = () => 2.6 / Math.max(240, canvas.clientHeight);
+  function pan(dx, dy) {
+    const k = 2 * cam.dist * Math.tan(FOV / 2) / Math.max(1, canvas.clientHeight);
+    const { r, u } = basis();
+    cam.t = add(cam.t, add(mul(r, -dx * k), mul(u, dy * k)));
+    dirty = true;
+  }
+  function pinchState() {
+    const [a, b] = [...pointers.values()];
+    return { d: Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 };
+  }
+  function userMoved() { viewTween = null; pressView(null); }
+  canvas.addEventListener("pointerdown", (e) => {
+    canvas.focus({ preventScroll: true });
+    try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* not every browser allows it */ }
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pointers.size === 1) {
+      mode = (e.button === 2 || e.shiftKey || e.ctrlKey || e.metaKey) ? "pan" : "rotate";
+      downX = e.clientX; downY = e.clientY; downT = performance.now(); travel = 0;
+    } else if (pointers.size === 2) {
+      mode = "pinch"; pinch = pinchState(); travel = 99;
+    }
+  });
+  canvas.addEventListener("pointermove", (e) => {
+    const p = pointers.get(e.pointerId);
+    if (!p) return;
+    const dx = e.clientX - p.x, dy = e.clientY - p.y;
+    p.x = e.clientX; p.y = e.clientY;
+    travel = Math.max(travel, Math.hypot(e.clientX - downX, e.clientY - downY));
+    if (travel < 4 && mode !== "pinch") return;
+    if (mode === "rotate") {
+      userMoved();
+      cam.az -= dx * ROT_SPEED();
+      cam.el = clamp(cam.el + dy * ROT_SPEED(), -EL_MAX, EL_MAX);
+      dirty = true;
+    } else if (mode === "pan") { userMoved(); pan(dx, dy); }
+    else if (mode === "pinch" && pointers.size >= 2) {
+      userMoved();
+      const s = pinchState();
+      cam.dist = clamp(cam.dist * pinch.d / s.d, 60, 4000);
+      pan(s.mx - pinch.mx, s.my - pinch.my);
+      pinch = s;
+      dirty = true;
+    }
+  });
+  function pointerEnd(e) {
+    if (!pointers.has(e.pointerId)) return;
+    const tap = e.type === "pointerup" && mode === "rotate" && pointers.size === 1 && travel < 6 && performance.now() - downT < 700;
+    pointers.delete(e.pointerId);
+    if (tap) select(pickAt(e.clientX, e.clientY));
+    if (pointers.size === 1) { mode = "rotate"; travel = 99; }
+    else if (pointers.size === 0) mode = null;
+  }
+  canvas.addEventListener("pointerup", pointerEnd);
+  canvas.addEventListener("pointercancel", pointerEnd);
+  canvas.addEventListener("contextmenu", (e) => e.preventDefault());
+  canvas.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    userMoved();
+    const k = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 400 : 1;
+    cam.dist = clamp(cam.dist * Math.exp(e.deltaY * k * 0.0012), 60, 4000);
+    dirty = true;
+  }, { passive: false });
+  canvas.addEventListener("gesturestart", (e) => e.preventDefault());
+  canvas.addEventListener("keydown", (e) => {
+    const step = 0.08;
+    if (e.key === "ArrowLeft") cam.az += step;
+    else if (e.key === "ArrowRight") cam.az -= step;
+    else if (e.key === "ArrowUp") cam.el = clamp(cam.el - step, -EL_MAX, EL_MAX);
+    else if (e.key === "ArrowDown") cam.el = clamp(cam.el + step, -EL_MAX, EL_MAX);
+    else if (e.key === "+" || e.key === "=") cam.dist = clamp(cam.dist * 0.9, 60, 4000);
+    else if (e.key === "-" || e.key === "_") cam.dist = clamp(cam.dist / 0.9, 60, 4000);
+    else return;
+    e.preventDefault();
+    userMoved();
+    dirty = true;
+  });
+
+  // ---- the loop: draw only when something changed ----
+  function tick(now) {
+    if (viewTween) {
+      const k = clamp((now - viewTween.t0) / viewTween.dur, 0, 1), e = k < 0.5 ? 2 * k * k : 1 - 2 * (1 - k) * (1 - k);
+      if (assyTween) { const s = viewState(viewTween.name); viewTween.to.t = s.t; viewTween.to.dist = s.dist; }  // parts moving too
+      const a = viewTween.from, b = viewTween.to;
+      cam.t = add(a.t, mul(sub(b.t, a.t), e));
+      cam.dist = a.dist * Math.pow(b.dist / a.dist, e);
+      cam.az = a.az + (b.az - a.az) * e;
+      cam.el = a.el + (b.el - a.el) * e;
+      dirty = true;
+      if (k >= 1) viewTween = null;
+    }
+    if (assyTween) {
+      const k = clamp((now - assyTween.t0) / assyTween.dur, 0, 1);
+      setAssy(assyTween.from + (assyTween.to - assyTween.from) * k);
+      if (k >= 1) assyTween = null;
+    }
+    resize();
+    if (dirty) { dirty = false; draw(); }
+    requestAnimationFrame(tick);
+  }
+
+  // ---- the theme ----
+  readBg();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", readBg);
+  new MutationObserver(readBg).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "class", "style"] });
+
+  resize();
+  goView("overview", true);
+  setAssy(NSTEP);
+  requestAnimationFrame(tick);
+  setTimeout(() => {
+    try {
+      for (const m of meta.meshes) meshes.push(buildMesh(m));
+      ready = true;
+      status.hidden = true;
+      dirty = true;
+    } catch (err) {
+      status.textContent = "The parts could not be drawn here: " + err.message;
+    }
+  }, 30);
+})();
+</script>

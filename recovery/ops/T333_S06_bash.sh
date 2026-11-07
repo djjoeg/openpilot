@@ -1,0 +1,1 @@
+ruff check platefit.py 2>&1 | head -12; ruff check --fix platefit.py | tail -1

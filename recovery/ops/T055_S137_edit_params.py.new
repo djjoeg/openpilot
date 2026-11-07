@@ -1,0 +1,6 @@
+TEETH_ON_WHEEL = TEETH_SETS[29]["teeth"]
+# Torque at the steering wheel, from the car port (opendbc/car/hondastepper/values.py and the safety chip's
+# honda_stepper.h): lane keeping's own most (STEER_MAX, 43 units) and the safety chip's hard limit (47 units), in
+# firmware units of 0.125 Nm turned into steering wheel torque for this motor and these gears.
+LANE_KEEPING_MOST_NM = 4.03
+MOST_TORQUE_NM = 4.41  # the most torque lane keeping may use at the steering wheel (the safety chip's limit)

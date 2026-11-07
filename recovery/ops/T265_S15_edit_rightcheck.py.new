@@ -1,0 +1,15 @@
+  # 1. the fixed parts against each other (the arm in the receiver); then the arm slid 20 mm in or out across, with
+  # the carrier and its bolts on it, against the plate, the cover and the receiver's wing bolt turning
+  check("plate / arm", plate, arm)
+  check("plate / column cover", plate, cover)
+  check("arm / column cover", arm, cover)
+  rx = hardware(0.0, RA.STOP_P, True)["receiver bolt"]
+  for dx in (-20.0, 20.0):
+    sh = {"arm": arm.translate((dx, 0.0, 0.0))}
+    for dz in (0.0, RA.DZ_END):
+      sh.update({f"{k} slid {dz:+.0f}": m.translate((dx, 0.0, 0.0)) for k, m in moving(dz).items()})
+    sh.update({f"{k} wings turning": m for k, m in hardware(0.0, RA.STOP_P, True, dx).items()
+               if "receiver" not in k and "nut" not in k})
+    for n, m in sh.items():
+      for fn, fm in (("plate", plate), ("column cover", cover), ("receiver bolt wings turning", rx)):
+        check(f"arm slid {dx:+.0f} across: {n} / {fn}", m, fm)

@@ -1,0 +1,3 @@
+SLOT_HALF = (3.6, 11.3)                    # the slot in the block's front wall the nose slides in: +- x, +- z (the cam's
+SLOT_DEEP = 1.0                            # side swings into it, 10.7 from the middle at most, when the teeth meet tip to
+                                           # tip), this far past the wall; a collar round it keeps 2 mm of wall

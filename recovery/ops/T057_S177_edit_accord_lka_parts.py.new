@@ -1,0 +1,2 @@
+  clear_deg = next(th / 10 for th in range(1, 300)
+                   if gy * math.cos(math.radians(th / 10)) + gz * math.sin(math.radians(th / 10)) - gy >= overlap_mm)

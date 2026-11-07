@@ -1,0 +1,12 @@
+  rows.append({"bolt": "M5 washer, 10 mm across (1)", "use": "under the spring, from the start on this mount", "length": 0.0,
+               "through_mm": 0.0, "nut_mm": 0.0, "past_the_nut_mm": 0.0, "ok": True})
+  # the set screw runs in through a tooth gap of the 16-tooth gear onto the shaft's flat: it must end below the gap's floor
+  flat = P.SHAFT_ACROSS_FLAT - P.SHAFT_D / 2
+  gap_floor = FP.R_P - GR.DEDENDUM * GR.MODULE
+  set_len = 10.0
+  rows.append({"bolt": f"M3 x {set_len:.0f} set screw (1), in place of the M3 x 12",
+               "use": f"back motor gear onto the shaft's flat: it ends {gap_floor - flat - set_len:.1f} mm below the floor of its "
+                      f"tooth gap (an M3 x 12 would stand {flat + 12.0 - gap_floor:.1f} mm out into it, where the back teeth's tips "
+                      "come in)", "length": 0.0, "through_mm": 0.0, "nut_mm": 0.0, "past_the_nut_mm": 0.0,
+               "ok": flat + set_len < gap_floor - 1.0})
+  return rows

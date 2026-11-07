@@ -1,0 +1,14 @@
+# ***** motor: STEPPERONLINE 17HS16-2004S1 (NEMA 17, 45 Ncm, 2 A, 1.3 ohm, 40 mm, 310 g) *****
+# Chosen weaker than it could be on purpose: at the most current its controller board can give (3.3 A), it can't
+# push the steering wheel harder than a driver is expected to overpower easily (see margins.py).
+
+NEMA = 42.3             # square body
+NEMA_LEN = 40.0
+NEMA_HOLES = 31.0       # M3 holes, square pattern
+NEMA_BOSS = 22.0        # round boss around the shaft, about 2 mm high
+SHAFT_D = 5.0
+SHAFT_ACROSS_FLAT = 4.5
+SHAFT_LEN = 23.0
+SHAFT_FLAT_LEN = 21.0   # the D flat runs this far back from the shaft's tip
+MOTOR_HOLD_NCM, MOTOR_RATED_A, MOTOR_OHM, MOTOR_KG = 45.0, 2.0, 1.3, 0.31   # STEPPERONLINE's data
+BOARD_MAX_A = 3.3       # the most current the StepperServoCAN board's motor driver gives (its firmware: I_MAX_A4950)

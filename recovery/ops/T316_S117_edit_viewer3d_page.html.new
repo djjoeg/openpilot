@@ -1,0 +1,47 @@
+  // A view button's view keeps every part that moves in the picture, clear of the title and the view buttons, so
+  // the parts stay in sight as it comes apart: it slides over (as little as it can) and backs off (never closer
+  // than its own distance). Once you turn, zoom or move it yourself, it stays where you put it.
+  const movers = parts.filter((p) => p.bb && p.moves.length);
+  const headEl = document.querySelector(".head"), viewsEl = document.querySelector(".views");
+  function fitView(t, dir, base) {
+    const f = mul(dir, -1), r = norm(cross(f, [0, 1, 0])), u = cross(r, f);
+    const sr = stage.getBoundingClientRect(), hr = headEl.getBoundingClientRect(), vr = viewsEl.getBoundingClientRect();
+    const Hs = Math.max(1, sr.height), Ws = Math.max(1, sr.width), ty = Math.tan(FOV / 2);
+    const A = ty * Ws / Hs * (1 - 2 * 14 / Ws);                                   // the sides, 14 px in
+    const T = ty * (1 - 2 * clamp(hr.bottom - sr.top + 8, 0, 0.35 * Hs) / Hs);    // under the title
+    const B = ty * (1 - 2 * clamp(sr.bottom - vr.top + 8, 0, 0.35 * Hs) / Hs);    // above the view buttons
+    const pts = [];
+    for (const p of movers) {
+      const b = p.bb, o = p.off;
+      for (let k = 0; k < 8; k++) {
+        const q = sub(toWorld([(k & 1 ? b[3] : b[0]) + o[0], (k & 2 ? b[4] : b[1]) + o[1], (k & 4 ? b[5] : b[2]) + o[2]]), t);
+        pts.push([dot(q, r), dot(q, u), dot(q, dir)]);       // across, up, towards the eye
+      }
+    }
+    // seen from d away, a point (x, y, z) is on the screen at x / ((d - z) * A) across, y / ((d - z) * T or B) up;
+    // sliding the view over by (sx, sy) takes sx from x and sy from y
+    let xa = -Infinity, xb = Infinity, ya = -Infinity, yb = Infinity;
+    for (const [x, y, z] of pts) {
+      xa = Math.max(xa, x + A * z); xb = Math.min(xb, x - A * z);
+      ya = Math.max(ya, y + T * z); yb = Math.min(yb, y - B * z);
+    }
+    const d = Math.max(base, (xa - xb) / (2 * A), (ya - yb) / (T + B));
+    let x0 = -Infinity, x1 = Infinity, y0 = -Infinity, y1 = Infinity;
+    for (const [x, y, z] of pts) {
+      x0 = Math.max(x0, x - A * (d - z)); x1 = Math.min(x1, x + A * (d - z));
+      y0 = Math.max(y0, y - T * (d - z)); y1 = Math.min(y1, y + B * (d - z));
+    }
+    const sx = clamp(0, x0, x1), sy = clamp(0, y0, y1);
+    return { t: add(t, add(mul(r, sx), mul(u, sy))), dist: d };
+  }
+  function viewState(name) {
+    const v = meta.views[name];
+    const t = toWorld(v.target);
+    let dir, dist;
+    if (v.eye) { const d = sub(toWorld(v.eye), t); dir = norm(d); dist = v.dist || Math.hypot(d[0], d[1], d[2]); }
+    else if (v.world_dir) { dir = norm(v.world_dir); dist = v.dist; }
+    else { dir = norm(toWorld(v.dir)); dist = v.dist; }
+    const aspect = W / H;
+    const fit = fitView(t, dir, dist * Math.max(1, 0.95 / aspect));
+    return { t: fit.t, dist: fit.dist, az: Math.atan2(dir[0], dir[2]), el: Math.asin(clamp(dir[1], -1, 1)) };
+  }

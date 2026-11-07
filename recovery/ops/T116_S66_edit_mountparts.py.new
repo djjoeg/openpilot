@@ -1,0 +1,4 @@
+def hinge_block(arm_nominal: float = ARM_NOMINAL, ears: bool = True) -> Manifold:
+  """arm_nominal: the arm's angle to the steering column in the middle of the joint's range (ARM_NOMINAL for the dash
+  mount; the column mount's arm runs closer to the column, so its hinge block has the slot centred lower). ears:
+  False leaves off the ears on top (the back-teeth mount's hinge block carries its arm's joint underneath instead)."""

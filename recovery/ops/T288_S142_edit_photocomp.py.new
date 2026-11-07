@@ -1,0 +1,6 @@
+  C = L["C"] * gain * np.asarray(wb)[None, None]
+  A = L["A"].copy()
+  # a soft shoulder on the brightest parts, as the phone rolls off its highlights
+  cu = C / np.maximum(A, 1e-6)[..., None]
+  cu = np.where(cu > knee, knee + (1 - knee) * (1 - np.exp(-(cu - knee) / (1 - knee))), cu)
+  C = cu * A[..., None]

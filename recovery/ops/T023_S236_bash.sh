@@ -1,0 +1,1 @@
+sed -i 's/  lo, hi = -DROP_DEG - 2.0, STOP_DEG + 3.0/  lo, hi = -DROP_DEG - 2.0, LIFT_DEG + 6.0/' mountparts.py && PYTHONPATH=/home/claude/pylib python3 /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/cadwork/side.py

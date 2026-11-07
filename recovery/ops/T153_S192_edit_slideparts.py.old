@@ -1,0 +1,4 @@
+def cam_outline() -> CrossSection:
+  """In the lever's frame with the lever on: u along the pusher (+y), v = +z."""
+  flat = CrossSection.square((0.01, 2 * CAM_FLAT_HALF)).translate((CAM_FLAT - 0.01, -CAM_FLAT_HALF))
+  return CrossSection.batch_hull([CrossSection.circle(CAM_MIN, 96), flat])

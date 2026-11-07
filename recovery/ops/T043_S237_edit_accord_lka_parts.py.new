@@ -1,0 +1,40 @@
+  # What the spring does at the motor gear with the gear on the teeth, leaving out the motor's own weight (which adds to
+  # it). Its turning force about the hinge presses the roller onto the rolling band and holds the teeth in mesh; the
+  # push that drives the teeth apart (the torque's share along the line between the gears' centres, at the 20 degree
+  # tooth angle) acts at the teeth, further from the hinge than the roller.
+  def from_hinge(z_range):
+    """Distance along the shaft from the hinge to the middle of a contact (z range in the steering wheel frame)."""
+    return (z_range[0] + z_range[1]) / 2 - P.Z_MOTOR_FACE - MP.HINGE[1]
+  band_flat = (P.Z_ROLL[0], P.Z_ROLL[1] - max(0.0, t.r_roll - t.r_root))      # the rolling band's flat top
+  roller_z = (max(band_flat[0], P.Z_GEAR_ROLLER[0]), min(band_flat[1], P.Z_GEAR_ROLLER[1]))
+  mesh_z = (max(P.Z_TEETH[0], P.Z_GEAR_TEETH[0]), min(P.Z_TEETH[1], P.Z_GEAR_TEETH[1]))
+  roller_n = MP.spring_torque(0) / from_hinge(roller_z)
+  hold_n = MP.spring_torque(0) / from_hinge(mesh_z)
+  apart_n = P.MOST_TORQUE_NM * 1000 / GR.pitch_radius(P.RING_TEETH) * math.tan(math.radians(GR.PRESSURE_ANGLE))
+  report["spring"] = {"part": "Lee Spring LCM100E03S (9 mm outside, 1 mm wire, 28.5 mm long, 1.98 N/mm)",
+                      "length_gear_on_teeth_mm": MP.SPRING_LEN, "force_gear_on_teeth_N": round(MP.spring_force(0), 1),
+                      "length_lever_up_mm": round(MP.SPRING_LEN - MP.SPRING_ARM * math.sin(math.radians(most)), 1),
+                      "force_lever_up_N": round(MP.spring_force(most), 1), "most_load_N": MP.SPRING_MAX_N,
+                      "fully_squashed_mm": MP.SPRING_SOLID,
+                      "presses_roller_on_rolling_band_N": round(roller_n, 1), "holds_teeth_in_mesh_up_to_N": round(hold_n, 1),
+                      "most_torque_at_steering_wheel_Nm": P.MOST_TORQUE_NM,
+                      "most_torque_pushes_teeth_apart_N": round(apart_n, 1), "times_what_it_needs": round(hold_n / apart_n, 2)}
+  if MP.spring_force(most) > MP.SPRING_MAX_N:
+    problems.append("the spring is pushed past its most load when the lever is up")
+  if hold_n <= apart_n:
+    problems.append(f"the spring holds the teeth in mesh against {hold_n:.1f} N, less than the {apart_n:.1f} N the most "
+                    "torque pushes them apart with")
+
+  # Past the last tooth the roller still rides on the rolling band: ROLL_PAST_TEETH degrees flat, then down the band's
+  # slope until the carrier stops dropping (DROP_DEG, the lift lever's rounded end on the hinge block). Through the
+  # roller's grip the motor can still push the steering wheel there, much more weakly than through the teeth.
+  ry, rz = -P.ROLLER_R - MP.HINGE[0], from_hinge(roller_z)       # roller's contact line, from the hinge (y, z)
+  d = math.radians(MP.DROP_DEG)
+  roller_drop = -(ry * (math.cos(d) - 1) - rz * math.sin(d))    # how far the roller can follow the band down (mm)
+  on_slope_deg = P.END_LEAD_IN * min(1.0, roller_drop / (t.r_roll - t.r_base))
+  weak_push_nm = roller_n * MP.RUB * t.r_roll / 1000
+  report["past_last_tooth"] = {
+    "roller_on_band_more_deg": round(P.ROLL_PAST_TEETH + on_slope_deg, 1), "flat_deg": P.ROLL_PAST_TEETH,
+    "on_slope_deg": round(on_slope_deg, 1), "push_there_Nm_estimate": round(weak_push_nm, 2), "rubbing_estimate": MP.RUB,
+    "sets": {str(reach): {"full_push_to_deg": round(ts.teeth_half, 1),
+                          "weak_push_to_deg": round(ts.roll_half + on_slope_deg, 1)} for reach, ts in teeth_sets.items()}}

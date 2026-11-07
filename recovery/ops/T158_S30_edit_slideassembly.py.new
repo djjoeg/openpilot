@@ -1,0 +1,8 @@
+  fingers = A.fingers()
+  for name, part in (("gear", A.gear(off)), ("carrier", A.carrier(off)), ("motor, board and plugs", A.motor(off)),
+                     ("rods and collars", A.rods(off)), ("latch lever", A.lever(off, SP.SWING_SIGN * SP.LEVER_SWING)),
+                     ("block", A.block()), ("pusher, bearings, switch", A.fixed_bits()), ("pull springs", A.springs(off))):
+    res[f"slid off: the teeth anywhere round the wheel/{name}"] = overlap(ring, part)
+    # slid off you hold the wheel there as usual: nothing in the room your fingers take round the grip
+    res[f"slid off: your fingers round the grip/{name}"] = overlap(fingers, part)
+  return res

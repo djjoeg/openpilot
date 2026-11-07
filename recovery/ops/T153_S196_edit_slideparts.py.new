@@ -1,0 +1,3 @@
+  pusher = cyl_y(PUSHER_BORE / 2 + 3.0, y0, PLUG_Y[1], x=PUSHER_X, z=PIVOT[1], segments=64)
+  collar = cyl_y(math.hypot(*SLOT_HALF) + 2.0, y0, PUSH_BODY_Y + SLOT_DEEP + 2.0, x=PUSHER_X, z=PIVOT[1], segments=64)
+  join = box(PUSHER_X, RODS[0][0], y0, PLUG_Y[1], PIVOT[1] - 8.0, PIVOT[1] + 8.0)

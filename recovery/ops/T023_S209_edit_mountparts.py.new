@@ -1,0 +1,3 @@
+  bearing = [extrude_x(bear_cs, LEVER_EAR_X[0], lx1), extrude_x(bear_cs, -lx1, -LEVER_EAR_X[0])]
+  stop_bar = box(-lx1, lx1, vy + STOP_BAR[0], vy + STOP_BAR[1], vz + STOP_BAR[2], vz + STOP_BAR[3])
+  cx0 = SW_THICK / 2 + 0.3

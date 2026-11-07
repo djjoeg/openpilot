@@ -1,0 +1,1 @@
+cd /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/safety && mv numbers.py drift_curves.py && rm -rf __pycache__ && cd /home/claude/work/opendbc && PYTHONPATH=/home/claude/pylib:/home/claude/work/opendbc timeout 120 python3 /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/safety/drift_curves.py 2>&1 | grep -v "^hondastepper:"

@@ -1,0 +1,15 @@
+# Spring that presses the motor gear onto the steering wheel teeth: Lee Spring LCM110E12S (stainless steel, 8.99 mm
+# outside, 6.81 mm inside, 1.09 mm wire, 35 mm long +-1.22, 2.645 N/mm +-10%, 12.8 mm fully squashed, which takes
+# 58.81 N). Lee Spring sizes its stock springs so that squashing them fully is the most they can take, so that load is
+# the spring's limit. The spring never gets that far here: lever up, it is still 20.98 mm long.
+SPRING_OD, SPRING_ID, SPRING_FREE, SPRING_RATE, SPRING_SOLID, SPRING_MAX_N = 8.99, 6.81, 35.0, 2.645, 12.8, 58.81
+SPRING_FREE_TOL, SPRING_RATE_TOL = 1.22, 0.10        # Lee Spring's tolerances on its free length (mm) and rate
+SPRING_PART = "Lee Spring LCM110E12S"
+SPRING_Z = -4.0                       # spring's axis, in front of the hinge
+SPRING_ARM = SPRING_Z - HINGE[1]      # its distance from the hinge axis
+SPRING_SEAT_R = 5.0                   # hole through the carrier's top block: the spring's lower end rests on the
+SPRING_SEAT_D = TOP_Y[1] - NEMA / 2   # motor's top, 8.5 mm below the carrier's top
+SPRING_POCKET_R = 5.5                 # pocket in the hinge block's underside for its upper end
+SPRING_POCKET_D = 6.0                 # (the block above it is 3 mm thick)
+SPRING_SHIM_T = 0.8                   # an M4 washer (9 mm across) under the spring adds this much push, if the grip
+                                      # test in the car setup asks for it

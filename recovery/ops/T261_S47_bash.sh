@@ -1,0 +1,1 @@
+sed -i 's|          "right-carrier": on_bed(car, rotate=(0.0, 90.0, 0.0))}    # x -> -z: the inside face down|          "right-carrier": on_bed(car, rotate=(0.0, -90.0, 0.0))}   # x -> z: the inside face down|' rightarm.py && sed -n 286,345p rightarm.py && grep -n "FACE_Z\|TAB_X\|TAB_Y\|FLAG_X\|FLAG_Y\|face_plate" rightarm.py visuals.py

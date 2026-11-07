@@ -1,0 +1,2 @@
+    colors = np.clip(base * shade, 0, 1)
+    ax.add_collection(PolyCollection(p[up][order][:, :, :2], facecolors=colors, edgecolors=colors, linewidths=0.3, zorder=2))

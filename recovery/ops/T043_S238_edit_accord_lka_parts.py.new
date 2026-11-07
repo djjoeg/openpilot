@@ -1,0 +1,16 @@
+  L.append(f"SPRING: {sp['part']}. {sp['length_gear_on_teeth_mm']} mm long and {sp['force_gear_on_teeth_N']} N with the motor gear "
+           f"on the teeth; {sp['length_lever_up_mm']} mm and {sp['force_lever_up_N']} N with the lever up (its most is "
+           f"{sp['most_load_N']} N at {sp['fully_squashed_mm']} mm). With the motor gear on the teeth it presses the roller "
+           f"onto the rolling band with {sp['presses_roller_on_rolling_band_N']} N and holds the teeth in mesh against up to "
+           f"{sp['holds_teeth_in_mesh_up_to_N']} N pushing them apart (by calculation, leaving out the motor's own weight, "
+           f"which adds to both). The most torque lane keeping may use ({sp['most_torque_at_steering_wheel_Nm']} Nm at the "
+           f"steering wheel) pushes them apart with {sp['most_torque_pushes_teeth_apart_N']} N: the spring has "
+           f"{sp['times_what_it_needs']} times what it needs.")
+  pt = r["past_last_tooth"]
+  L.append(f"PAST THE LAST TOOTH: the roller stays on the rolling band for {pt['roller_on_band_more_deg']} more degrees of "
+           f"steering wheel turn each way ({pt['flat_deg']} flat, then {pt['on_slope_deg']} down its slope until the carrier "
+           f"stops dropping). Its grip there can still push the steering wheel: about {pt['push_there_Nm_estimate']} Nm at "
+           f"most (an estimate, {pt['rubbing_estimate']} rubbing between printed parts), against "
+           f"{sp['most_torque_at_steering_wheel_Nm']} Nm through the teeth. " + "; ".join(
+             f"{reach} teeth: full push to {s['full_push_to_deg']} degrees each way, weak push to {s['weak_push_to_deg']}"
+             for reach, s in pt["sets"].items()) + ".")

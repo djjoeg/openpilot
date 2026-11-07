@@ -1,0 +1,6 @@
+  for m, mat in scene:
+    v, t = PR.mesh_of(m)
+    if len(t) == 0:
+      mats.append(mat)             # keep the material numbers lined up with the scene's items
+      continue
+    _, cn = PR.corner_normals(v, t, mat.smooth, mat.crease)

@@ -1,0 +1,2 @@
+  labels.append(text("WHEEL", -16.0, -11.0, T, pix=0.9))       # on the edge nearest the wheel
+  return body + union(labels)

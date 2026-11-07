@@ -1,0 +1,5 @@
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.floor((clientX - rect.left) / rect.width * W), y = Math.floor((1 - (clientY - rect.top) / rect.height) * H);
+    const px = new Uint8Array(4);
+    gl.readPixels(clamp(x, 0, W - 1), clamp(y, 0, H - 1), 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    gl.uniform1f(P.u.uPick, 0);

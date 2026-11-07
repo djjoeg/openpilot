@@ -1,0 +1,3 @@
+  L.append(f"SPRING: {sp['part']}. {sp['length_gear_on_teeth_mm']} mm long and {sp['force_gear_on_teeth_N']} N with the motor gear "
+           f"on the teeth; {sp['length_lever_up_mm']} mm and {sp['force_lever_up_N']} N with the lever up (its most is "
+           f"{sp['most_load_N']} N at {sp['fully_squashed_mm']} mm).")

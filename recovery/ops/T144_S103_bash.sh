@@ -1,0 +1,1 @@
+cd /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/sfm && sed -i 's/^F0 = 1860.0/F0 = 1900.0/' sfm.py && python3 sfm.py 0,1,6,7,9,11,17,22,32,35,36 6,9 20 sfm_A.pkl 2>&1 | tail -40

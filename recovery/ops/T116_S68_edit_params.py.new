@@ -1,0 +1,11 @@
+KEY_FROM = (45.0, -35.0, -72.0)     # the key cylinder's bezel on the covers' right-hand side near their front, pointing
+KEY_TO = (85.0, -62.0, -55.0)       # right, down and towards you (estimate)
+KEY_R = 16.0
+
+# ----- the back-teeth mount (faceparts.py): estimates from photos, steering wheel frame -----
+RIGHT_SPOKE_DEG = (-55.0, -15.0)    # the right spoke meets the grip between these angles from 3 o'clock (+ up, - down),
+                                    # read off a straight-on photo of the wheel; the channel leaves room 2 degrees past each
+COVER_BOTTOM = -50.0                # the lower column cover's underside, this far below the column's axis where the column
+                                    # plate sits (estimate; --cover-bottom)
+PLATE_FRONT_Z = -76.0               # the column plate's front end, behind the middle of the grip; its slots take the cover's
+                                    # screws from 29 to 139 mm behind that

@@ -1,0 +1,5 @@
+  function followParts() {
+    if (!activeView || viewTween) return;
+    const s = viewState(activeView);
+    cam.t = s.t; cam.dist = s.dist; dirty = true;
+  }

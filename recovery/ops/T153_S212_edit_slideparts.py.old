@@ -1,0 +1,16 @@
+  # in front of the flange the plate keeps 1.5 mm clear of the block (the mount turned anywhere in its +-3 degrees)
+  part = part - block_keepout(1.5).translate((0.0, -dy, -dz))
+  return clean(part.translate((0.0, dy, dz)))
+
+
+def block_keepout(clear: float) -> Manifold:
+  """Steering wheel frame: everywhere the block can be (the mount turned anywhere in its +-3 degrees), grown by clear,
+  in front of the column plate's flange."""
+  blk = slide_block()
+  placed = []
+  for m in (MOUNT_DEG_S - MOUNT_ADJ_S[0], MOUNT_DEG_S, MOUNT_DEG_S + MOUNT_ADJ_S[1]):
+    Rm = PP.rot_z(m)
+    placed.append(PP.place(blk, Rm @ PP.R_POP, Rm @ np.array([PP.R_FACE_P, 0.0, PP.Z_AXIS_P])))
+  grown = Manifold.batch_hull([p.translate((sx, sy, sz)) for p in placed
+                               for sx, sy, sz in ((clear, 0, 0), (-clear, 0, 0), (0, clear, 0), (0, -clear, 0), (0, 0, clear))])
+  return grown ^ box(-500.0, 500.0, -500.0, 500.0, flange_z()[1], 500.0)

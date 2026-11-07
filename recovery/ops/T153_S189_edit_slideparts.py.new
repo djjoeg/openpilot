@@ -1,0 +1,13 @@
+CAM_FLAT = CAM_MIN + CLEAR_OFF + STROKE + PUSH_TRAVEL_ON                # the flat's distance from the bolt
+PUSH_FACE_STOP = PIVOT[0] + STROKE + CAM_MIN + CLEAR_OFF                 # the pusher's nose (y), out against its stop
+# The cam's shape, as how far it reaches along the pusher (p) at each angle short of on (a, radians): the flat's corner
+# (the high point) until the touching point would get CAM_RATE off the nose's middle, then an even fall of CAM_RATE per
+# radian, eased over CAM_BLEND into the round part.
+_CAM_C = math.hypot(CAM_FLAT, CAM_FLAT_HALF)
+_CAM_AC = math.atan2(CAM_FLAT_HALF, CAM_FLAT)
+_CAM_A1 = _CAM_AC + math.asin(CAM_RATE / _CAM_C)
+_CAM_P1 = _CAM_C * math.cos(_CAM_A1 - _CAM_AC)
+_CAM_P2 = CAM_MIN + CAM_RATE * CAM_BLEND / 2.0
+_CAM_A2 = _CAM_A1 + (_CAM_P1 - _CAM_P2) / CAM_RATE
+_CAM_A3 = _CAM_A2 + CAM_BLEND
+LEVER_SWING = math.ceil(math.degrees(_CAM_A3)) + 1.0                     # degrees from off to on

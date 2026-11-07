@@ -1,0 +1,6 @@
+cd /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/snap && sed -i 's/cs.offset(1.0 + 2.0, CrossSection.JoinType.Round)/cs.offset(1.0 + 2.0, manifold3d.JoinType.Round, circular_segments=32)/' study90.py && sed -i 's/^from manifold3d import CrossSection, Manifold  # noqa: E402/import manifold3d  # noqa: E402\nfrom manifold3d import CrossSection, Manifold  # noqa: E402/' study90.py && export PYTHONPATH=/home/claude/pylib POP_CACHE=/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/pop/cache && python3 -c "
+import sys; sys.argv=['x']; sys.path.insert(0,'.')
+import study90 as S
+p=S.radial_parts(-63,'car'); print({k: round(v.volume()) for k,v in p.items()})
+p=S.radial_parts(-63,'motor'); print({k: round(v.volume()) for k,v in p.items()})
+" && for opt in motor car; do for m in -63 -70 -76 -82 -88; do (timeout 1500 python3 study90.py radial:$opt $m 97,103,106,110,115,120 0 6 > rb_${opt}_$m.txt 2>&1 &); done; done; sleep 5; ps aux | grep -c "[s]tudy90"

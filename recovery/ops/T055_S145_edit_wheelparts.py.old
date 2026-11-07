@@ -1,0 +1,2 @@
+  part = part - cyl(r, zr0 - 1, flat_from + 0.01, segments=96)
+  part = part - d_shape.extrude(zt1 + 1 - flat_from).translate((0, 0, flat_from))

@@ -1,0 +1,3 @@
+  # the pusher's bore: nose hole through the front wall, the body and spring behind, open at the back for the plug
+  part = part - cyl_y(PUSHER_HOLE_D / 2, y0 - 1.0, PUSH_BODY_Y + 0.01, x=PUSHER_X, z=PIVOT[1], segments=48)
+  part = part - cyl_y(PUSHER_BORE / 2, PUSH_BODY_Y, PLUG_Y[1] + 1.0, x=PUSHER_X, z=PIVOT[1], segments=64)

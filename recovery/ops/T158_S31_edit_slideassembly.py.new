@@ -1,0 +1,11 @@
+  car = dict(A.car_parts())
+  car["your fingers round the grip"] = A.fingers()
+  rows = []
+  for name, on, off in (("motor, board and plugs", A.motor(), A.motor(SP.STROKE)), ("carrier", A.carrier(), A.carrier(SP.STROKE)),
+                        ("gear", A.gear(), A.gear(SP.STROKE)),
+                        ("latch lever", A.lever(), A.lever(SP.STROKE, SP.SWING_SIGN * SP.LEVER_SWING)),
+                        ("block", A.block(), A.block())):
+    for cn in ("column cover", "back cover (it turns with the wheel)", "adjustment tab, its swing and your fingers on it",
+               "your fingers round the grip"):
+      rows.append((name, cn, min_gap(on, car[cn]), min_gap(off, car[cn])))
+  return rows

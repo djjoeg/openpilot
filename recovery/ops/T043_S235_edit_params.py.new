@@ -1,0 +1,2 @@
+MOST_TORQUE_NM = 4.5  # the most torque lane keeping may use at the steering wheel (the safety chip's limit)
+BACKLASH = 0.175      # each gear's teeth are this much thinner than nominal (mm at the pitch circle)

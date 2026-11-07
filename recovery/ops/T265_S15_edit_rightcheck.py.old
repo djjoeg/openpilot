@@ -1,0 +1,12 @@
+  # 1. the fixed parts against each other (the arm in the receiver), and the arm slid 20 mm in or out across
+  check("plate / arm", plate, arm)
+  check("plate / column cover", plate, cover)
+  check("arm / column cover", arm, cover)
+  for dx in (-20.0, 20.0):
+    a = arm.translate((dx, 0.0, 0.0))
+    check(f"arm slid {dx:+.0f} across / plate", a, plate)
+    check(f"arm slid {dx:+.0f} across / column cover", a, cover)
+    for hn, hm in hardware(0.0, RA.STOP_P, True, dx).items():
+      if "receiver" not in hn and "nut" not in hn:
+        check(f"arm slid {dx:+.0f} across: {hn} wings turning / receiver bolt",
+              hm, hardware(0.0, RA.STOP_P, True)["receiver bolt"])

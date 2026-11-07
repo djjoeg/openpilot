@@ -1,0 +1,4 @@
+def car_axes(tilt_deg: float = COLUMN_TILT):
+  """Car up and car rearward (towards the driver) as steering wheel frame vectors."""
+  c, s = math.cos(math.radians(tilt_deg)), math.sin(math.radians(tilt_deg))
+  return np.array([0.0, c, -s]), np.array([0.0, s, c])

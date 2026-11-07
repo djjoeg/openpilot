@@ -1,0 +1,4 @@
+  L.append("WHERE THE COVER'S UNDERSIDE MAY BE (mm below the column's axis): the arm and how far the joints turn from the middle of "
+           "their slots")
+  L.append("        " + "".join(f"{x:>26}" for x in h["cover_bottom_mm"]))
+  L.append("        " + "".join(f"{x:>26}" for x in h["fits"]))

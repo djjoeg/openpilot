@@ -1,0 +1,5 @@
+  for m, mat in scene:
+    v, t = PR.mesh_of(m)
+    if len(t) == 0:
+      continue
+    _, cn = PR.corner_normals(v, t, mat.smooth, mat.crease)

@@ -1,0 +1,3 @@
+HANDLE_ON = (-24.0, -8.0)                  # (y, z) the handle's end from the bolt, lever on: forward, a little in
+PAD_R = 6.5                                # the round pad at the handle's end, for your finger
+SWING_SIGN = -1.0                          # turning the lever off swings the handle out (away from the column)

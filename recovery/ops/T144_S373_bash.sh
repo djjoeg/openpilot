@@ -1,0 +1,1 @@
+cd /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/sfm && sed -i 's/^import pickle, sys$/import pickle, sys\nimport __main__\nfrom stage2 import Stage2\n__main__.Stage2 = Stage2/' checkproj.py && python3 checkproj.py stage2_1.164_1.280_1.407.pkl 1.164

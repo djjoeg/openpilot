@@ -1,0 +1,19 @@
+  for pid, name, note, chip, pick, looks, moves in parts():
+    ms = []
+    plo, phi = np.full(3, np.inf), np.full(3, -np.inf)
+    for m, (rgb, spec, shine), alpha in looks:
+      q, t = mesh_arrays(m)
+      po = len(blob)
+      blob += q.tobytes()
+      io = len(blob)
+      blob += t.tobytes()
+      meshes.append({"nv": len(q), "nt": len(t), "po": po, "io": io})
+      ms.append({"m": len(meshes) - 1, "c": [round(c, 3) for c in rgb], "s": spec, "sh": shine, "a": alpha})
+      bb = m.bounding_box()
+      plo, phi = np.minimum(plo, bb[:3]), np.maximum(phi, bb[3:])
+      if pid in ("plate", "arm", "carrier", "motor"):
+        lo, hi = np.minimum(lo, bb[:3]), np.maximum(hi, bb[3:])
+    item = {"id": pid, "name": name, "note": note, "chip": chip, "pick": pick, "meshes": ms, "moves": moves}
+    if moves:                                  # the page keeps the parts that move in the picture
+      item["bb"] = [round(float(c), 1) for c in (*plo, *phi)]
+    items.append(item)

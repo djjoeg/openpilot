@@ -1,0 +1,14 @@
+  for pid, name, note, chip, pick, looks, moves in parts():
+    ms = []
+    for m, (rgb, spec, shine), alpha in looks:
+      q, t = mesh_arrays(m)
+      po = len(blob)
+      blob += q.tobytes()
+      io = len(blob)
+      blob += t.tobytes()
+      meshes.append({"nv": len(q), "nt": len(t), "po": po, "io": io})
+      ms.append({"m": len(meshes) - 1, "c": [round(c, 3) for c in rgb], "s": spec, "sh": shine, "a": alpha})
+      if pid in ("plate", "arm", "carrier", "motor"):
+        bb = m.bounding_box()
+        lo, hi = np.minimum(lo, bb[:3]), np.maximum(hi, bb[3:])
+    items.append({"id": pid, "name": name, "note": note, "chip": chip, "pick": pick, "meshes": ms, "moves": moves})

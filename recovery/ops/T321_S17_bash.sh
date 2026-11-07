@@ -1,0 +1,1 @@
+python3 /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/patch_rc.py && grep -n "STOP_GAP\|push \|\"stop\|m4_" rightcheck.py | head; (time PYTHONPATH=/home/claude/pylib python3 rightcheck.py) 2>&1 | tail -30

@@ -1,0 +1,1 @@
+  return {"pusher_on_N": SP.PUSH_ON, "pull_springs_on_N": round(pull_on, 1), "pull_springs_off_N": round(SP.release_force(SP.STROKE), 1),

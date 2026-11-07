@@ -1,0 +1,2 @@
+           f"{tt['piece_spans_deg']} degrees; its two pieces meet {tt['joint_deg_above_3_oclock']} degrees above 3 o'clock. Zip tie slots at {tt['zip_tie_slots_deg']} degrees; no inner "
+           f"wall inside

@@ -1,0 +1,2 @@
+  ears = [extrude_x(ear_cs, EAR_X[0], EAR_X[1]), extrude_x(ear_cs, -EAR_X[1], -EAR_X[0])]
+  part = union([body] + kn + ears)

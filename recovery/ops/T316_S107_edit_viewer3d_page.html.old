@@ -1,0 +1,23 @@
+  // ---- views ----
+  function viewState(name) {
+    const v = meta.views[name];
+    const t = toWorld(v.target);
+    let dir, dist;
+    if (v.eye) { const d = sub(toWorld(v.eye), t); dir = norm(d); dist = v.dist || Math.hypot(d[0], d[1], d[2]); }
+    else if (v.world_dir) { dir = norm(v.world_dir); dist = v.dist; }
+    else { dir = norm(toWorld(v.dir)); dist = v.dist; }
+    const aspect = W / H;
+    dist *= Math.max(1, 0.95 / aspect);
+    return { t, dist, az: Math.atan2(dir[0], dir[2]), el: Math.asin(clamp(dir[1], -1, 1)) };
+  }
+  let viewTween = null;
+  const viewButtons = [...document.querySelectorAll(".views button")];
+  function pressView(name) { for (const b of viewButtons) b.setAttribute("aria-pressed", String(b.dataset.view === name)); }
+  function goView(name, instant) {
+    const to = viewState(name);
+    pressView(name);
+    if (instant || reduceMotion) { Object.assign(cam, { t: to.t, dist: to.dist, az: to.az, el: to.el }); viewTween = null; dirty = true; return; }
+    let daz = to.az - cam.az;
+    daz = Math.atan2(Math.sin(daz), Math.cos(daz));
+    viewTween = { from: { t: cam.t.slice(), dist: cam.dist, az: cam.az, el: cam.el }, to: { ...to, az: cam.az + daz }, t0: performance.now(), dur: 750 };
+  }

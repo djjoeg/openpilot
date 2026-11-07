@@ -1,0 +1,13 @@
+_SUPPORT = {}
+
+
+def cam_support(short_deg: float) -> float:
+  """How far the cam reaches towards the pusher (along +y from the bolt) with the lever short_deg degrees short of on,
+  where it can touch the pusher's nose (within its height, less the rounded edges). Far from on the flat's corner
+  swings past the nose's end, and the cam's side does the pushing."""
+  key = round(abs(short_deg), 4)
+  if key not in _SUPPORT:
+    h = NOSE_HALF[1] - NOSE_EDGE
+    strip = CrossSection.square((100.0, 2.0 * h)).translate((-50.0, -h))
+    _SUPPORT[key] = max(CAM_MIN, (cam_outline().rotate(SWING_SIGN * key) ^ strip).bounds()[2])
+  return _SUPPORT[key]

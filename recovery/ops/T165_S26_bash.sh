@@ -1,0 +1,1 @@
+sed -i 's/^LUG_GAP = 0.2                     # each side of its hub, between the fork.s two lugs/LUG_GAP = 0.3                     # each side of its hub, between the fork'"'"'s two lugs/' sideparts.py && grep -n "^LUG_GAP" sideparts.py && sed -n 440,460p sideassembly.py

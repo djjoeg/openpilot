@@ -1,0 +1,9 @@
+PUSHER_X = -47.0                           # the pusher's axis (x); it points at the bolt (z = PIVOT[1])
+PUSHER_NOSE_D = 11.6                       # the nose that the cam pushes, through a 12.2 mm hole in the block's front
+PUSHER_HOLE_D = 12.2
+PUSHER_BODY_D = 14.0                       # its body behind the block's front wall; the spring behind it
+PUSHER_BORE = 14.4
+CLEAR_OFF = 0.5                            # slid off with the lever off, the cam clears the pusher by this much
+FRONT_WALL_T = 2.5                         # the block's wall in front of the pusher's body
+HANDLE_ON = (-24.0, -8.0)                  # (y, z) the handle's end from the bolt, lever on: forward, a little in
+PAD_R = 6.5                                # the round pad at the handle's end, for your finger

@@ -1,0 +1,1 @@
+sed -i 's/bbox=dict(boxstyle="round,pad=0.2", facecolor="white", alpha=0.85, edgecolor="none"))/bbox={"boxstyle": "round,pad=0.2", "facecolor": "white", "alpha": 0.85, "edgecolor": "none"})/' plates.py && /home/claude/bin/ruff check --output-format concise --line-length 140 plates.py; echo "ruff exit $?"; grep -n "SOLID = \|^import render\|import matplotlib$" plates.py

@@ -1,0 +1,2 @@
+  C = L["C"] * gain * np.asarray(wb)[None, None]
+  A = L["A"].copy()

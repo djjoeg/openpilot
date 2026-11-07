@@ -1,0 +1,7 @@
+  report["spring"] = {"part": "Lee Spring LCM100E03S (9 mm outside, 1 mm wire, 28.5 mm long, 1.98 N/mm)",
+                      "length_gear_on_teeth_mm": MP.SPRING_LEN, "force_gear_on_teeth_N": round(MP.spring_force(0), 1),
+                      "length_lever_up_mm": round(MP.SPRING_LEN - MP.SPRING_ARM * math.sin(math.radians(most)), 1),
+                      "force_lever_up_N": round(MP.spring_force(most), 1), "most_load_N": MP.SPRING_MAX_N,
+                      "fully_squashed_mm": MP.SPRING_SOLID}
+  if MP.spring_force(most) > MP.SPRING_MAX_N:
+    problems.append("the spring is pushed past its most load when the lever is up")

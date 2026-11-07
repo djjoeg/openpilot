@@ -1,0 +1,1 @@
+    ax.add_collection(PolyCollection(p[up][order][:, :, :2], facecolors=np.clip(base * shade, 0, 1), edgecolors="none", zorder=2))

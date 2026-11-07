@@ -1,0 +1,14 @@
+def extrude_x(cs: CrossSection, x0, x1) -> Manifold:
+  """Extrudes a 2D shape drawn in (y, z) coordinates along X from x0 to x1."""
+  return cs.extrude(x1 - x0).transform([[0, 0, 1, x0], [1, 0, 0, 0], [0, 1, 0, 0]])
+
+
+def circle_yz(r, y=0.0, z=0.0, segments=64) -> CrossSection:
+  return CrossSection.circle(r, segments).translate((y, z))
+
+
+def rect_yz(y0, y1, z0, z1) -> CrossSection:
+  return CrossSection.square((y1 - y0, z1 - z0)).translate((y0, z0))
+
+
+def union(parts) -> Manifold:

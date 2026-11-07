@@ -1,0 +1,11 @@
+def cam_outline() -> CrossSection:
+  """In the lever's frame with the lever on: u along the pusher (+y), v = +z. Each point is where the pusher's face
+  touches it at one angle (the same both ways from on)."""
+  pts = []
+  for deg in np.arange(-180.0, 180.0, 0.5):
+    phi = math.radians(deg)
+    p, dp = cam_reach(abs(phi))
+    dp = dp if phi >= 0 else -dp
+    c, s = math.cos(phi), math.sin(phi)
+    pts.append((p * c - dp * s, p * s + dp * c))
+  return CrossSection([pts]).simplify(0.002)

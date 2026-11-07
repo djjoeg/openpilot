@@ -1,0 +1,8 @@
+CAM_MIN = 8.0                              # the cam round the bolt (it faces the pusher with the lever off)
+CAM_FLAT_HALF = 3.6                        # the flat that sits on the pusher with the lever on: +- this wide
+LEVER_SWING = 85.0                         # degrees from off to on (the cam starts pushing about 77 degrees before on)
+PUSHER_X = -47.0                           # the pusher's axis (x); it points at the bolt (z = PIVOT[1])
+NOSE_HALF = (3.3, 5.8)                     # the pusher's square nose that the cam pushes: +- across (x), +- up/down (z)
+NOSE_EDGE = 0.5                            # its edges are rounded this much: the cam pushes only within the rest
+SLOT_HALF = (3.6, 9.5)                     # the slot in the block's front wall the nose slides in: +- x, +- z (the cam's
+SLOT_DEEP = 3.5                            # corners swing into it when the teeth meet tip to tip), this far past the wall

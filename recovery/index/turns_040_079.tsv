@@ -1,0 +1,61 @@
+43	90	bash	/home/claude/deliver/hardware/cad/*.py (copied to /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/cad_before_lever/)	-	T043_S90_bash.sh	backup copy of cad/*.py and report/ to scratchpad/cad_before_lever; no source change
+43	94	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/lever2/proto.py	-	T043_S94_bash.sh	creates scratchpad prototype of front lift-lever cam (heredoc) and runs it
+43	95	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/lever2/proto2.py	-	T043_S95_bash.sh	creates scratchpad prototype cam/spring sweep script (heredoc) and runs it
+43	98	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/lever2/proto2.py	-	T043_S98_bash.sh	python str.replace edits to proto2.py, then runs it
+43	101	write	/home/claude/deliver/hardware/cad/mountparts.py	-	T043_S101_write_mountparts.py	full rewrite of mountparts.py (lift lever to driver side, click-lock)
+43	102	edit	/home/claude/deliver/hardware/cad/mountparts.py	false	T043_S102_edit_mountparts.py.old,T043_S102_edit_mountparts.py.new	switch holes: slot -> M2 clearance holes
+43	103	edit	/home/claude/deliver/hardware/cad/mountparts.py	false	T043_S103_edit_mountparts.py.old,T043_S103_edit_mountparts.py.new	cadlib import list trimmed
+43	105	bash	/home/claude/deliver/hardware/cad/assembly.py	-	T043_S105_bash.sh	python str.replace edits to assembly.py (cwd inferred hardware/cad from S104)
+43	106	edit	/home/claude/deliver/hardware/cad/mountparts.py	false	T043_S106_edit_mountparts.py.old,T043_S106_edit_mountparts.py.new	adds lever_tab() before lever_in_carrier
+43	107	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T043_S107_bash.sh	python str.replace edits to accord_lka_parts.py (cwd inferred hardware/cad)
+43	108	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T043_S108_bash.sh	python str.replace edits to accord_lka_parts.py (scene colours/lever), then runs build to scratchpad
+43	111	bash	/home/claude/deliver/hardware/cad/mountparts.py	-	T043_S111_bash.sh	python str.replace edits (RIDGE_H, FINGER_GAP etc) to mountparts.py, then runs checks
+43	113	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/lever2/dbg_arm.py	-	T043_S113_bash.sh	creates scratchpad debug script checking arm clearance (heredoc) and runs it
+43	115	bash	/home/claude/deliver/hardware/cad/mountparts.py	-	T043_S115_bash.sh	sed -i: PIVOT z -26.0 -> -29.0 in mountparts.py, then runs dbg_arm.py
+43	139	bash	/home/claude/deliver/hardware/cad/params.py; /home/claude/deliver/hardware/cad/wheelparts.py	-	T043_S139_bash.sh	python replace: two teeth sets in params.py and wheelparts.py
+43	140	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T043_S140_bash.sh	python str.replace edits (two teeth sets) to accord_lka_parts.py (cwd hardware/cad)
+43	141	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T043_S141_bash.sh	python replace of report pictures list in accord_lka_parts.py, then runs build
+43	157	bash	/home/claude/deliver/hardware/cad/mountparts.py; /home/claude/deliver/hardware/cad/wheelparts.py; /home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T043_S157_bash.sh	python replace (unused import, unused rf) in mountparts.py and wheelparts.py; chmod +x accord_lka_parts.py
+43	173	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T043_S173_bash.sh	python replace of picture names list in accord_lka_parts.py; rm report/parts-*.png; full build
+43	234	edit	/home/claude/deliver/hardware/cad/params.py	false	T043_S234_edit_params.py.old,T043_S234_edit_params.py.new	teeth sets comment/values in params
+43	235	edit	/home/claude/deliver/hardware/cad/params.py	false	T043_S235_edit_params.py.old,T043_S235_edit_params.py.new	adds MOST_TORQUE_NM before BACKLASH
+43	237	edit	/home/claude/deliver/hardware/cad/accord_lka_parts.py	false	T043_S237_edit_accord_lka_parts.py.old,T043_S237_edit_accord_lka_parts.py.new	spring report block rewritten
+43	238	edit	/home/claude/deliver/hardware/cad/accord_lka_parts.py	false	T043_S238_edit_accord_lka_parts.py.old,T043_S238_edit_accord_lka_parts.py.new	SPRING report text line
+47	36	write	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/safety/safety_calc.py	-	T047_S36_write_safety_calc.py	BORDERLINE (vehicle-dynamics safety calc, teeth-end lateral accel; not part geometry): creates scratchpad/safety/safety_calc.py
+47	38	edit	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/safety/safety_calc.py	false	T047_S38_edit_safety_calc.py.old,T047_S38_edit_safety_calc.py.new	BORDERLINE safety_calc.py: vm_for uses update_params instead of deepcopy
+47	39	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/safety/safety_calc.py	-	T047_S39_bash.sh	BORDERLINE: sed -i to drop 'import copy' (pattern with \n likely matches nothing), then runs
+47	55	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/safety/safety_calc.py	-	T047_S55_bash.sh	BORDERLINE: python str.replace edits to safety_calc.py, then runs
+47	57	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/safety/safety_calc.py	-	T047_S57_bash.sh	BORDERLINE: sed -i adds 0.7 s reaction time to safety_calc.py, then runs
+47	62	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/safety/curves_indot.py	-	T047_S62_bash.sh	BORDERLINE: creates scratchpad/safety/curves_indot.py (steering turn for INDOT design curves) and runs it
+53	20	write	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/fitaudit/fit_audit.py	-	T053_S20_write_fit_audit.py	creates scratchpad/fitaudit/fit_audit.py (extra fit checks: dash cover, screws, gauge, bolt lengths, A1 bed)
+53	22	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/fitaudit/fit_audit.py	-	T053_S22_bash.sh	python str.replace edits to fit_audit.py
+53	33	bash	/home/claude/deliver/hardware/cad/mountparts.py (backups of mountparts/assembly/accord_lka_parts .py to /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/fitaudit/*.before.py)	-	T053_S33_bash.sh	cp backups to scratchpad/fitaudit, then python edits mountparts.py: MOTOR_SCREW_CBORE const + appended screws/bolts section and bolt length table (cwd hardware/cad)
+53	35	bash	/home/claude/deliver/hardware/cad/mountparts.py	-	T053_S35_bash.sh	python replace: switch_screws() in mountparts.py
+53	36	bash	/home/claude/deliver/hardware/cad/assembly.py	-	T053_S36_bash.sh	python replace edits to assembly.py (imports, screw/bolt fit checks)
+53	37	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T053_S37_bash.sh	python replace: adds bolt and screw lengths section to accord_lka_parts.py
+53	38	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T053_S38_bash.sh	python replace: docstring of accord_lka_parts.py; then full build, md5 compare; ends with cd ..
+53	39	bash	/home/claude/deliver/hardware/cad/mountparts.py	-	T053_S39_bash.sh	python replace: params import line in mountparts.py; build
+53	43	bash	/home/claude/deliver/hardware/cad/mountparts.py	-	T053_S43_bash.sh	python replace: hinge block ears in mountparts.py; then checks
+53	44	bash	/home/claude/deliver/hardware/cad/mountparts.py; /home/claude/deliver/hardware/cad/assembly.py	-	T053_S44_bash.sh	python replace: adds hinge_bolt() in mountparts.py and edits assembly.py; build
+55	120	edit	/home/claude/deliver/hardware/cad/mountparts.py	false	T055_S120_edit_mountparts.py.old,T055_S120_edit_mountparts.py.new	spring comment block (Lee spring) in mountparts.py
+55	121	edit	/home/claude/deliver/hardware/cad/mountparts.py	false	T055_S121_edit_mountparts.py.old,T055_S121_edit_mountparts.py.new	spring limit comment in mountparts.py
+55	137	edit	/home/claude/deliver/hardware/cad/params.py	false	T055_S137_edit_params.py.old,T055_S137_edit_params.py.new	torque-at-wheel comment/values after TEETH_ON_WHEEL in params.py
+55	138	edit	/home/claude/deliver/hardware/cad/params.py	false	T055_S138_edit_params.py.old,T055_S138_edit_params.py.new	motor changed to STEPPERONLINE 17HS16-2004S1 in params.py
+55	139	edit	/home/claude/deliver/hardware/cad/mountparts.py	false	T055_S139_edit_mountparts.py.old,T055_S139_edit_mountparts.py.new	BLOCK_BACK comment / WALL_BACK in mountparts.py
+55	140	edit	/home/claude/deliver/hardware/cad/mountparts.py	false	T055_S140_edit_mountparts.py.old,T055_S140_edit_mountparts.py.new	walls use WALL_BACK in mountparts.py
+55	141	edit	/home/claude/deliver/hardware/cad/mountparts.py	false	T055_S141_edit_mountparts.py.old,T055_S141_edit_mountparts.py.new	SPRING_POCKET_D 6.0 -> 5.5 in mountparts.py
+55	145	edit	/home/claude/deliver/hardware/cad/wheelparts.py	false	T055_S145_edit_wheelparts.py.old,T055_S145_edit_wheelparts.py.new	motor gear D-shape start (d_from) in wheelparts.py
+55	193	write	/home/claude/deliver/hardware/cad/margins.py	-	T055_S193_write_margins.py	creates hardware/cad/margins.py (failure-mode margins, aim 1.5, min 1.4)
+55	194	bash	/home/claude/deliver/hardware/cad/margins.py; /home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T055_S194_bash.sh	python replace edits to margins.py (row()) and adds 'import margins as MG' to accord_lka_parts.py
+55	196	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T055_S196_bash.sh	python replace: import block of accord_lka_parts.py
+55	198	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T055_S198_bash.sh	python edit: inserts margins into text_report in accord_lka_parts.py; then build to scratchpad/m1
+55	199	bash	/home/claude/deliver/hardware/cad/margins.py	-	T055_S199_bash.sh	python replace edits to margins.py (condition rows); then build to scratchpad
+57	13	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/safety/safety_calc.py	-	T057_S13_bash.sh	BORDERLINE: python str.replace edits to safety_calc.py (safety chip limits section), then runs
+57	83	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py; /home/claude/deliver/hardware/cad/mountparts.py	-	T057_S83_bash.sh	python replace: ASA -> PETG (density, click label) in accord_lka_parts.py; FINGER_E 1810 and RUB comment in mountparts.py (cwd hardware/cad)
+57	177	edit	/home/claude/deliver/hardware/cad/accord_lka_parts.py	false	T057_S177_edit_accord_lka_parts.py.old,T057_S177_edit_accord_lka_parts.py.new	clear_deg line wrapped in accord_lka_parts.py
+62	11	bash	/home/claude/deliver/hardware/cad/mountparts.py; /home/claude/deliver/hardware/cad/params.py	-	T062_S11_bash.sh	python edits: spring block rewritten in mountparts.py (stiffer spring) and params.py changes (cwd hardware/cad)
+62	12	bash	/home/claude/deliver/hardware/cad/margins.py	-	T062_S12_bash.sh	python replace: no grease, dry PETG rubbing in margins.py (cwd hardware/cad)
+62	13	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T062_S13_bash.sh	python replace: lever push report text in accord_lka_parts.py; copies report; full build
+62	14	bash	/home/claude/deliver/hardware/cad/mountparts.py	-	T062_S14_bash.sh	python replace: LEG_SLOT_Z in mountparts.py; then prints values
+64	10	bash	/home/claude/deliver/hardware/cad/mountparts.py (backup to /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/mountparts_before_handle.py)	-	T064_S10_bash.sh	backup cp, then sed -i HANDLE_LEN 39.0 -> 47.0 in mountparts.py; full build
+71	62	bash	/home/claude/deliver/hardware/cad/margins.py	-	T071_S62_bash.sh	python replace: socket-plug fuse and accessory socket rows replace comma fuse rows in margins.py

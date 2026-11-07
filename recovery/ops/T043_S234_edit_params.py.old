@@ -1,0 +1,3 @@
+# Two sets of steering wheel teeth, named by how far they reach each way from straight ahead (degrees of steering wheel
+# turn): the teeth printed, centred on 12 o'clock, and the zip tie positions each side of 12 o'clock. The motor can't
+# turn the steering wheel further than its teeth reach, so the short set is for getting used to lane keeping.

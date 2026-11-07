@@ -1,0 +1,1 @@
+mkdir -p /mnt/user-data/outputs && cp /home/claude/deliver/hardware/print/frame-plate-v2-paper-template-your-printer.pdf /home/claude/deliver/hardware/print/frame-plate-v2-before-after.png /home/claude/deliver/CHANGELOG.md /mnt/user-data/outputs/ && cp -r /home/claude/deliver/hardware/cad /mnt/user-data/outputs/cad-backup && ls /mnt/user-data/outputs

@@ -1,0 +1,1 @@
+      if (assyTween) { const s = viewState(viewTween.name); viewTween.to.t = s.t; viewTween.to.dist = s.dist; }  // parts moving too

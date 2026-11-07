@@ -1,0 +1,8 @@
+DZ_DEEP, DZ_SHALLOW = 4.0, -4.0  # the stop's range
+DZ_OUT = -10.0                   # slid out (6 mm is enough)
+# the carrier's plate (the motor's face against its outside), the web joining it to the bar, the bar's length
+PLATE_U = (R_FACE_OUT - FACE_T, R_FACE_OUT)
+PLATE_V = (BAR_V[0], H + 0.35)
+PLATE_Z = (Z_AXIS - H - 0.35, Z_AXIS + H)
+BAR_Z = (TOWER_Z[0] - STOP_P - LUG_T, PLATE_Z[1])      # (-186.7, -38.35) at the nominal depth
+DZ_END = TOWER_Z[1] - PLATE_Z[0]                        # -13: slid out this far, the web sits on the tower's top

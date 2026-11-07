@@ -1,0 +1,4 @@
+  part = union([part, flange, reach, gusset])
+  for (bx, by) in bolts:
+    part = part - Manifold.batch_hull([cyl(M5_CLEAR / 2, fz0 - 1.0, fz1 + 1.0, bx, by + s, 32) for s in (-PL_FLANGE_SLOT, PL_FLANGE_SLOT)])
+  return clean(part.translate((0.0, dy, dz)))

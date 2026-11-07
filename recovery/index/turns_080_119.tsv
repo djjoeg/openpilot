@@ -1,0 +1,104 @@
+88	17	bash	/home/claude/deliver/hardware/cad/params.py	-	T088_S17_bash.sh	appends column-mount parameters (cat >> heredoc; cwd assumed hardware/cad)
+88	18	bash	/home/claude/deliver/hardware/cad/gears.py	-	T088_S18_bash.sh	python replace: internal gear outlines and internal mesh sweep
+88	19	write	/home/claude/deliver/hardware/cad/columnparts.py	-	T088_S19_write_columnparts.py	new file: column mount parts module
+88	20	bash	/home/claude/deliver/hardware/cad/columnparts.py	-	T088_S20_bash.sh	python replaces in columnparts.py (imports etc.), then runs a test build
+88	24	bash	/home/claude/deliver/hardware/cad/columnparts.py	-	T088_S24_bash.sh	python replace: Z_TEETH_C ring teeth start; then overlap test
+88	26	write	/home/claude/deliver/hardware/cad/columnassembly.py	-	T088_S26_write_columnassembly.py	new file: column mount assembly/check module
+88	27	bash	/home/claude/deliver/hardware/cad/columnassembly.py	-	T088_S27_bash.sh	python replaces in columnassembly.py (clamp_upper orientation etc.); then runs checks
+88	29	bash	/home/claude/deliver/hardware/cad/mountparts.py; /home/claude/deliver/hardware/cad/columnparts.py; /home/claude/deliver/hardware/cad/params.py; /home/claude/deliver/hardware/cad/columnassembly.py	-	T088_S29_bash.sh	python replaces in several files: V trough, pivot neck, hinge block joint range; then sweep
+88	30	bash	/home/claude/deliver/hardware/cad/columnparts.py; /home/claude/deliver/hardware/cad/params.py	-	T088_S30_bash.sh	python replaces: ring back face (Z_ROLL_C); then render
+88	33	bash	/home/claude/deliver/hardware/cad/columnparts.py; /home/claude/deliver/hardware/cad/columnassembly.py	-	T088_S33_bash.sh	python replaces: ring back face forward, arc check fix; then checks
+88	34	bash	/home/claude/deliver/hardware/cad/columnparts.py	-	T088_S34_bash.sh	sed -i RING_BACK_Z +2.0 -> +3.0; then checks
+88	36	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T088_S36_bash.sh	python replaces integrating column mount into build script; probably failed its assert (next calls grep then re-apply part 1 in S38)
+88	38	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T088_S38_bash.sh	python replaces: part 1 of build-script integration (re-apply of S36 part 1)
+88	39	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/col_build_fn.py; /home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T088_S39_bash.sh	writes scratch helper col_build_fn.py then inserts it plus report text into accord_lka_parts.py (part 2)
+88	41	bash	/home/claude/deliver/hardware/cad/margins.py	-	T088_S41_bash.sh	python replace: adds column mount margin rows
+88	45	bash	/home/claude/deliver/hardware/cad/columnassembly.py; /home/claude/deliver/hardware/cad/columnparts.py; /home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T088_S45_bash.sh	python replaces: position table, reach-back figures, ROD_LEN 180
+88	48	bash	/home/claude/deliver/hardware/cad/columnparts.py	-	T088_S48_bash.sh	python replace: side plates as one hulled shape; then render
+88	51	bash	/home/claude/deliver/hardware/cad/columnparts.py	-	T088_S51_bash.sh	python replace: cs.area() < 0 -> < 1e-9 winding test; then render
+88	56	bash	/home/claude/deliver/hardware/cad/margins.py; /home/claude/deliver/hardware/cad/accord_lka_parts.py; /home/claude/deliver/hardware/cad/columnparts.py	-	T088_S56_bash.sh	python wrap_file: wraps long lines, drops unused variable; then ruff check
+88	58	bash	/home/claude/deliver/hardware/cad/columnparts.py; /home/claude/deliver/hardware/cad/margins.py	-	T088_S58_bash.sh	python replaces: remaining ruff findings; then ruff + fit-test build
+88	59	bash	/home/claude/deliver/hardware/cad/margins.py	-	T088_S59_bash.sh	python replace: proof-pull wording; then starts rebuild in background
+88	82	bash	/home/claude/deliver/hardware/cad/columnparts.py; /home/claude/deliver/hardware/cad/columnassembly.py	-	T088_S82_bash.sh	python replaces: ring root follows lead-in, dropping-carrier sweep check; then checks
+88	85	bash	/home/claude/deliver/hardware/cad/mountparts.py; /home/claude/deliver/hardware/cad/columnparts.py; /home/claude/deliver/hardware/cad/columnassembly.py; /home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T088_S85_bash.sh	python replaces: column carrier variant (motor_carrier guard), split lead-in cuts, roller rests on ring in drop check
+88	87	bash	/home/claude/deliver/hardware/cad/columnparts.py	-	T088_S87_bash.sh	python replace: lead-in teeth zone cut fully; then checks
+88	88	bash	/home/claude/deliver/hardware/cad/columnassembly.py	-	T088_S88_bash.sh	python replace: teeth-only gear in lead-in sweep; then checks
+88	90	bash	/home/claude/deliver/hardware/cad/columnparts.py	-	T088_S90_bash.sh	sed -i Z_TEETH_SPLIT -3.1 -> -3.4 and comment 3 mm -> 3.2 mm; then checks
+98	3	bash	/home/claude/deliver/hardware/cad/columnparts.py	-	T098_S03_bash.sh	python replaces: RingTeeth shallow channel option, slot_angles every 4.5 deg, ring_teeth centre_deg (transcribed from inline record; old blocks verified vs T088_S19)
+98	4	bash	/home/claude/deliver/hardware/cad/columnparts.py	-	T098_S04_bash.sh	appends side_bracket, screw_tab, bracket_fastener_rows (cat >> heredoc, cwd hardware/cad); then render test (transcribed from inline record)
+103	29	bash	/home/claude/deliver/hardware/cad/columnparts.py	-	T103_S29_bash.sh	python: replaces the side bracket section of columnparts.py (from its header marker) with corrected design
+103	31	bash	/home/claude/deliver/hardware/cad/columnparts.py	-	T103_S31_bash.sh	python replace: arm bolt stack in bracket fastener row
+103	33	write	/home/claude/deliver/hardware/cad/columnassembly.py	-	T103_S33_write_columnassembly.py	OVERWRITES columnassembly.py with a new full version (adds right-side mount assembly)
+103	34	bash	/home/claude/deliver/hardware/cad/params.py	-	T103_S34_bash.sh	python: appends right-side mount estimates to params.py; then solves default fit
+103	36	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side_test.py	-	T103_S36_bash.sh	writes scratch check script side_test.py (right-side clearance checks + render) and runs it from hardware/cad
+103	37	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side_dbg.py	-	T103_S37_bash.sh	writes scratch debug script side_dbg.py (locates overlaps) and runs it
+103	39	bash	/home/claude/deliver/hardware/cad/columnparts.py; /home/claude/deliver/hardware/cad/columnassembly.py; /home/claude/deliver/hardware/cad/params.py	-	T103_S39_bash.sh	python replaces: arm bolt forward (SB_PIVOT), covers taper, lock bolt at arm angle; then checks
+103	41	bash	/home/claude/deliver/hardware/cad/columnparts.py	-	T103_S41_bash.sh	python replace: separate bolt solids from faces; then checks
+103	44	bash	/home/claude/deliver/hardware/cad/margins.py	-	T103_S44_bash.sh	python: adds right-side margin rows (TIE_PULL_N, side_rows...)
+103	45	bash	/home/claude/deliver/hardware/cad/margins.py	-	T103_S45_bash.sh	python replace: simplify tab lever arm expression in side_rows
+103	47	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T103_S47_bash.sh	python replaces: right-side mount arguments, docstring and call in build script
+103	48	bash	/home/claude/deliver/hardware/cad/columnassembly.py	-	T103_S48_bash.sh	python replace: pass covers front width into assemblies
+103	49	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T103_S49_bash.sh	python: inserts right-side section, pictures and report text into build script
+103	51	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T103_S51_bash.sh	python replaces: hook right-side text into report; ring tie wording
+103	54	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py; /home/claude/deliver/hardware/cad/columnassembly.py	-	T103_S54_bash.sh	python replaces: wrap three long lines (incl. columnassembly import line); then ruff
+103	83	bash	/home/claude/deliver/hardware/cad/columnparts.py; /home/claude/deliver/hardware/cad/columnassembly.py; /home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T103_S83_bash.sh	python replaces: screw tab three lengths sliding 60 mm; dash-depth note as warning
+103	84	bash	/home/claude/deliver/hardware/cad/columnparts.py	-	T103_S84_bash.sh	python replace: clamp tab start clear of plate (TAB_SLOT); then checks
+103	89	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T103_S89_bash.sh	python replace: shorter side-assembly picture title, top view orientation
+103	91	bash	/home/claude/deliver/hardware/cad/render.py	-	T103_S91_bash.sh	python replace: wrap long picture titles over several lines in render.save
+103	93	bash	/home/claude/deliver/hardware/cad/render.py	-	T103_S93_bash.sh	python replace: wrap long plt.subplots line in render.py
+103	101	bash	/home/claude/deliver/hardware/cad/columnparts.py; /home/claude/deliver/hardware/cad/columnassembly.py; /home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T103_S101_bash.sh	python replaces: cap tab plate below bracket bar; then checks several screw positions
+106	2	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side_render.py	-	T106_S02_bash.sh	writes scratch render script side_render.py (3 o'clock mount from behind/above) and runs it from hardware/cad
+114	43	bash	/home/claude/deliver/hardware/cad/margins.py	-	T114_S43_bash.sh	python replaces: DEVICE_A comma device 1.5 A on socket plug fuse/socket rows; then ruff
+116	14	bash	/home/claude/deliver/hardware/cad/*.py (whole /home/claude/deliver tarred into /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/pkg/accord-lane-keeping)	-	T116_S14_bash.sh	packaging only: rebuilds delivery zip from /home/claude/deliver; no source change
+116	53	write	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/facegen_test.py	-	T116_S53_write_facegen_test.py	scratch prototype: face-gear tooth space generated by sweeping the pinion
+116	57	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/facegen_test.py	-	T116_S57_bash.sh	cat >> appends face_block mesh check to scratch facegen_test.py; then runs it
+116	58	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/facecheck2.py	-	T116_S58_bash.sh	writes scratch facecheck2.py (face tooth thickness at radii); then runs it
+116	66	edit	/home/claude/deliver/hardware/cad/mountparts.py	false	T116_S66_edit_mountparts.py.old,T116_S66_edit_mountparts.py.new	hinge_block gets ears=True option (back-teeth mount leaves ears off)
+116	67	edit	/home/claude/deliver/hardware/cad/mountparts.py	false	T116_S67_edit_mountparts.py.old,T116_S67_edit_mountparts.py.new	ears list empty when ears=False
+116	68	edit	/home/claude/deliver/hardware/cad/params.py	false	T116_S68_edit_params.py.old,T116_S68_edit_params.py.new	adds key cylinder (KEY_FROM/TO/R) and back-teeth mount estimates to params.py
+116	69	write	/home/claude/deliver/hardware/cad/faceparts.py	-	T116_S69_write_faceparts.py	NEW FILE faceparts.py: back-teeth (face gear) mount parts, 32414 chars
+116	70	edit	/home/claude/deliver/hardware/cad/faceparts.py	false	T116_S70_edit_faceparts.py.old,T116_S70_edit_faceparts.py.new	faceparts: spots from inner/outer corner thickness (k_in, k_out, z_c)
+116	71	write	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/build_test.py	-	T116_S71_write_build_test.py	scratch: builds the new mount parts and reports sizes
+116	73	bash	/home/claude/deliver/hardware/cad/faceparts.py	-	T116_S73_bash.sh	python replaces: move plate joint (ARM_LENGTHS_F etc.), arm sweep cut
+116	74	write	/home/claude/deliver/hardware/cad/faceassembly.py	-	T116_S74_write_faceassembly.py	NEW FILE faceassembly.py: back-teeth mount fit/clearance checks, 18704 chars
+116	75	bash	/home/claude/deliver/hardware/cad/faceassembly.py; /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/assy_test.py	-	T116_S75_bash.sh	python replace in faceassembly.py (cwd cad), writes scratch assy_test.py; runs it
+116	76	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/diag1.py	-	T116_S76_bash.sh	writes scratch diag1.py (locate remaining collisions); runs it
+116	77	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/diag2.py	-	T116_S77_bash.sh	writes scratch diag2.py (probe back surface along lead-in); runs it
+116	78	bash	/home/claude/deliver/hardware/cad/faceparts.py; /home/claude/deliver/hardware/cad/faceassembly.py	-	T116_S78_bash.sh	python replaces: ramp facets, tip chamfers, key clearance; then reruns checks
+116	80	bash	/home/claude/deliver/hardware/cad/faceparts.py	-	T116_S80_bash.sh	python replaces: wider tip chamfers and fast ramp; then rechecks
+116	89	bash	/home/claude/deliver/hardware/cad/faceparts.py	-	T116_S89_bash.sh	cat >> appends lift lever with paddle to faceparts.py, plus python replace
+116	90	bash	/home/claude/deliver/hardware/cad/margins.py	-	T116_S90_bash.sh	python: adds back-teeth mount margin rows (PLATE_SCREW_HOLD...), prints them
+116	93	bash	/home/claude/deliver/hardware/cad/faceassembly.py; /home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T116_S93_bash.sh	cat >> parts_scene etc. to faceassembly.py; python replaces: build script options/report
+116	94	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T116_S94_bash.sh	python replaces: back mount build, pictures and report text in build script
+116	95	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py; /home/claude/deliver/hardware/cad/faceassembly.py	-	T116_S95_bash.sh	python replaces: report text wording and gap direction
+116	109	bash	/home/claude/deliver/hardware/cad/faceparts.py; /home/claude/deliver/hardware/cad/faceassembly.py	-	T116_S109_bash.sh	python replaces lint fixes, THEN ruff check --fix on both files (auto-fix changes not in record)
+116	168	edit	/home/claude/deliver/hardware/cad/accord_lka_parts.py	false	T116_S168_edit_accord_lka_parts.py.old,T116_S168_edit_accord_lka_parts.py.new	report text: cover underside table one line per height
+116	177	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py; /home/claude/deliver/hardware/cad/faceassembly.py	-	T116_S177_bash.sh	python replaces: wrap two long lines; also regenerates scratch report txt (output)
+116	179	edit	/home/claude/deliver/hardware/cad/accord_lka_parts.py	false	T116_S179_edit_accord_lka_parts.py.old,T116_S179_edit_accord_lka_parts.py.new	line wrapping
+116	182	edit	/home/claude/deliver/hardware/cad/accord_lka_parts.py	false	T116_S182_edit_accord_lka_parts.py.old,T116_S182_edit_accord_lka_parts.py.new	line wrapping
+116	185	edit	/home/claude/deliver/hardware/cad/accord_lka_parts.py	false	T116_S185_edit_accord_lka_parts.py.old,T116_S185_edit_accord_lka_parts.py.new	line wrapping
+116	188	edit	/home/claude/deliver/hardware/cad/accord_lka_parts.py	false	T116_S188_edit_accord_lka_parts.py.old,T116_S188_edit_accord_lka_parts.py.new	line wrapping
+116	191	edit	/home/claude/deliver/hardware/cad/accord_lka_parts.py	false	T116_S191_edit_accord_lka_parts.py.old,T116_S191_edit_accord_lka_parts.py.new	line wrapping
+116	203	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/closeups.py	-	T116_S203_bash.sh	writes scratch render script closeups.py; runs it
+116	209	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/overhang.py; /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/overhang2.py	-	T116_S209_bash.sh	writes scratch overhang.py (stub) and overhang2.py (overhang by height); runs
+116	214	bash	/home/claude/deliver/hardware/cad/render.py; /home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T116_S214_bash.sh	python replaces: grid option in render.save; split out back parts list and picture
+116	215	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/reparts.py	-	T116_S215_bash.sh	writes scratch reparts.py (rebuilds back-teeth STLs into deliver/stl, redraws picture); runs
+116	217	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/zoomend.py	-	T116_S217_bash.sh	writes scratch render zoomend.py; runs
+116	220	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/islands.py	-	T116_S220_bash.sh	writes scratch islands.py (slice for tiny islands); runs
+116	222	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/slivers.py	-	T116_S222_bash.sh	writes scratch slivers.py (zero-area slivers); runs
+116	223	edit	/home/claude/deliver/hardware/cad/faceparts.py	false	T116_S223_edit_faceparts.py.old,T116_S223_edit_faceparts.py.new	ramp fix (slivers)
+116	226	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/slivercheck.py	-	T116_S226_bash.sh	writes scratch slivercheck.py (all STLs); runs
+116	240	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/platecalc.py	-	T116_S240_bash.sh	writes scratch platecalc.py (plate screw loads per layout); runs
+116	244	bash	/home/claude/deliver/hardware/cad/margins.py	-	T116_S244_bash.sh	python: rewrites plate screw margin with tipping model
+116	245	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/rowtest.py	-	T116_S245_bash.sh	writes scratch rowtest.py (print back-teeth margin rows); runs
+116	249	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/hbzoom.py	-	T116_S249_bash.sh	writes scratch render hbzoom.py; runs
+116	259	edit	/home/claude/deliver/hardware/cad/faceassembly.py	false	T116_S259_edit_faceassembly.py.old,T116_S259_edit_faceassembly.py.new	fastener rows: set screw for back motor gear
+116	261	bash	/home/claude/deliver/hardware/cad/faceassembly.py	-	T116_S261_bash.sh	python replace: missing imports; prints fastener rows
+116	276	bash	/home/claude/deliver/hardware/cad/faceparts.py; /home/claude/deliver/hardware/cad/faceassembly.py	-	T116_S276_bash.sh	python replaces: back teeth buildable as a short set too
+116	277	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/face/short_test.py	-	T116_S277_bash.sh	writes scratch short_test.py (build/check short back teeth); runs
+116	280	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py	-	T116_S280_bash.sh	python replaces: build, check and report both back-teeth sets
+116	282	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py; /home/claude/deliver/hardware/cad/faceparts.py	-	T116_S282_bash.sh	report text/docstring for both sets; LIKELY FAILED (anchor lacked cover_heights line); S283 greps, S284 re-applies
+116	284	bash	/home/claude/deliver/hardware/cad/accord_lka_parts.py; /home/claude/deliver/hardware/cad/faceparts.py	-	T116_S284_bash.sh	re-apply of S282 with corrected anchor: report text and docstring for both sets
+116	287	edit	/home/claude/deliver/hardware/cad/accord_lka_parts.py	false	T116_S287_edit_accord_lka_parts.py.old,T116_S287_edit_accord_lka_parts.py.new	help text: back-teeth options
+116	355	bash	/home/claude/deliver/hardware/cad/*.py (copied to /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/pkg/accord-lane-keeping/hardware/cad/)	-	T116_S355_bash.sh	packaging only: copies cad/*.py, stl, report into package and zips
+116	356	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/pkgcheck2/accord-lane-keeping/hardware/cad/*.py (unzipped copy)	-	T116_S356_bash.sh	packaging check only: unzips package and rebuilds all parts from it

@@ -1,0 +1,1 @@
+ruff check --fix --unsafe-fixes armmount.py midteeth.py 2>&1 | tail -12

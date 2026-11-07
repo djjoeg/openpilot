@@ -1,0 +1,4 @@
+  L.append("WHERE THE COVER'S UNDERSIDE MAY BE (mm below the column's axis): the arm and how far the joints turn from the middle of "
+           "their slots (they turn 25 degrees each way)")
+  for x, fit_ in zip(h["cover_bottom_mm"], h["fits"], strict=True):
+    L.append(f"  {x:3d} mm: {fit_}")

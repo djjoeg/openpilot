@@ -1,0 +1,9 @@
+    const rect = canvas.getBoundingClientRect();
+    const x = clamp(Math.floor((clientX - rect.left) / rect.width * W), 0, W - 1);
+    const y = clamp(Math.floor((1 - (clientY - rect.top) / rect.height) * H), 0, H - 1);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, pickFB);
+    gl.viewport(0, 0, W, H);
+    gl.enable(gl.SCISSOR_TEST);
+    gl.scissor(x, y, 1, 1);
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);

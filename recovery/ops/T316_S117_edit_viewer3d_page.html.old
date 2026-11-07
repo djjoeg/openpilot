@@ -1,0 +1,34 @@
+  // A view button's view backs off (never closer than its own distance) until every part that moves is in the
+  // picture, clear of the title and the view buttons, so the parts stay in sight as it comes apart. Once you turn,
+  // zoom or move it yourself, it stays where you put it.
+  const movers = parts.filter((p) => p.bb && p.moves.length);
+  const headEl = document.querySelector(".head"), viewsEl = document.querySelector(".views");
+  function fitDist(t, dir, base) {
+    const f = mul(dir, -1), r = norm(cross(f, [0, 1, 0])), u = cross(r, f);
+    const sr = stage.getBoundingClientRect(), hr = headEl.getBoundingClientRect(), vr = viewsEl.getBoundingClientRect();
+    const Hs = Math.max(1, sr.height), Ws = Math.max(1, sr.width);
+    const top = 1 - 2 * clamp(hr.bottom - sr.top + 8, 0, 0.35 * Hs) / Hs;     // how far up and down the picture
+    const bot = 1 - 2 * clamp(sr.bottom - vr.top + 8, 0, 0.35 * Hs) / Hs;     // may go, -1 to 1 like the screen
+    const side = 1 - 2 * 14 / Ws, ty = Math.tan(FOV / 2), tx = ty * Ws / Hs;
+    let d = base;
+    for (const p of movers) {
+      const b = p.bb, o = p.off;
+      for (let k = 0; k < 8; k++) {
+        const c = toWorld([(k & 1 ? b[3] : b[0]) + o[0], (k & 2 ? b[4] : b[1]) + o[1], (k & 4 ? b[5] : b[2]) + o[2]]);
+        const q = sub(c, t), x = dot(q, r), y = dot(q, u), z = dot(q, dir);
+        d = Math.max(d, z + Math.abs(x) / (tx * side), z + Math.abs(y) / (ty * (y > 0 ? top : bot)));
+      }
+    }
+    return d;
+  }
+  function viewState(name) {
+    const v = meta.views[name];
+    const t = toWorld(v.target);
+    let dir, dist;
+    if (v.eye) { const d = sub(toWorld(v.eye), t); dir = norm(d); dist = v.dist || Math.hypot(d[0], d[1], d[2]); }
+    else if (v.world_dir) { dir = norm(v.world_dir); dist = v.dist; }
+    else { dir = norm(toWorld(v.dir)); dist = v.dist; }
+    const aspect = W / H;
+    dist = fitDist(t, dir, dist * Math.max(1, 0.95 / aspect));
+    return { t, dist, az: Math.atan2(dir[0], dir[2]), el: Math.asin(clamp(dir[1], -1, 1)) };
+  }

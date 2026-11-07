@@ -1,0 +1,2 @@
+           f"{tt['gear_ratio']}. The teeth reach {tt['full_push_reach_deg']} degrees each way; with the rolling band past them the motor gear turns with the wheel over "
+           f"{tt['steering_wheel_turn_tracked_deg']} degrees.

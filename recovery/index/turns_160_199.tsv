@@ -1,0 +1,88 @@
+160	3	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/layout.py	-	T160_S03_bash.sh	creates layout.py (sideways-slide layout drawing, scratchpad/side) via heredoc, then runs it
+160	5	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/layout.py	-	T160_S05_bash.sh	python str-replace edits to layout.py labels/colors/limits, then runs it
+160	7	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/layout.py	-	T160_S07_bash.sh	python str-replace moves overlapping labels in layout.py, then runs it
+162	74	write	/home/claude/deliver/hardware/cad/sideparts.py	-	T162_S74_write_sideparts.py	new side-slide parts module (extracted programmatically from saved oversized turn)
+162	75	bash	/home/claude/deliver/hardware/cad/sideparts.py	-	T162_S75_bash.sh	python replace in sideparts.py (y-extrusion helper, pin position fn); cwd hardware/cad
+162	78	write	/home/claude/deliver/hardware/cad/sideassembly.py	-	T162_S78_write_sideassembly.py	new side-slide assembly/fit-check module
+162	79	bash	/home/claude/deliver/hardware/cad/sideassembly.py	-	T162_S79_bash.sh	python replace in sideassembly.py, then runs internal checks; cwd hardware/cad
+162	80	bash	/home/claude/deliver/hardware/cad/sideassembly.py;/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/run_internal.py	-	T162_S80_bash.sh	replace in sideassembly.py (spool placement); creates scratchpad/side/run_internal.py and runs it
+162	81	bash	/home/claude/deliver/hardware/cad/sideparts.py	-	T162_S81_bash.sh	replace in sideparts.py (shorten ear, move switch), reruns checks
+162	82	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/run_wheel.py	-	T162_S82_bash.sh	creates scratchpad/side/run_wheel.py (steering wheel checks runner)
+162	96	bash	/home/claude/deliver/hardware/cad/sideparts.py;/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/run_wheel2.py	-	T162_S96_bash.sh	replace in sideparts.py (flange end, plate edge); creates scratchpad/side/run_wheel2.py and runs it
+162	99	bash	/home/claude/deliver/hardware/cad/sideparts.py	-	T162_S99_bash.sh	replace in sideparts.py (plate printable flat, switch holder), recheck
+162	100	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/shots.py	-	T162_S100_bash.sh	creates scratchpad/side/shots.py (render views of side-slide mount) and runs it
+162	105	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/drawing.py	-	T162_S105_bash.sh	creates scratchpad/side/drawing.py (two-view drawing) and runs it
+162	107	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/drawing.py	-	T162_S107_bash.sh	replace in drawing.py (labels, axis wording)
+162	109	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/drawing.py	-	T162_S109_bash.sh	replace in drawing.py (move overlapping labels)
+162	111	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/render3d.py	-	T162_S111_bash.sh	creates scratchpad/side/render3d.py (labeled 3D views, parts sheet) and runs it
+162	114	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/orient.py	-	T162_S114_bash.sh	creates scratchpad/side/orient.py (print orientation support areas) and runs it
+162	115	bash	/home/claude/deliver/hardware/cad/sideparts.py	-	T162_S115_bash.sh	replace in sideparts.py (supportless guard/holes, single-flange spool)
+162	116	bash	/home/claude/deliver/hardware/cad/sideparts.py	-	T162_S116_bash.sh	replace in sideparts.py (teardrop, post), then runs orient/internal checks
+162	117	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/overhangs.py	-	T162_S117_bash.sh	creates scratchpad/side/overhangs.py and runs it
+162	119	bash	/home/claude/deliver/hardware/cad/sideassembly.py	-	T162_S119_bash.sh	appends side_margins() to sideassembly.py (cat >>), prints rows
+162	120	bash	/home/claude/deliver/hardware/cad/sideassembly.py	-	T162_S120_bash.sh	replace in sideassembly.py (bump row to plain number)
+162	123	bash	/home/claude/deliver/hardware/cad/sideparts.py	-	T162_S123_bash.sh	replace in sideparts.py (thicken spool post)
+162	124	write	/home/claude/deliver/hardware/cad/sidebuild.py	-	T162_S124_write_sidebuild.py	new side-slide build/export/report program
+162	125	bash	/home/claude/deliver/hardware/cad/sidebuild.py	-	T162_S125_bash.sh	replace in sidebuild.py (report question numbers from CAD)
+162	142	bash	/home/claude/deliver/hardware/cad/sideparts.py;/home/claude/deliver/hardware/cad/sidebuild.py	-	T162_S142_bash.sh	replace in sideparts.py and sidebuild.py (strip clamp bar, guard slots), recheck
+162	143	bash	/home/claude/deliver/hardware/cad/sideparts.py;/home/claude/deliver/hardware/cad/sidebuild.py	-	T162_S143_bash.sh	replace in sideparts.py and sidebuild.py (narrow spool post), recheck
+162	176	bash	/home/claude/deliver/hardware/cad/sidebuild.py;/home/claude/deliver/hardware/cad/sideassembly.py	-	T162_S176_bash.sh	lint fixes in sidebuild.py and sideassembly.py
+162	177	bash	/home/claude/deliver/hardware/cad/sidebuild.py	-	T162_S177_bash.sh	lint fix in sidebuild.py (bracket multi-line strings)
+162	222	bash	/home/claude/deliver/hardware/cad/carscene.py;/home/claude/deliver/hardware/cad/popparts.py;/home/claude/deliver/hardware/cad/sideassembly.py;/home/claude/deliver/hardware/cad/sidebuild.py;/home/claude/deliver/hardware/cad/sideparts.py;/home/claude/deliver/hardware/cad/slideparts.py	-	T162_S222_bash.sh	lint fixes via sub() in carscene, popparts (x2), sideassembly, sidebuild, sideparts, slideparts
+162	245	bash	/home/claude/deliver/hardware/report/parts_report.txt;/home/claude/deliver/CHANGELOG.md	-	T162_S245_bash.sh	cp generated scratch parts_report.txt over hardware/report/parts_report.txt; also edits CHANGELOG.md (not design)
+162	255	write	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/sidemock/side_export.py	-	T162_S255_write_side_export.py	mesh export program for the 3D page (sidemock); page html/js writes in this turn skipped
+162	258	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/sidemock/side_export.py	-	T162_S258_bash.sh	replace in side_export.py (teeth own group), re-export
+165	16	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/sideparts_v110.py;/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/sideassembly_v110.py;/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/sidebuild_v110.py	-	T165_S16_bash.sh	cp backups of sideparts/sideassembly/sidebuild.py to scratchpad/side/*_v110.py (sources unchanged); extracted programmatically
+165	19	bash	/home/claude/deliver/hardware/cad/sideparts.py	-	T165_S19_bash.sh	replace in sideparts.py (latch constants -> lever)
+165	20	bash	/home/claude/deliver/hardware/cad/sideparts.py	-	T165_S20_bash.sh	replace in sideparts.py (lever, fork on bracket, plate slot)
+165	25	bash	/home/claude/deliver/hardware/cad/sideparts.py	-	T165_S25_bash.sh	replace in sideparts.py (clear slivers next to lever)
+165	26	bash	/home/claude/deliver/hardware/cad/sideparts.py	-	T165_S26_bash.sh	sed -i in sideparts.py: LUG_GAP 0.2 -> 0.3
+165	27	bash	/home/claude/deliver/hardware/cad/sideassembly.py	-	T165_S27_bash.sh	replace in sideassembly.py (checks, forces, margins for lever)
+165	28	bash	/home/claude/deliver/hardware/cad/sideassembly.py	-	T165_S28_bash.sh	replace in sideassembly.py, then runs checks
+165	29	bash	/home/claude/deliver/hardware/cad/sideparts.py	-	T165_S29_bash.sh	replace in sideparts.py (trim ear inner lug)
+165	32	bash	/home/claude/deliver/hardware/cad/sideparts.py;/home/claude/deliver/hardware/cad/sideassembly.py	-	T165_S32_bash.sh	replace in sideparts.py and sideassembly.py (turn latch round)
+165	33	bash	/home/claude/deliver/hardware/cad/sideassembly.py	-	T165_S33_bash.sh	replace in sideassembly.py (lever latched/parked checks)
+165	34	bash	/home/claude/deliver/hardware/cad/sidebuild.py	-	T165_S34_bash.sh	replace in sidebuild.py (parts list, report, questions, pictures for lever)
+165	41	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/sidemock/side_export.py	-	T165_S41_bash.sh	replace in side_export.py (3D page export for lever)
+165	63	edit	/home/claude/deliver/hardware/cad/sidebuild.py	false	T165_S63_edit_sidebuild.py.old,T165_S63_edit_sidebuild.py.new	Edit tool on sidebuild.py
+165	66	bash	/home/claude/deliver/hardware/cad/sidebuild.py	-	T165_S66_bash.sh	sed -i in sidebuild.py (lever note label position 204->195), redraws
+165	77	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/sidemock/side_export.py	-	T165_S77_bash.sh	mixed: edits page JS (motion/labels/looks_state.js) then side_export.py; replay suggests it stopped on a motion.js assert before side_export.py; 78 repeats it
+165	78	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/sidemock/side_export.py	-	T165_S78_bash.sh	mixed: page JS edits plus same side_export.py edit (switch lever group rename)
+165	91	bash	/home/claude/deliver/hardware/cad/sideassembly.py;/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/sideassembly_pre_holds.py	-	T165_S91_bash.sh	cp sideassembly.py backup to scratchpad/side/sideassembly_pre_holds.py, then replace in sideassembly.py (lever own-weight hold check)
+165	97	bash	/home/claude/deliver/hardware/cad/sideassembly.py;/home/claude/deliver/hardware/cad/sideparts.py;/home/claude/deliver/hardware/cad/sidebuild.py	-	T165_S97_bash.sh	lint fixes in sideassembly.py, sideparts.py; sed -i PETG_DENSITY 1.27->1.28 in sidebuild.py
+165	99	bash	/home/claude/deliver/hardware/cad/sidebuild.py	-	T165_S99_bash.sh	replace in sidebuild.py (report opening text), starts build
+170	37	bash	/home/claude/deliver/hardware/cad/sideparts.py;/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/sideparts_v111.py;/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/sideassembly_v111.py;/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/side/sidebuild_v111.py	-	T170_S37_bash.sh	cp backups to scratchpad/side/*_v111.py, then replace in sideparts.py (lever pivot M4 screw, teeth sets parametrized)
+170	38	bash	/home/claude/deliver/hardware/cad/sideparts.py	-	T170_S38_bash.sh	replace in sideparts.py (foot, bar, shim, screw geometry), then test build
+170	39	bash	/home/claude/deliver/hardware/cad/sideparts.py	-	T170_S39_bash.sh	replace in sideparts.py (tongue fix, pivot M4 x 20 with nut)
+170	41	bash	/home/claude/deliver/hardware/cad/sideassembly.py	-	T170_S41_bash.sh	replace in sideassembly.py (teeth sets, screw, foot parts wired in)
+170	43	bash	/home/claude/deliver/hardware/cad/sideassembly.py	-	T170_S43_bash.sh	replace in sideassembly.py (foot-fit calc, screw naming)
+170	44	bash	/home/claude/deliver/hardware/cad/sideassembly.py	-	T170_S44_bash.sh	sed -i in sideassembly.py: add import slideparts as SP, then runs foot-fit check
+170	45	bash	/home/claude/deliver/hardware/cad/sideparts.py;/home/claude/deliver/hardware/cad/sideassembly.py	-	T170_S45_bash.sh	replace in sideparts.py and sideassembly.py (fixing margins)
+170	46	bash	/home/claude/deliver/hardware/cad/sideassembly.py;/home/claude/deliver/hardware/cad/sideparts.py	-	T170_S46_bash.sh	replace in sideassembly.py and sideparts.py (foot bending formula, clamp estimate)
+170	49	bash	/home/claude/deliver/hardware/cad/sideparts.py;/home/claude/deliver/hardware/cad/sidebuild.py	-	T170_S49_bash.sh	replace in sideparts.py and sidebuild.py (bought list, questions, envelope, printed parts)
+170	50	bash	/home/claude/deliver/hardware/cad/sidebuild.py	-	T170_S50_bash.sh	replace in sidebuild.py (teeth checks per set)
+170	51	bash	/home/claude/deliver/hardware/cad/sidebuild.py	-	T170_S51_bash.sh	replace in sidebuild.py (report text: sets, foot, car estimates)
+170	52	bash	/home/claude/deliver/hardware/cad/sidebuild.py	-	T170_S52_bash.sh	replace in sidebuild.py (foot label on drawing)
+170	53	bash	/home/claude/deliver/hardware/cad/sidebuild.py	-	T170_S53_bash.sh	replace in sidebuild.py (bar, screw, shims in 3D picture), then ruff check
+170	54	bash	/home/claude/deliver/hardware/cad/sideassembly.py;/home/claude/deliver/hardware/cad/sidebuild.py	-	T170_S54_bash.sh	lint fixes in sideassembly.py and sidebuild.py, starts build to scratch out7
+170	74	bash	/home/claude/deliver/hardware/cad/sideparts.py	-	T170_S74_bash.sh	replace in sideparts.py: FOOT_X (46,95)->(46,92)
+170	76	bash	/home/claude/deliver/hardware/cad/sidebuild.py	-	T170_S76_bash.sh	sed -i (likely no-op, multi-line pattern) + replace in sidebuild.py: plate file renamed (no -draft); also rm two old STL outputs
+170	85	bash	/home/claude/deliver/hardware/cad/sideparts.py	-	T170_S85_bash.sh	replace in sideparts.py (engrave teeth set number in outer wall)
+170	86	bash	/home/claude/deliver/hardware/cad/sideparts.py	-	T170_S86_bash.sh	replace in sideparts.py (engraved number reads from outside), plots it
+170	90	bash	/home/claude/deliver/hardware/cad/sideassembly.py	-	T170_S90_bash.sh	sed -i in sideassembly.py: teeth cache name side_teeth2_ -> side_teeth3_
+170	140	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/sidemock/side_export.py	-	T170_S140_bash.sh	replace in side_export.py (foot parts and three teeth sets), runs export
+170	157	bash	/home/claude/deliver/hardware/cad/sideassembly.py;/home/claude/deliver/hardware/cad/sidebuild.py	-	T170_S157_bash.sh	tidy two lines in sideassembly.py and sidebuild.py, md5 + rebuild
+174	70	write	/home/claude/deliver/hardware/cad/plates.py	-	T174_S70_write_plates.py	new plates.py: Bambu Studio 3MF print plates + PNG previews (21314 chars)
+174	73	edit	/home/claude/deliver/hardware/cad/plates.py	false	T174_S73_edit_plates.py.old,T174_S73_edit_plates.py.new	Edit plates.py: preview face edge colors
+174	99	bash	/home/claude/deliver/hardware/cad/plates.py	-	T174_S99_bash.sh	ruff --fix -q on plates.py (auto changes not in chat), then replace SOLID dict literal
+174	100	bash	/home/claude/deliver/hardware/cad/plates.py	-	T174_S100_bash.sh	sed -i in plates.py: bbox=dict(...) -> dict literal
+193	7	write	/home/claude/deliver/hardware/cad/measureplate.py	-	T193_S07_write_measureplate.py	new measureplate.py: column measuring plate + slotted bar (hand-copied from inline turn; replays clean)
+193	11	bash	/home/claude/deliver/hardware/cad/measureplate.py	-	T193_S11_bash.sh	replace in measureplate.py (rim ticks, hole grid range, WORDS), rebuild; hand-copied
+193	14	bash	/home/claude/deliver/hardware/cad/measureplate.py	-	T193_S14_bash.sh	replace in measureplate.py (ticks skip windows, LABELS placed by hand), rebuild+render; hand-copied
+193	16	bash	/home/claude/deliver/hardware/cad/plates.py	-	T193_S16_bash.sh	replace in plates.py (build/layout take parts and plate_list args); hand-copied
+193	17	bash	/home/claude/deliver/hardware/cad/measureplate.py	-	T193_S17_bash.sh	replace in measureplate.py (bambu_plate via plates.py, plate-0 3mf), build+ruff; hand-copied
+193	19	bash	/home/claude/deliver/hardware/cad/measureplate.py	-	T193_S19_bash.sh	sed -i in measureplate.py (lint: WINDOWS.values(), comment), rebuild
+195	1	write	/home/claude/deliver/hardware/cad/slotplate.py	-	T195_S01_write_slotplate.py	new slotplate.py: 100x120 plate of oblong slots (hand-copied from inline turn; replays clean)
+195	2	bash	/home/claude/deliver/hardware/cad/measureplate.py;/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/measureplate_windows.py	-	T195_S02_bash.sh	mv measureplate.py out of cad to scratchpad/measureplate_windows.py (retired); rm its STL/3mf/png outputs; builds slotplate
+195	3	bash	/home/claude/deliver/hardware/cad/slotplate.py	-	T195_S03_bash.sh	sed -i in slotplate.py (str(round(y)), WHEEL x = SIDE_RAIL), rebuild+render
+195	7	bash	/home/claude/deliver/hardware/cad/slotplate.py	-	T195_S07_bash.sh	replace in slotplate.py (text pix arg, smaller slot numbers 0.9), rebuild; hand-copied

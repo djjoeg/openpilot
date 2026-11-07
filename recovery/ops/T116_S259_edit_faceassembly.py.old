@@ -1,0 +1,3 @@
+  rows.append({"bolt": "M5 washer, 10 mm across (1)", "use": "under the spring, from the start on this mount", "length": 0.0,
+               "through_mm": 0.0, "nut_mm": 0.0, "past_the_nut_mm": 0.0, "ok": True})
+  return rows

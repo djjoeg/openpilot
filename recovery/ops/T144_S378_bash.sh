@@ -1,0 +1,1 @@
+cd /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/sfm && sed -i 's/    Y, miss2 = tri(\[(36, (1455, 995)), (22, (2320, 590)), (35, (1090, 360))\], s)/    Y, miss2 = X, miss/' tri_front.py && python3 tri_front.py

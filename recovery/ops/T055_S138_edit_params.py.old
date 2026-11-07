@@ -1,0 +1,10 @@
+# ***** motor: STEPPERONLINE 17HS19-2004S1 (NEMA 17) *****
+
+NEMA = 42.3             # square body
+NEMA_LEN = 48.0
+NEMA_HOLES = 31.0       # M3 holes, square pattern
+NEMA_BOSS = 22.0        # round boss around the shaft, about 2 mm high
+SHAFT_D = 5.0
+SHAFT_ACROSS_FLAT = 4.5
+SHAFT_LEN = 24.0
+SHAFT_FLAT_LEN = 15.0   # the D flat runs this far back from the shaft's tip

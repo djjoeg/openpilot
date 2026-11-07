@@ -1,0 +1,1 @@
+cd /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/recover && python3 replay.py 2>&1 | tr '\n' ' ' | tail -c 1500; echo; grep -c "EDIT\b" replay.log; grep "980 BASH" -A 12 replay.log | tail -6

@@ -1,0 +1,2 @@
+  occ = (to >= 0) & (zo < zp_near - 0.5)
+  Zocc = np.where(occ, zo, 0.0)

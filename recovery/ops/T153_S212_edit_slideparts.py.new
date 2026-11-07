@@ -1,0 +1,28 @@
+  # the plate keeps 1.5 mm clear of the block in front of its flange, and of the rods' back ends, their collars and
+  # springs everywhere they go (the mount turned anywhere in its +-3 degrees)
+  part = part - block_keepout(1.5).translate((0.0, -dy, -dz))
+  return clean(part.translate((0.0, dy, dz)))
+
+
+def _mount_angles() -> tuple:
+  return (MOUNT_DEG_S - MOUNT_ADJ_S[0], MOUNT_DEG_S, MOUNT_DEG_S + MOUNT_ADJ_S[1])
+
+
+def _to_wheel_at(m: Manifold, mount_deg: float) -> Manifold:
+  Rm = PP.rot_z(mount_deg)
+  return PP.place(m, Rm @ PP.R_POP, Rm @ np.array([PP.R_FACE_P, 0.0, PP.Z_AXIS_P]))
+
+
+def block_keepout(clear: float) -> Manifold:
+  """Steering wheel frame: everywhere the block can be (the mount turned anywhere in its +-3 degrees), grown by clear,
+  in front of the column plate's flange; and everywhere the rods' back ends, their collars and springs go."""
+  blk = slide_block()
+  placed = [_to_wheel_at(blk, m) for m in _mount_angles()]
+  grown = Manifold.batch_hull([p.translate((sx, sy, sz)) for p in placed
+                               for sx, sy, sz in ((clear, 0, 0), (-clear, 0, 0), (0, clear, 0), (0, -clear, 0), (0, 0, clear))])
+  out = grown ^ box(-500.0, 500.0, -500.0, 500.0, flange_z()[1], 500.0)
+  r = COLLAR[0] / 2 + clear
+  for x, z in RODS:
+    tube = cyl_y(r, BLOCK_Y[1] - 1.0, ROD_FRONT + ROD_LEN + STROKE + 1.0, x=x, z=z, segments=32)
+    out = out + Manifold.batch_hull([_to_wheel_at(tube, m) for m in _mount_angles()])
+  return out

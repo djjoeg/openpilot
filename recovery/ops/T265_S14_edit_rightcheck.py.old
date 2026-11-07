@@ -1,0 +1,3 @@
+  # the receiver's wing bolt: in the plate frame along -y through the dash-side wall at PINCH_X, its nut in the wall
+  pz = RA.PLATE_T + RA.BORE_DEPTH / 2
+  bolt = wb.rotate((-90.0, 0.0, 0.0)).translate((RA.PINCH_X, RA.TUBE_Y[1], pz))       # -z -> -y

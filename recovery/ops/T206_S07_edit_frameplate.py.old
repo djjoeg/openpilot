@@ -1,0 +1,3 @@
+  labels.append(text("WHEEL", -16.0, -11.0, T, pix=0.9))
+  labels.append(text("^", -16.0, 42.0, T, pix=0.9))            # not an arrow to the wheel: see the drawing
+  return body + union(labels)

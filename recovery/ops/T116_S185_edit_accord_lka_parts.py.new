@@ -1,0 +1,2 @@
+           f"motor gear turns with the wheel over {tt['steering_wheel_turn_tracked_deg']} degrees. The piece spans "
+           f"{tt['piece_spans_deg']} degrees; its two pieces meet {tt['joint_deg_above_3_oclock']} degrees above 3 o'clock.

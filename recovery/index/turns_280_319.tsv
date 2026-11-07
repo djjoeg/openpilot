@@ -1,0 +1,95 @@
+284	24	write	/home/claude/deliver/hardware/cad/allinone.py	-	T284_S24_write_allinone.py	new file: plate 13 all-in-one builder (frame plate v4, carrier, teeth v2 11, arm)
+286	19	bash	/home/claude/deliver/hardware/cad/rightcheck.py	-	T286_S19_bash.sh	python replace in rightcheck.py: TEETH_SETS (18/14/10), teeth_piece(n_teeth), checks 5 and 6 over all three teeth sets; then runs rightcheck
+286	20	bash	/home/claude/deliver/hardware/cad/allinone.py; /home/claude/deliver/hardware/cad/visuals.py; /home/claude/deliver/hardware/cad/rightarm.py	-	T286_S20_bash.sh	python replace (cwd hardware/cad from earlier cd): allinone uses teeth v2 20 set + new layout; visuals and rightarm n_teeth 10->18; then runs allinone + ruff
+288	14	write	/home/claude/deliver/hardware/cad/photorender.py	-	T288_S14_write_photorender.py	new file: photo-style renderer (turn 288 extracted by script from saved record; see report)
+288	15	bash	/home/claude/deliver/hardware/cad/photorender.py	-	T288_S15_bash.sh	python replace in photorender.py (soft shadows, taps); cwd hardware/cad
+288	16	write	/home/claude/deliver/hardware/cad/carphoto.py	-	T288_S16_write_carphoto.py	new file: in-the-car pictures from a rough car model
+288	17	bash	/home/claude/deliver/hardware/cad/carphoto.py	-	T288_S17_bash.sh	python replace in carphoto.py (hub size, KEY light)
+288	21	bash	/home/claude/deliver/hardware/cad/carphoto.py	-	T288_S21_bash.sh	python replace in carphoto.py (materials, render call; bigger dash wall); then runs carphoto
+288	25	bash	/home/claude/deliver/hardware/cad/photorender.py; /home/claude/deliver/hardware/cad/carphoto.py	-	T288_S25_bash.sh	python replace: photorender surface grain/noise; carphoto materials with grain
+288	28	bash	/home/claude/deliver/hardware/cad/carphoto.py	-	T288_S28_bash.sh	python replace in carphoto.py (dash wall size, PETG colour, key power)
+288	70	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/comp/camload.py; /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/comp/projtest.py	-	T288_S70_bash.sh	SCRATCHPAD helper, not under deliver (camera fit for photos): heredocs create camload.py and projtest.py; include only if wanted
+288	77	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/comp/fit00.py	-	T288_S77_bash.sh	SCRATCHPAD helper (camera fit): heredoc creates fit00.py and runs it
+288	99	write	/home/claude/deliver/hardware/cad/photocomp.py	-	T288_S99_write_photocomp.py	new file: composites rendered parts into the person's photos
+288	100	edit	/home/claude/deliver/hardware/cad/photocomp.py	false	T288_S100_edit_photocomp.py.old; T288_S100_edit_photocomp.py.new	occlusion test uses part mask
+288	102	write	/home/claude/deliver/hardware/cad/incar.py	-	T288_S102_write_incar.py	new file: the parts drawn into the in-car photos
+288	103	edit	/home/claude/deliver/hardware/cad/photocomp.py	false	T288_S103_edit_photocomp.py.old; T288_S103_edit_photocomp.py.new	edit
+288	104	edit	/home/claude/deliver/hardware/cad/photocomp.py	false	T288_S104_edit_photocomp.py.old; T288_S104_edit_photocomp.py.new	edit
+288	132	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/comp/pnp29.py	-	T288_S132_bash.sh	SCRATCHPAD helper (camera fit): heredoc creates pnp29.py and runs it
+288	133	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/comp/pnp29b.py	-	T288_S133_bash.sh	SCRATCHPAD helper (camera fit): heredoc creates pnp29b.py and runs it
+288	137	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/comp/match29.py	-	T288_S137_bash.sh	SCRATCHPAD helper (camera fit): heredoc creates match29.py and runs it
+288	138	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/comp/match29b.py	-	T288_S138_bash.sh	SCRATCHPAD helper (camera fit): heredoc creates match29b.py and runs it
+288	139	bash	/home/claude/deliver/hardware/cad/incar.py	-	T288_S139_bash.sh	python: replace the PHOTOS block in incar.py
+288	141	bash	/home/claude/deliver/hardware/cad/incar.py	-	T288_S141_bash.sh	python: replace incar.py from def occluders() to def main(argv) (backproject etc.); cwd hardware/cad
+288	142	edit	/home/claude/deliver/hardware/cad/photocomp.py	false	T288_S142_edit_photocomp.py.old; T288_S142_edit_photocomp.py.new	edit
+288	143	edit	/home/claude/deliver/hardware/cad/photocomp.py	false	T288_S143_edit_photocomp.py.old; T288_S143_edit_photocomp.py.new	composite() gains knee=0.55
+288	151	bash	/home/claude/deliver/hardware/cad/photocomp.py	-	T288_S151_bash.sh	python: replace photocomp.py lens-blur section
+288	152	bash	/home/claude/deliver/hardware/cad/incar.py	-	T288_S152_bash.sh	python replace in incar.py (zip ties / cable parts)
+288	153	bash	/home/claude/deliver/hardware/cad/incar.py	-	T288_S153_bash.sh	python replace in incar.py (cable route points)
+288	154	bash	/home/claude/deliver/hardware/cad/incar.py	-	T288_S154_bash.sh	python replace in incar.py (cable route points)
+288	163	bash	/home/claude/deliver/hardware/cad/incar.py	-	T288_S163_bash.sh	python replace in incar.py (motor_parts())
+288	166	bash	/home/claude/deliver/hardware/cad/incar.py	-	T288_S166_bash.sh	python: replace incar.py make() onward
+288	169	bash	/home/claude/deliver/hardware/cad/photocomp.py; /home/claude/deliver/hardware/cad/incar.py	-	T288_S169_bash.sh	python replace: photocomp wheel_shade; incar daylight lights; then runs incar 00
+288	171	bash	/home/claude/deliver/hardware/cad/incar.py	-	T288_S171_bash.sh	python replace in incar.py (sky ground colour)
+288	179	bash	/home/claude/deliver/hardware/cad/incar.py	-	T288_S179_bash.sh	python: new docstring for incar.py
+288	185	bash	/home/claude/deliver/hardware/cad/incar.py; /home/claude/deliver/hardware/cad/carphoto.py; /home/claude/deliver/hardware/cad/photocomp.py	-	T288_S185_bash.sh	python: dict(...) to {...} literals in incar.py and carphoto.py; lint fixes in incar, photocomp, carphoto
+288	187	bash	/home/claude/deliver/hardware/cad/incar.py	-	T288_S187_bash.sh	python replace in incar.py (photo 33 entry)
+288	197	bash	/home/claude/deliver/hardware/cad/photocomp.py; /home/claude/deliver/hardware/cad/carphoto.py	-	T288_S197_bash.sh	python: docstring edits in photocomp.py and carphoto.py
+288	198	bash	/home/claude/deliver/hardware/cad/incar.py; /home/claude/deliver/CHANGELOG.md	-	T288_S198_bash.sh	sed -i: "fitted to 0.2 px" -> "0.3 px" in incar.py (and CHANGELOG.md)
+305	13	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/comp/cam36.py	-	T305_S13_bash.sh	SCRATCHPAD helper (camera for head-on photo 36): heredoc creates cam36.py, then draws a protractor overlay
+311	22	write	/home/claude/deliver/hardware/cad/viewer3d.py	-	T311_S22_write_viewer3d.py	new: viewer3d.py builds the 3D viewer page (arm-3d.html) from the CAD parts; 12511 chars
+311	23	write	/home/claude/deliver/hardware/cad/viewer3d_page.html	-	T311_S23_write_viewer3d_page.html	new: HTML/JS template read by viewer3d.py (WebGL viewer, __META__/__DATA__ placeholders); 34813 chars; kept as program input
+311	24	bash	/home/claude/deliver/hardware/cad/viewer3d.py; /home/claude/deliver/hardware/cad/viewer3d_page.html	-	T311_S24_bash.sh	python replace: drop import math in viewer3d.py; [hidden] css rule in page template; then runs viewer3d.py
+311	26	bash	/home/claude/deliver/hardware/cad/viewer3d.py	-	T311_S26_bash.sh	python: wrap STEPS strings in parentheses for linter
+311	28	bash	/home/claude/deliver/hardware/cad/viewer3d.py	-	T311_S28_bash.sh	python: replace parts() list body, add BOLT/NOTES dict, small lint fixes; then runs viewer3d.py
+311	51	bash	/home/claude/deliver/hardware/cad/viewer3d.py; /home/claude/deliver/hardware/cad/viewer3d_page.html	-	T311_S51_bash.sh	python replace: board as plain box (BOARD colour), view settings; page template css/ring/views tweaks; then runs
+311	69	edit	/home/claude/deliver/hardware/cad/viewer3d_page.html	false	T311_S69_edit_viewer3d_page.html.old; T311_S69_edit_viewer3d_page.html.new	pick: compute x,y first, scissor test
+311	70	edit	/home/claude/deliver/hardware/cad/viewer3d_page.html	false	T311_S70_edit_viewer3d_page.html.old; T311_S70_edit_viewer3d_page.html.new	pick: readPixels at x,y, disable scissor
+311	87	bash	/home/claude/deliver/hardware/cad/viewer3d_page.html	-	T311_S87_bash.sh	python replace: outlines drawn 0.998 nearer, drop polygon offset
+311	88	bash	/home/claude/deliver/hardware/cad/viewer3d.py	-	T311_S88_bash.sh	python replace: chip_rgb motor colour; then runs viewer3d.py and scratchpad speck test
+311	94	bash	/home/claude/deliver/hardware/cad/viewer3d_page.html	-	T311_S94_bash.sh	python replace: outline edges carry other end (aOther), drop end-on edges; then runs
+311	98	bash	/home/claude/deliver/hardware/cad/viewer3d.py	-	T311_S98_bash.sh	python replace: shorter take-apart distances, overview dist 500; then runs
+311	101	bash	/home/claude/deliver/hardware/cad/viewer3d_page.html	-	T311_S101_bash.sh	python replace: .steptext min-height 5.8em; then runs viewer3d.py
+316	49	bash	/home/claude/deliver/hardware/cad/midteeth.py	-	T316_S49_bash.sh	python replace in midteeth.py: 7 mm inner pull, cut-back ends, fit_sample/plate 14, docstring; then ruff
+316	51	bash	/home/claude/deliver/hardware/cad/midteeth.py	-	T316_S51_bash.sh	python replace in midteeth.py: mark_text, 7 on outer wall of sample; then draws sample png
+316	60	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T316_S60_bash.sh	python replace in rightarm.py: v4 docstring, tower/stop/THETA constants
+316	61	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T316_S61_bash.sh	python replace in rightarm.py: closed tower tube, lug cut, M4 stop hole and slot; then ruff + test
+316	63	bash	/home/claude/deliver/hardware/cad/rightarm.py; /home/claude/deliver/hardware/cad/rightcheck.py	-	T316_S63_bash.sh	python: drop hex_prism_z import in rightarm.py; rightcheck.py checks for closed tube, M4 stop, new assembly order
+316	64	bash	/home/claude/deliver/hardware/cad/rightcheck.py	-	T316_S64_bash.sh	python replace in rightcheck.py (stop bolt hardware); then runs rightcheck.py
+316	67	bash	/home/claude/deliver/hardware/cad/allinone.py; /home/claude/deliver/hardware/cad/visuals.py; /home/claude/deliver/hardware/cad/incar.py; /home/claude/deliver/hardware/cad/carphoto.py	-	T316_S67_bash.sh	python replace: allinone docstring/layout for v4, visuals.py v4 pictures, incar/carphoto STOP_P->STOP_GAP
+316	68	bash	/home/claude/deliver/hardware/cad/visuals.py	-	T316_S68_bash.sh	python replace in visuals.py: assembly picture captions
+316	71	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T316_S71_bash.sh	python replace in rightarm.py: arm foot below plate; then slide range test
+316	73	bash	/home/claude/deliver/hardware/cad/viewer3d.py; /home/claude/deliver/hardware/cad/viewer3d_page.html	-	T316_S73_bash.sh	python: rewrite viewer3d moves/steps/parts for v4 + page text; PROBABLY FAILED on an assert (74 checks file unchanged, 75 reapplies)
+316	75	bash	/home/claude/deliver/hardware/cad/viewer3d.py; /home/claude/deliver/hardware/cad/viewer3d_page.html	-	T316_S75_bash.sh	python: rewrite viewer3d moves/steps/parts for v4 + page text (retry of 73 minus two replacements)
+316	76	bash	/home/claude/deliver/hardware/cad/viewer3d_page.html	-	T316_S76_bash.sh	python replace in page template: step slider sized from number of steps
+316	77	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T316_S77_bash.sh	python replace in rightarm.py: plate_list names v4; then runs rightarm.py etc.
+316	78	bash	/home/claude/deliver/hardware/cad/rightarm.py	-	T316_S78_bash.sh	python replace in rightarm.py: arm picture suptitle v4; then runs visuals.py
+316	82	bash	/home/claude/deliver/hardware/cad/visuals.py	-	T316_S82_bash.sh	python replace in visuals.py: hardware() shows M4 stop below tower; then slide picture
+316	88	bash	/home/claude/deliver/hardware/cad/viewer3d.py	-	T316_S88_bash.sh	sed -i viewer3d.py: M_CARRIER lift 150 -> 100; then reads README
+316	106	edit	/home/claude/deliver/hardware/cad/viewer3d.py	false	T316_S106_edit_viewer3d.py.old; T316_S106_edit_viewer3d.py.new	viewer3d.py edit
+316	107	edit	/home/claude/deliver/hardware/cad/viewer3d_page.html	false	T316_S107_edit_viewer3d_page.html.old; T316_S107_edit_viewer3d_page.html.new	page template edit
+316	108	edit	/home/claude/deliver/hardware/cad/viewer3d_page.html	false	T316_S108_edit_viewer3d_page.html.old; T316_S108_edit_viewer3d_page.html.new	page template edit
+316	109	edit	/home/claude/deliver/hardware/cad/viewer3d_page.html	false	T316_S109_edit_viewer3d_page.html.old; T316_S109_edit_viewer3d_page.html.new	page template edit
+316	110	edit	/home/claude/deliver/hardware/cad/viewer3d_page.html	false	T316_S110_edit_viewer3d_page.html.old; T316_S110_edit_viewer3d_page.html.new	page template edit
+316	112	edit	/home/claude/deliver/hardware/cad/viewer3d_page.html	false	T316_S112_edit_viewer3d_page.html.old; T316_S112_edit_viewer3d_page.html.new	page template edit
+316	117	edit	/home/claude/deliver/hardware/cad/viewer3d_page.html	false	T316_S117_edit_viewer3d_page.html.old; T316_S117_edit_viewer3d_page.html.new	page template edit
+316	118	edit	/home/claude/deliver/hardware/cad/viewer3d_page.html	false	T316_S118_edit_viewer3d_page.html.old; T316_S118_edit_viewer3d_page.html.new	page template edit
+316	119	edit	/home/claude/deliver/hardware/cad/viewer3d_page.html	false	T316_S119_edit_viewer3d_page.html.old; T316_S119_edit_viewer3d_page.html.new	page template edit
+316	135	bash	/home/claude/deliver/hardware/cad/midteeth.py	-	T316_S135_bash.sh	python replace in midteeth.py: plate 14 title shorter; then prints sample plate
+316	142	bash	/home/claude/deliver/hardware/cad/plates.py	-	T316_S142_bash.sh	python replace in plates.py: bed picture axes height 0.85; saves STL sha list to scratchpad
+316	169	bash	/home/claude/deliver/CHANGELOG.md; /home/claude/deliver/hardware/cad/rightarm.py	-	T316_S169_bash.sh	python: CHANGELOG text (skip) + rightarm.py WASHER_OD comment (cwd /home/claude/deliver)
+319	6	write	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/fea/armfea.py	-	T319_S06_write_armfea.py	SCRATCHPAD stiffness check (voxel FEA of arm+carrier); new file, 7223 chars
+319	8	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/fea/armfea_diag.py	-	T319_S08_bash.sh	SCRATCHPAD: armfea.py + rigid-rotation diagnostic written as armfea_diag.py; then runs
+319	9	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/fea/armfea.py; /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/fea/armfea_v.py	-	T319_S09_bash.sh	SCRATCHPAD: armfea.py VARIANT arg + deep arm variant; cp armfea.py armfea_v.py; then runs
+319	10	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/fea/armfea_diag.py	-	T319_S10_bash.sh	SCRATCHPAD: carry variant code from armfea_v.py into armfea_diag.py; then runs
+319	11	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/fea/armfea.py	-	T319_S11_bash.sh	SCRATCHPAD: armfea.py flange variant; then runs
+319	13	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/fea/armfea.py	-	T319_S13_bash.sh	SCRATCHPAD: armfea.py variant name regex + iterative solver option; then runs
+319	15	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/fea/armfea.py	-	T319_S15_bash.sh	SCRATCHPAD: armfea.py deep@x0 variant; then runs
+319	17	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/fea/armfea.py	-	T319_S17_bash.sh	SCRATCHPAD: armfea.py grid aligned to arm bar faces; then runs (log aligned125.log)
+319	19	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/fea/armfea_full.py	-	T319_S19_bash.sh	SCRATCHPAD: armfea.py + frame plate 'full' variant written as armfea_full.py
+319	21	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/fea/armfea_full.py	-	T319_S21_bash.sh	SCRATCHPAD: armfea_full.py second screw at slot 1
+319	22	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/fea/armfea.py; /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/fea/armfea_full.py	-	T319_S22_bash.sh	SCRATCHPAD: both scripts save solution npz when 'save' arg
+319	26	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/v5/cad	-	T319_S26_bash.sh	SCRATCHPAD: rm -rf v5/cad; cp -r deliver/hardware/cad to scratch v5/cad (trial copy)
+319	29	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/v5/cad/rightarm.py; /tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/v5/cad/rightcheck.py	-	T319_S29_bash.sh	SCRATCHPAD trial v5 in copy: M4 nut slot across flats, DEEP arm 50 mm; rightcheck m4_nut flats, dx range (-5,20)
+319	43	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/v5/armpic.py	-	T319_S43_bash.sh	SCRATCHPAD render helper: heredoc creates armpic.py (assembly from two sides, CAD_DIR arg); then renders
+319	46	bash	/tmp/claude-0/-home-claude/29de5e81-e3b9-5428-a15c-fac1d206c0d4/scratchpad/v5/armpic2.py	-	T319_S46_bash.sh	SCRATCHPAD render helper: heredoc creates armpic2.py (arm/plate/carrier from below); then renders

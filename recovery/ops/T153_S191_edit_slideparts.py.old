@@ -1,0 +1,6 @@
+# ***** the cam *****
+# The cam is the convex hull of a circle round the bolt and a flat: with the lever on, the flat sits square on the
+# pusher's nose CAM_FLAT from the bolt; the flat's corners are the high point the lever passes over just before (and
+# just after) on, so it stays on until you push the handle back. With the lever off the circle faces the pusher.
+
+_SUPPORT = {}

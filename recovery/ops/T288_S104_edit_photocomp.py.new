@@ -1,0 +1,3 @@
+  if L["occ"].max() > 0:
+    sel = L["occ"] > 0.5 if (L["occ"] > 0.5).any() else L["occ"] > 0
+    zo = occ_depth if occ_depth is not None else float(np.median(L["Zocc"][sel]))

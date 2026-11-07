@@ -1,0 +1,4 @@
+def cam_support(short_deg: float) -> float:
+  """How far the cam reaches towards the pusher (along +y from the bolt) with the lever short_deg degrees short of on."""
+  d = math.radians(abs(short_deg))
+  return max(CAM_MIN, CAM_FLAT * math.cos(d) + CAM_FLAT_HALF * math.sin(d))

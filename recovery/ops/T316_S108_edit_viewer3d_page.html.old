@@ -1,0 +1,4 @@
+    if (!fromSlider) slider.value = String(Math.round(assy * 100));
+    placeParts();
+    caption();
+    dirty = true;

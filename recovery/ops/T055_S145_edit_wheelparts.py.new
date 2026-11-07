@@ -1,0 +1,4 @@
+  d_from = max(flat_from, zr0 - 1)         # the D shape starts where the flat starts, or at the gear's back end
+  if d_from > zr0 - 1:
+    part = part - cyl(r, zr0 - 1, d_from + 0.01, segments=96)
+  part = part - d_shape.extrude(zt1 + 1 - d_from).translate((0, 0, d_from))

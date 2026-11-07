@@ -1,0 +1,4 @@
+    const px = new Uint8Array(4);
+    gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    gl.disable(gl.SCISSOR_TEST);
+    gl.uniform1f(P.u.uPick, 0);

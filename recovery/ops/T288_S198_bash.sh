@@ -1,0 +1,1 @@
+cd /home/claude/deliver && grep -n "0.2 px" CHANGELOG.md hardware/cad/incar.py; sed -i 's/fitted to 0.2 px/fitted to 0.3 px/' CHANGELOG.md hardware/cad/incar.py; sed -i 's/  - 00: the grip.s outline (fitted to 0.2 px)/  - 00: the grip'"'"'s outline (fitted to 0.3 px)/' hardware/cad/incar.py; grep -n "0.3 px\|0.2 px" CHANGELOG.md hardware/cad/incar.py

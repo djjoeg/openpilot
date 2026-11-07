@@ -1,0 +1,5 @@
+  k_in = (t.rr - t.c1 - t.rho + t.k_i) / 2.0          # the middle of the inner corner's thickness: r + z = k_in
+  k_out = (t.rr + t.c1 + t.rho + t.k_o) / 2.0         # ... and the outer corner's: r - z = k_out
+  z_c = -t.c1 - 5.0
+  spots = [(k_in - z_c, z_c), (k_out + z_c, z_c),
+           (FACE_BAND[0] + 3.0, (t.z_bridge + t.z_root) / 2.0), (FACE_BAND[1], (t.z_bridge + t.z_root) / 2.0)]

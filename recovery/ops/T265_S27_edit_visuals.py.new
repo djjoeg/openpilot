@@ -1,0 +1,14 @@
+  t = 30.0
+  off = (float(t * RA.V[0]), float(t * RA.V[1]), 0.0)
+  near = [assembly_parts(dz=0.0), assembly_parts(dz=RA.DZ_END), assembly_parts(dz=RA.DZ_END, off=off)]
+  side, below = R.look((1.0, -0.6, 0.0), (0, 0, 1)), R.look((0.6, -1.0, 0.5), (0, 0, 1))
+  views = [(near[0], side), (near[1], side), (near[0], below), (near[1], below),
+           (near[2], R.look((0.9, -0.9, 0.6), (0, 0, 1))),
+           (near[2], R.look((float(RA.U[0]), float(RA.U[1]), 0.15), (0, 0, 1)))]
+  R.save(path, views, cols=2, size=(1100, 800),
+         titles=["IN: slid up against the stop, the push wing bolt tight (the wheel is up, the dash down)",
+                 f"OUT: push bolt loosened, motor slid down until the carrier sits on the tower ({-RA.DZ_END:.0f} mm; "
+                 "6 is enough), tightened",
+                 "IN, from below on the right", "OUT, from below on the right",
+                 "PUTTING IT ON: the carrier, motor on it, comes in from the motor's side into the channel",
+                 "the same from the passenger's side"],

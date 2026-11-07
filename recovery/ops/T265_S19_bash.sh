@@ -1,0 +1,1 @@
+sed -i 's/^DZ_END = PLATE_Z\[0\] - TOWER_Z\[1\]   /DZ_END = TOWER_Z[1] - PLATE_Z[0]   /' rightarm.py && grep -n "^DZ_END" rightarm.py && (time PYTHONPATH=/home/claude/pylib python3 rightcheck.py) > /home/claude/build/logs/rightcheck_v3.log 2>&1; tail -60 /home/claude/build/logs/rightcheck_v3.log
