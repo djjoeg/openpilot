@@ -326,7 +326,11 @@ def motor_and_gear(dz: float = 0.0) -> dict:
   """The motor's body, board and the side-slide gear: carrier frame (z out along the shaft from the face) -> here
   the shaft points in: carrier z -> -U, carrier y -> V, carrier x -> along the column. dz as for carrier()."""
   motor = box(-H, H, -H, H, -NEMA_LEN, 0.0) + cyl(11.0, 0.0, 2.0)
-  board = box(-23.0, 23.0, -23.0, 23.0, -NEMA_LEN - 11.0, -NEMA_LEN)
+  # the StepperServoCAN board as it came (9 Nov): 56.0 x 43.3 mm (its maker's PCB file), centred on the shaft along its
+  # long side and 22.9 / 20.4 either side across it. Mounted with the long side around the wheel (along V): along
+  # the column it hits the arm with the carrier slid 15 mm or more down. Its case's height isn't measured; 16 mm
+  # assumed (11 and 16 both pass). Plugs and cables leaving its sides are not in the model.
+  board = box(-22.9, 20.4, -28.0, 28.0, -NEMA_LEN - 16.0, -NEMA_LEN)
   c = R_FACE_OUT * U
   mat = [[0.0, V[0], -U[0], float(c[0])], [0.0, V[1], -U[1], float(c[1])], [1.0, 0.0, 0.0, Z_AXIS + dz]]
   return {"motor": motor.transform(mat), "board": board.transform(mat), "gear": S.side_gear().transform(mat)}

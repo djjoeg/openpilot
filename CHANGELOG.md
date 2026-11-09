@@ -48,6 +48,12 @@ opendbc from your copy, at that branch's commit (checked on GitHub). Install wit
 
 ### Printed parts
 
+Changed on 9 Nov (no printed part changed): the board came. Its maker's PCB file puts it at 56.0 x 43.3 mm, where
+the model had 46 x 46. With its long side along the column it would hit the arm when the motor is slid 15 mm or
+more down. With its long side around the wheel, all 8,391 checks pass, with a case 11 or 16 mm tall. So: **mount
+the board with its long side running around the wheel, not toward the dash.** `rightarm.py` now models it that
+way. Not checked yet: the plugs and cables coming out of its sides, and the case's real height.
+
 Changed on 7 Nov (no part changed): the design programs, lost when my workspace was replaced on 5 Nov, are rebuilt
 from the chat record and kept on GitHub, branch `hardware` of `github.com/djjoeg/openpilot`, folder `hardware/cad`
 (39 programs; `RECOVERED.md` there says what each makes). Checked by running them: plates 13, 14 and 15 come out
