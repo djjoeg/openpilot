@@ -66,7 +66,9 @@ the model keeps 16.)
 - **Not in this kit: a motor-to-board cable** (it comes only with their motor kit). **Buy one:** a stepper cable with
   the motor's 6-pin plug (16 mm wide on the motor's card: PH 2.0) on one end and a 4-pin JST XH 2.54 on the other,
   the common 3D-printer kind. It must take the motor's pins 1, 3, 4, 6 (A+, A-, B+, B-) to the XH plug's 1, 2, 3, 4
-  (the board's A1, A2, B1, B2); PartsBuilt's 1 m one says it does. Check before plugging in: XH pins 1 and 2 read
+  (the board's A1, A2, B1, B2); PartsBuilt's 1 m one says it does. Amazon pick (10 Nov): TIEXYE 4 x 500 mm,
+  B0FD8PPNJY, $7.39 (its page gives no wire order; a review had to swap the middle two). With it, ARCTIC MX-4
+  thermal paste 4 g, B07L9BDY3T, $4.99 (the board's underside says to apply it). Check before plugging in: XH pins 1 and 2 read
   about 2.3 ohm, 3 and 4 about 2.3 ohm, 1 and 3 nothing. The 1 m power/CAN cable stays whole except its far plug,
   cut off for the lever nuts.
 - **Don't snap off the board's side tabs.** The page says Nema17 users may, but the board's 120 ohm CAN resistor (R44)
