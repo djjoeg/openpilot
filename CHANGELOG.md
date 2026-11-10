@@ -330,6 +330,13 @@ carry them. The frame plate is new as well, so plate 13 is the whole reprint.
   in the teeth (step 4). Its 30-day money-back trial starts the day it is delivered, and comma's page (2 Nov) says
   orders go out the next business day by free UPS 2nd Day Air (US, signature needed): about 3 business days, while
   you wire the plug and the board and power the board up. Its harness is needed for the rest of the wiring.
+- **Still to buy (10 Nov):** now, for the board and motor: the TIEXYE motor cables ($7.39) and ARCTIC MX-4 ($4.99),
+  plus glue for the magnet if you have none. Later: the comma device and cable ($1,019, 3 Dec); a hose clamp, its
+  size from the shoelace test; two #8 x 2 in stainless pan head screws (5 Nov note), once the plate fits, since
+  the length depends on it. Tools assumed owned: wire strippers, metric hex keys 1.5 (set screw), 2 (M3 button
+  heads) and 2.5 mm (the board's long bolts), a small Phillips screwdriver. Not checked yet: how the board sits on
+  the motor's back (the long bolts' length against the motor's own screws, and the two screw heads left under the
+  board); that check could add a part.
 
 ### Wiring
 
