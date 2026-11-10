@@ -52,7 +52,24 @@ Changed on 9 Nov (no printed part changed): the board came. Its maker's PCB file
 the model had 46 x 46. With its long side along the column it would hit the arm when the motor is slid 15 mm or
 more down. With its long side around the wheel, all 8,391 checks pass, with a case 11 or 16 mm tall. So: **mount
 the board with its long side running around the wheel, not toward the dash.** `rightarm.py` now models it that
-way. Not checked yet: the plugs and cables coming out of its sides, and the case's real height.
+way. Not checked yet: the plugs and cables coming out of its sides. (Retropilot's page gives the board 8 mm high;
+the model keeps 16.)
+- **What came (10 Nov, from your photos and Retropilot's page for the controller kit):**
+  - the board, v0.5, with its software already on;
+  - a 1 m power/CAN cable with a white 4-pin JST plug on both ends;
+  - a 30 cm cable for reprogramming the board (black 5-pin end; not needed);
+  - two long M3 bolts (about 40 mm) that hold the board to the back of the motor;
+  - small M3 screws, for a bigger (Nema23) motor (not needed);
+  - the tan jig that centres the magnet.
+- **Missing: the magnet.** The page lists one, 6 mm across and 2 mm thick; none in the photos.
+- **Not in this kit: a motor-to-board cable** (it comes only with their motor kit). Plan, nothing to buy: cut the 1 m
+  cable in two, one piece for power/CAN and one for the motor, and join the motor's four wires with lever nuts:
+  black and green to the plug's A1 and A2, red and blue to B1 and B2. The board works out which way round on its
+  first start.
+- **Don't snap off the board's side tabs.** The page says Nema17 users may, but the board's 120 ohm CAN resistor (R44)
+  sits on one of them.
+- The board's own pin labels: Car (Vehicle) socket GND, CAN_H, CAN_L, Vin; Motor socket A1, A2, B1, B2; Debug socket
+  GND, SWD, SCK, 3.3 V.
 
 Changed on 7 Nov (no part changed): the design programs, lost when my workspace was replaced on 5 Nov, are rebuilt
 from the chat record and kept on GitHub, branch `hardware` of `github.com/djjoeg/openpilot`, folder `hardware/cad`
