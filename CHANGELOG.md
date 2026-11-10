@@ -60,12 +60,15 @@ the model keeps 16.)
   - a 30 cm cable for reprogramming the board (black 5-pin end; not needed);
   - two long M3 bolts (about 40 mm) that hold the board to the back of the motor;
   - small M3 screws, for a bigger (Nema23) motor (not needed);
+  - the magnet: the smooth flat discs in the clump of small screws (two seen; the screws cling to them). On 10 Nov I
+    first wrote that it was missing; that was wrong;
   - the tan jig that centres the magnet.
-- **Missing: the magnet.** The page lists one, 6 mm across and 2 mm thick; none in the photos.
-- **Not in this kit: a motor-to-board cable** (it comes only with their motor kit). Plan, nothing to buy: cut the 1 m
-  cable in two, one piece for power/CAN and one for the motor, and join the motor's four wires with lever nuts:
-  black and green to the plug's A1 and A2, red and blue to B1 and B2. The board works out which way round on its
-  first start.
+- **Not in this kit: a motor-to-board cable** (it comes only with their motor kit). **Buy one:** a stepper cable with
+  the motor's 6-pin plug (16 mm wide on the motor's card: PH 2.0) on one end and a 4-pin JST XH 2.54 on the other,
+  the common 3D-printer kind. It must take the motor's pins 1, 3, 4, 6 (A+, A-, B+, B-) to the XH plug's 1, 2, 3, 4
+  (the board's A1, A2, B1, B2); PartsBuilt's 1 m one says it does. Check before plugging in: XH pins 1 and 2 read
+  about 2.3 ohm, 3 and 4 about 2.3 ohm, 1 and 3 nothing. The 1 m power/CAN cable stays whole except its far plug,
+  cut off for the lever nuts.
 - **Don't snap off the board's side tabs.** The page says Nema17 users may, but the board's 120 ohm CAN resistor (R44)
   sits on one of them.
 - The board's own pin labels: Car (Vehicle) socket GND, CAN_H, CAN_L, Vin; Motor socket A1, A2, B1, B2; Debug socket
