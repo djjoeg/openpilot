@@ -14,6 +14,59 @@ teeth, lane keeping off. There is no switch.
 The build guide (https://claude.ai/code/artifact/0b3ce053-a508-4e38-92c4-faf3a50fd2b3) still describes the earlier
 lever mounts; for this build, this README and `CHANGELOG.md` (1.3.0) are current.
 
+## Where it stands (10 Nov)
+
+- Software: done, v1.3.0 on GitHub. Tested in simulation only.
+- Design files: recovered, re-run, identical to your print files, on GitHub (`hardware/cad`).
+- In hand: the motor, the board (magnet, two long bolts, its 1 m power/CAN cable), the 2 Nov Amazon order.
+  Ordered 10 Nov: the motor cable and the thermal paste.
+- Blocker: the frame plate. v4 didn't fit; the new one waits on the shoelace test.
+
+## To do, in order
+
+1. Shoelace test: a lace round the column through the gap above the tilt lever's tab. It must miss the key, the
+   stalks and the wheel, and the lever must still lock. Tell me the loop's length.
+2. Try the new paper template on the car (I send it after step 1).
+3. Print the plastic fit-test plate from the paper shape that fits; try it on the car.
+4. Plate 14, the teeth fit sample, if not done: push it onto the grip; it should go on snug.
+5. When the motor cable comes: **Board onto the motor** and **Bench power-up**, below.
+6. Print the full set once the plate fits; then steps 1 to 4 under **Then**.
+7. 3 Dec: order the comma four and the long OBD-C cable ($1,019).
+8. Wiring with the comma harness (step 5 under **Then**), checked with the meter.
+9. Install v1.3.0, car setup parts 1 and 2, the 5 kg push test, a parking lot, a quiet road.
+
+## Board onto the motor
+
+1. **Check the motor cable:** its 6-pin end in the motor; on the meter (ohm), at its 4-pin end, pins 1-2 and 3-4
+   read 2 to 3 ohm each and 1-3 reads nothing. If 1-2 reads nothing but 1-3 does, the middle two wires are swapped.
+2. **Which way round:** the board's long side runs along the motor's side that has the plug, with the board's
+   Motor socket on that side. On the carrier the motor's plug must face along the column (toward the dash or toward
+   you, either works); one of the two ways round the wheel hits the carrier. Checked in CAD with the plugs in (10 Nov).
+3. **Bolts:** take out the two motor screws on the diagonal that lines up with the board's two brass corner holes.
+   Hold one next to a long bolt from the kit: the bolt should be about 8 mm longer (the board's height). If it is
+   more than that, stop and tell me: it would reach into the holes the carrier's screws use.
+4. **Sticker:** cut out the middle of the back sticker over the dip (a 10 mm circle). Wipe the shaft's end with
+   rubbing alcohol.
+5. **Gap check:** set the magnet in the dip (it snaps onto the shaft). Lay a ruler across the back: the magnet must
+   not touch it. The maker designed for the magnet's top about 1 mm below the board. If it touches, stop, tell me.
+6. **Glue:** lift the magnet out, a small drop of super glue on the shaft's end, then the magnet back in through the
+   tan jig's hole so it sits centred. Let it set; take the jig off. Which way the magnet is turned doesn't matter.
+   The maker's video shows it: https://youtu.be/mQyXR3hITy0?t=41
+7. **Paste:** a thin layer on the board's underside, in the dashed box marked "Apply thermal paste".
+8. **Board on:** the two long bolts through its brass corner holes into the two empty motor holes. Snug, not hard
+   (the case is plastic). It must sit flat: if it rocks on the other two screw heads, stop, tell me.
+9. **Plug in** the motor cable: 6-pin in the motor, 4-pin in the board's Motor socket.
+
+## Bench power-up (no comma device needed)
+
+1. Cut one plug off the board's 1 m cable; strip 11 mm. Red into the + lever nut, black into the -, with the 12 V
+   plug's + and -. Tape the yellow and white ends, each on its own. The other plug into the board's Car socket.
+2. Wiring page checks 2 and 3 (`hardware/wiring/wiring-page.png`).
+3. Motor loose on the seat, nothing touching the gear. Key on, plug in. The board twitches the motor; when its blue
+   light stays on, press F1: the motor turns slowly while it calibrates. Red light blinking once a second: it can't
+   read the magnet; unplug and tell me. Red with a short break each second: under 8 V.
+4. Board stays dark: red and black are swapped; swap them (the board is protected against that).
+
 ## Buy
 
 Three orders: Amazon (one cart, returns), the comma device from comma, and the motor controller from the Retropilot
@@ -23,18 +76,16 @@ day it is delivered, and it comes in about 3 business days (comma's page on 2 No
 UPS 2nd Day Air in the US, someone has to sign). Its harness is needed for the wiring.
 Prices were read on the shop pages on 2026-11-01. The Amazon items are on the wishlist "Accord lane keeping".
 
-Bought (2026-11-01): the motor (STEPPERONLINE 17HS15-1504S-X1, 45 Ncm at 1.5 A, 40 mm), the StepperServoCAN board from
-Retropilot, the cover screws (Mellewell #8 x 1-1/2 stainless, 100, $9.99). Ordered (2026-11-02): everything on the
-Amazon list below. Owned: fender washers, zip ties, filament, the two M5 nuts. Still to buy: the comma device and its
-cable (when: above).
+Bought (2026-11-01): the motor (STEPPERONLINE 17HS15-1504S-X1, 45 Ncm at 1.5 A, 40 mm; came 6 Nov), the
+StepperServoCAN board from Retropilot (came 9 Nov), the cover screws (Mellewell #8 x 1-1/2 stainless, 100, $9.99).
+Ordered (2026-11-02): everything on the Amazon list below. Ordered (2026-11-10): the motor cable (TIEXYE 4 x 500 mm,
+XH 2.54 4-pin to PH 2.0 6-pin, B0FD8PPNJY, $7.39) and ARCTIC MX-4 thermal paste (B07L9BDY3T, $4.99). Owned: fender
+washers, zip ties, filament, the two M5 nuts. Still to buy: the comma device and its cable (when: above); a hose
+clamp (size from the shoelace test); two #8 x 2 in stainless pan head screws, once the plate fits.
 
 Nothing new for the fit print (3 Nov: the arm v6 and the frame plate v5): each of its two slides takes one of the M5
 wing bolts, one of the M5 nuts and one of your fender washers (3/4 to 1 in across), and the two cover screws take a
 fender washer each: four fender washers in all.
-
-On the way (checked 2 Nov): the motor, USPS 9214490416422007317521 (label made 1 Nov in Perth Amboy, NJ; USPS gives
-a delivery date once it has the package). A parcel from Portugal, LA137988293PT, most likely the board (Portugal's
-post, CTT; accepted 2 Nov; the tracking site's estimate is 13 to 19 Nov at your post office).
 
 | What | Which | Where | Price |
 |---|---|---|---|
@@ -42,7 +93,7 @@ post, CTT; accepted 2 Nov; the tracking site's estimate is 13 to 19 Nov at your 
 | OBD-C cable | the **long** one, 9.5 ft | [comma](https://comma.ai/shop/obd-c-cable) | $20 |
 | power plug | LANMINGLEL 12 V socket plug, 14 AWG, 2 m of cable with bare ends, 15 A fuse built in | [Amazon](https://www.amazon.com/dp/B0GXFML4TH) | $11.99 |
 | connectors | WAGO 221 lever nuts, 12-piece box (three each of the 2-, 3- and 5-way and the inline; two 5-way are used) | Amazon wishlist | $12.45 |
-| wire | BNTECHGO 20 AWG silicone wire, red and black, 10 ft each | Amazon wishlist | $8.48 |
+| wire | BNTECHGO 20 AWG silicone wire, red and black, 10 ft each (not needed now: the board's own cable reaches the nuts) | Amazon wishlist | $8.48 |
 | motor screws | MoyoCodi M3 x 10 button head screws, stainless, 50 with the hex key (four hold the motor to its carrier; exactly 10 mm long) | Amazon wishlist | $5.99 |
 | set screws | JT Custom M3 x 10 set screws, 10, with the hex key (one for the gear) | Amazon wishlist | $6.99 |
 | wing bolts | AOESIN M5 x 20 stainless wing bolts, 20 (two are used) | Amazon wishlist | $9.98 |
@@ -54,15 +105,17 @@ $1,180 with what was bought.
 The two M5 nuts come from your own M5 kit: plain hex nuts (8 mm across, 4 mm thick), not nylon lock nuts,
 which are too tall for the nut slots.
 
-No fuses to buy: the plug has its own 15 A fuse. No relay or switch: nothing switches. Recommended, not on the list:
-a pack of 120 ohm resistors (about $5) for one across the pink and blue wires at the harness end; the board has one
-at its end, and a CAN pair wants one at each end (it will very likely work without it over 1 to 2 m; the multimeter
-check tells). The motor's own 1 m cable reaches the board.
+No fuses to buy: the plug has its own 15 A fuse. No relay or switch: nothing switches. No extra 120 ohm resistor:
+left out by your choice (7 Nov); the board has its own. The motor's own cable ends in a 0.1 in plug that doesn't
+latch in the board's socket, so the TIEXYE cable replaces it.
 
 Tools, if you don't have them: a luggage scale (about $12), hex keys 1.5 to 10 mm (about $9), a wire stripper
 (about $12), a Phillips screwdriver, a tape measure, super glue, your phone.
 
 ## Print
+
+**On hold (10 Nov):** the frame plate v5 in plate 13 is from before the v4 plate failed to fit (5 Nov); plate 13
+waits for the new plate. Plate 14 (the teeth fit sample) can be printed now.
 
 First, the fit sample: **`plate-14-teeth-fit-sample.3mf`**, a 23 mm slice of the teeth's channel at the new width
 (1 mm wider than the v2 teeth you tried; marked 7 on the outside), on economy settings (2 walls, 15% infill), a few
@@ -123,9 +176,10 @@ claude.ai at https://claude.ai/artifact/2frUtDazPaeNmDnm2MzN2d).
    is about 4 mm further in than drawn). Then back the motor down 1 mm, one tick on the carrier's bar, read where the
    bar comes out of the tower's top, and tighten the motor's wing bolt. Turn the steering wheel by hand across the
    teeth: it should go smoothly. That tick is your "on" mark from now on.
-5. **Wire it** (`hardware/report/wiring-right-arm.png`): the plug's + and - into two lever nuts; the harness's two
-   red and brown, and the board's Vin, on +; the harness's two black and the board's GND on -; pink to the board's
-   CANH and blue to CANL. Check it with the multimeter before plugging in the comma device or the board.
+5. **Wire it** (`hardware/wiring/wiring-page.png`): the plug's + and - into two lever nuts; the harness's two
+   red and two brown (each pair twisted, one hole) and the board's red on +; the harness's two black and the
+   board's black on -; pink to the board's yellow (CAN H) and blue to its white (CAN L), an inline lever nut
+   each. Check it with the multimeter before plugging in the comma device or the board.
 6. **First power-up with the gear out of the teeth:** a new board may calibrate itself, turning the motor slowly.
 7. **Install the software:** it is on your GitHub copies, `github.com/djjoeg/openpilot` and `github.com/djjoeg/opendbc`
    (every version, v1.0.0 to v1.3.0, put there 2 Nov). On the comma device, at setup, enter

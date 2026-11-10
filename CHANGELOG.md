@@ -48,6 +48,19 @@ opendbc from your copy, at that branch's commit (checked on GitHub). Install wit
 
 ### Printed parts
 
+Changed on 10 Nov (no printed part changed):
+- **The board's plugs and the motor's own plug are in the model now** (`rightarm.py`): the motor's 6-pin socket and
+  its plug's wires (motor card: 16 mm wide, 6.5 mm out, the back 11 mm), and the board's Motor and Car plugs, 20 and
+  10 mm past its edges. All 8,391 checks pass with the motor's plug facing along the column, either way; facing one
+  way round the wheel it hits the carrier (32 checks fail). The board passes both ways round, with its Motor socket
+  on the motor plug's side.
+- **Simpler wiring:** the board's own 1 m cable reaches the lever nuts, so the 20 AWG wire and the ethernet pair are
+  not needed. Its colors, read off your unboxing photo against the board's labels: red Vin, black GND, yellow CAN H,
+  white CAN L. Red and black into the + and - nuts; pink to yellow and blue to white, an inline lever nut each.
+  The wiring page (version 8) and `hardware/wiring/wiring-page.png` show it.
+- **README:** where it stands, the to-do list, putting the board on the motor (with three stop-and-tell-me checks:
+  the bolt length, the magnet's gap, the board sitting flat) and a bench power-up that needs no comma device.
+
 Changed on 9 Nov (no printed part changed): the board came. Its maker's PCB file puts it at 56.0 x 43.3 mm, where
 the model had 46 x 46. With its long side along the column it would hit the arm when the motor is slid 15 mm or
 more down. With its long side around the wheel, all 8,391 checks pass, with a case 11 or 16 mm tall. So: **mount

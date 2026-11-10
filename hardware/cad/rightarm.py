@@ -325,12 +325,18 @@ def carrier(dz: float = 0.0) -> Manifold:
 def motor_and_gear(dz: float = 0.0) -> dict:
   """The motor's body, board and the side-slide gear: carrier frame (z out along the shaft from the face) -> here
   the shaft points in: carrier z -> -U, carrier y -> V, carrier x -> along the column. dz as for carrier()."""
-  motor = box(-H, H, -H, H, -NEMA_LEN, 0.0) + cyl(11.0, 0.0, 2.0)
+  # the motor's own 6-pin socket (motor card: 16 mm wide, 6.5 mm out, the back 11 mm of the body) and its plug's
+  # wires bending away, 12 mm more: facing along the column (+x here; -x passes too). Facing -V it hits the carrier.
+  motor = (box(-H, H, -H, H, -NEMA_LEN, 0.0) + cyl(11.0, 0.0, 2.0)
+           + box(21.15, 21.15 + 6.5 + 12.0, -8.0, 8.0, -NEMA_LEN, -NEMA_LEN + 11.0))
   # the StepperServoCAN board as it came (9 Nov): 56.0 x 43.3 mm (its maker's PCB file), centred on the shaft along its
-  # long side and 22.9 / 20.4 either side across it. Mounted with the long side around the wheel (along V): along
-  # the column it hits the arm with the carrier slid 15 mm or more down. Its case's height isn't measured; 16 mm
-  # assumed (11 and 16 both pass). Plugs and cables leaving its sides are not in the model.
-  board = box(-22.9, 20.4, -28.0, 28.0, -NEMA_LEN - 16.0, -NEMA_LEN)
+  # long side and 20.4 / 22.9 either side across it. Mounted with the long side around the wheel (along V): along
+  # the column it hits the arm with the carrier slid 15 mm or more down. Its case is 8 mm high (Retropilot); 16 mm
+  # kept here. Turned so its Motor socket is on the motor plug's side (+x): that plug and its wires reach 20 mm past
+  # the board's edge; the Car socket's plug runs off its +V end, to 38 mm out (both ways round pass, 10 Nov).
+  board = (box(-20.4, 22.9, -28.0, 28.0, -NEMA_LEN - 16.0, -NEMA_LEN)
+           + box(22.9, 42.9, -7.7, 5.3, -NEMA_LEN - 7.5, -NEMA_LEN - 1.0)
+           + box(-12.3, 0.7, 15.0, 38.0, -NEMA_LEN - 7.5, -NEMA_LEN - 1.0))
   c = R_FACE_OUT * U
   mat = [[0.0, V[0], -U[0], float(c[0])], [0.0, V[1], -U[1], float(c[1])], [1.0, 0.0, 0.0, Z_AXIS + dz]]
   return {"motor": motor.transform(mat), "board": board.transform(mat), "gear": S.side_gear().transform(mat)}
