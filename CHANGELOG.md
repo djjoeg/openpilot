@@ -69,8 +69,10 @@ the model keeps 16.)
   (the board's A1, A2, B1, B2); PartsBuilt's 1 m one says it does. Amazon pick (10 Nov, re-checked): TIEXYE
   4 x 500 mm, B0FD8PPNJY, $7.39, Fulfilled by Amazon; its page says XH 2.54 at the board end and PH 2.0 at the motor
   end, gives no wire order, and has 8 ratings (one had to swap the middle two wires). Same-day delivery is free
-  only over $25. STEPPERONLINE's page for this motor doesn't name its plug; the STEPPERONLINE-brand cable on Amazon
-  says PH 2.0. Iverntech's 6 x 500 mm (B07Q12B6K5, 398 ratings) doesn't say which plug, so not picked. With it,
+  only over $25. The motor's socket is PH 2.0: your card photo draws it 6 pins and 16 mm wide, and a 6-pin JST XH
+  is about 17.3 mm (RS's spec for XHP-6), so 16 mm is the 2 mm PH size. The motor's own cable can't be used at the
+  board: its far end (your 6 Nov photo) is a 4-pin 0.1 in plug, black, green, red, blue, which doesn't latch in
+  the board's XH socket. Iverntech's 6 x 500 mm (B07Q12B6K5, 398 ratings) doesn't say which plug, so not picked. With it,
   ARCTIC MX-4 thermal paste 4 g, B07L9BDY3T, $4.99, non-conductive per its page (the board's underside says to
   apply paste). The board's software learns the motor's direction itself but not which wires pair up
   (`Learn_StepSize_WiringPolarity` in its calibration.c). Check with the 6-pin end plugged into the motor, at
