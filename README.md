@@ -14,19 +14,21 @@ teeth, lane keeping off. There is no switch.
 The build guide (https://claude.ai/code/artifact/0b3ce053-a508-4e38-92c4-faf3a50fd2b3) still describes the earlier
 lever mounts; for this build, this README and `CHANGELOG.md` (1.3.0) are current.
 
-## Where it stands (10 Nov)
+## Where it stands (11 Nov)
 
 - Software: done, v1.3.0 on GitHub. Tested in simulation only.
 - Design files: recovered, re-run, identical to your print files, on GitHub (`hardware/cad`).
 - In hand: the motor, the board (magnet, two long bolts, its 1 m power/CAN cable), the 2 Nov Amazon order.
   Ordered 10 Nov: the motor cable and the thermal paste.
-- Blocker: the frame plate. v4 didn't fit; the new one waits on the shoelace test.
+- Blocker: the frame plate. v4 didn't fit; paper template v3 (your pick, 11 Nov) is ready to try, and the shoelace
+  test still sizes the hose clamp.
 
 ## To do, in order
 
-1. Shoelace test: a lace round the column through the gap above the tilt lever's tab. It must miss the key, the
-   stalks and the wheel, and the lever must still lock. Tell me the loop's length.
-2. Try the new paper template on the car (I send it after step 1).
+1. Try paper template v3 on the car: `hardware/print/frame-plate-v3-paper-template-your-printer.pdf` (the steps
+   are on the page).
+2. Shoelace test, same visit: a lace round the column through the gap above the tilt lever's tab. It must miss the
+   key, the stalks and the wheel, and the lever must still lock. Tell me the loop's length.
 3. Print the plastic fit-test plate from the paper shape that fits; try it on the car.
 4. Plate 14, the teeth fit sample, if not done: push it onto the grip; it should go on snug.
 5. When the motor cable comes: **Board onto the motor** and **Bench power-up**, below.

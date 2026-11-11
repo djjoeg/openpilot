@@ -48,6 +48,22 @@ opendbc from your copy, at that branch's commit (checked on GitHub). Install wit
 
 ### Printed parts
 
+Changed on 11 Nov (no printed part changed; the version stays 1.3.0): the frame plate's new shape, on paper.
+- **Frame plate, paper template v3, `frame-plate-v3-paper-template-your-printer.pdf`** (from your marked v2 paper and
+  your pick, option 1): the v2 crossbar at the wheel end is gone (your purple line). The new crosspiece goes
+  straight across right behind the block, from the block to the long piece, 25 mm wide laid flat, and folds up about
+  45° with the cover where it turns up, into the space above the tilt lever's tab. Over the tab its edge is cut back
+  4.6 mm (a notch 36 mm wide), so the tab as I read it from your photos passes under it with 2 mm to spare. The long
+  piece now ends at the fold; its slot keeps its dash end and starts 6 mm from the fold. The block, the cup slot and
+  the receiver's place are unchanged. Drawn 5.8% big for your printer, as v2 (checked in the file: its 100 mm bar is
+  105.8 mm on the page, and the outline 175.7 x 115.4 mm, which your printer's 94.5% makes 166 x 109 mm, the
+  drawn size). Not tried on the car yet. Rough: where the cover turns up and the tab's size come from your photos (5
+  mm or worse); the paper checks them. Made by `platefit3.py`; a full-size copy, `-100.pdf`, is beside it.
+- **The three ways it could fold, drawn for you to pick from** (`hardware/report/frame-plate-v3-options.png`, made by
+  `crosspiece_options.py`): 1 straight across (your pick), 2 and 3 slanted 16 mm either way.
+- **Paper template v2** (6 Nov), replaced by v3: you marked it on the car on 11 Nov (the crossbar to cut off, the new
+  crosspiece drawn in).
+
 Changed on 10 Nov (no printed part changed):
 - **The board's plugs and the motor's own plug are in the model now** (`rightarm.py`): the motor's 6-pin socket and
   its plug's wires (motor card: 16 mm wide, 6.5 mm out, the back 11 mm), and the board's Motor and Car plugs, 20 and
