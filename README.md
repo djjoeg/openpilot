@@ -31,8 +31,10 @@ lever mounts; for this build, this README and `CHANGELOG.md` (1.3.0) are current
    key, the stalks and the wheel, and the lever must still lock. Tell me the loop's length.
 3. Print the plastic fit-test plate from the paper shape that fits; try it on the car.
 4. Plate 14, the teeth fit sample, if not done: push it onto the grip; it should go on snug.
-5. When the motor cable comes: **Board onto the motor** and **Bench power-up**, below.
-6. Print the full set once the plate fits; then steps 1 to 4 under **Then**.
+5. Inside, now: **Board onto the motor**; print plates 14, 12 (the arm and the motor carrier) and 16 (the gear);
+   build the motor end (step 3 under **Then**, up to the car). **Bench power-up** needs 12 V: the car, or something
+   with a car-type 12 V socket that gives 4 A or more.
+6. Print the frame plate and the teeth once the plate fits and plate 14 is tried; then steps 1 to 4 under **Then**.
 7. 3 Dec: order the comma four and the long OBD-C cable ($1,019).
 8. Wiring with the comma harness (step 5 under **Then**), checked with the meter.
 9. Install v1.3.0, car setup parts 1 and 2, the 5 kg push test, a parking lot, a quiet road.
@@ -117,7 +119,12 @@ Tools, if you don't have them: a luggage scale (about $12), hex keys 1.5 to 10 m
 ## Print
 
 **On hold (10 Nov):** the frame plate v5 in plate 13 is from before the v4 plate failed to fit (5 Nov); plate 13
-waits for the new plate. Plate 14 (the teeth fit sample) can be printed now.
+waits for the new plate. Plate 14 (the teeth fit sample) can be printed now, and so can plate 12 (the arm and the
+motor carrier: the new plate keeps the receiver where it was) and plate 16 (the gear).
+
+The motor's gear is on its own plate, **`plate-16-motor-gear.3mf`** (15 Nov): solid, about 12 g, printed on its
+motor end. It is the side-slide mount's gear, the same as on the old plate 1, so if you printed that you have it.
+None of the other plates carry it.
 
 First, the fit sample: **`plate-14-teeth-fit-sample.3mf`**, a 23 mm slice of the teeth's channel at the new width
 (1 mm wider than the v2 teeth you tried; marked 7 on the outside), on economy settings (2 walls, 15% infill), a few
@@ -163,7 +170,7 @@ claude.ai at https://claude.ai/artifact/2frUtDazPaeNmDnm2MzN2d).
    inside the rim. (Step 4 fine-tunes it: slide it along the grip until the gear sits in the middle of the teeth.)
 3. **Build the arm, off the car** (pictures: `hardware/report/review-1b-slide.png` and `review-1c-receiver.png`; the
    3D page goes through it step by step): the motor on the carrier (four M3 x 10 from the side with the four pads,
-   the motor's boss in the big hole), the gear on the shaft (set screw on the flat). The motor's M5 nut into the slot
+   the motor's boss in the big hole), the gear (plate 16) on the shaft (set screw firmly on the flat). The motor's M5 nut into the slot
    across the carrier's bar, from the motor's side, its flats along the bar (it only goes in that way). The carrier's
    bar down the tower's tube from the top (the end nearer the steering wheel), all the way, till the carrier sits on
    the tower. The motor's wing bolt, a fender washer under its wings, in through the groove up the tower's outer wall

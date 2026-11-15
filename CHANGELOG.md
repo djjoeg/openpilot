@@ -48,6 +48,22 @@ opendbc from your copy, at that branch's commit (checked on GitHub). Install wit
 
 ### Printed parts
 
+Changed on 15 Nov (no part changed; the version stays 1.3.0):
+- **Plate 16, `plate-16-motor-gear.3mf`: the motor's gear on its own.** This build uses the side-slide mount's
+  gear, unchanged, but none of plates 12 to 15 carry it: it was only ever on the side-slide mount's plate 1 (26 Oct).
+  Solid, printed on its motor end with the pointed tooth ends up, no supports, about 12 g. Made by `gearplate.py`.
+  If you printed the old plate 1, you already have it.
+- **The gear on this motor's shaft, checked against its card** (the open item under "The motor's own card"): the
+  card's shaft is 24 ± 1 mm out with a 15 ± 0.25 mm flat; the gear's D-shaped hole was drawn for a 21 mm flat. Its
+  flat side meets the round part of the shaft about 1 mm before the gear's drawn place (up to 2.25 mm with the card's
+  spread), so the gear sits that much further along the shaft. Its place is set by hand at the car anyway (README,
+  Then step 4), and the arm's slide covers it. At the grip test's full push (3.3 A: 0.70 Nm at the motor, which makes
+  0.212 Nm per amp) the shaft's flat presses on the hole at about 32 MPa over 14.5 mm, about PETG's 34 MPa tensile
+  figure (it takes more in compression, and the set screw holds it too); at lane keeping's most (1.8 A), about 18 MPa,
+  about half of it. Tighten the set screw firmly on the flat.
+- **README:** what can be done inside now (the board onto the motor, plates 14, 12 and 16, the motor end of the arm),
+  and plate 16 in the print list.
+
 Changed on 11 Nov (no printed part changed; the version stays 1.3.0): the frame plate's new shape, on paper.
 - **Frame plate, paper template v3, `frame-plate-v3-paper-template-your-printer.pdf`** (from your marked v2 paper and
   your pick, option 1): the v2 crossbar at the wheel end is gone (your purple line). The new crosspiece goes
